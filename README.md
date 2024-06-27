@@ -8,7 +8,7 @@ Follow the steps below to set up your environment on your device
 
 ### Github
 - Clone repository:
-- ![image](https://github.com/Quarcc/EventNow/assets/121778246/b9e51905-5539-4366-83fa-0c3753a72209)
+- ![image](https://github.com/Quarcc/ElderWee/assets/121778246/dea638fd-672c-43a9-b119-be735ee1123a)
 1. Click on "clone" / "clone again"
 2. Ensure that repository is cloned into your "C:" drive
 3. File directory should look like this: "C:/ElderWee"
