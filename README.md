@@ -52,5 +52,8 @@ Run:
 
 #### You're done! Happy coding
 
-
-
+# MAKE YOUR LIFE EASIER AND SAFE :exclamation: :
+### Open VSC
+1. Hit ```"Ctrl" + "+"``` / "File > Preference > Settings"
+2. Search "Auto Save"
+3. At "Files: Auto Save", select ```afterDelay```
