@@ -57,3 +57,9 @@ Run:
 1. Hit ```"Ctrl" + "+"``` / "File > Preference > Settings"
 2. Search "Auto Save"
 3. At "Files: Auto Save", select ```afterDelay```
+
+# Documentations:
+1. https://react-bootstrap.netlify.app/docs/getting-started/introduction - React Bootstrap
+2. https://threejs.org/docs/ - ThreeJS Models
+3. https://hygraph.com/blog/routing-in-react - React Routing
+4. https://mui.com/material-ui/getting-started/installation/ - Material Icons

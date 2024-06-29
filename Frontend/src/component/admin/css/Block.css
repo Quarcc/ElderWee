@@ -1,0 +1,11 @@
+.Block{
+    text-align: center;
+    padding: 20px;
+}
+
+.CubeContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
