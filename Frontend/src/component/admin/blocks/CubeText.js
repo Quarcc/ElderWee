@@ -9,7 +9,7 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
     useEffect(() => {
         // Creating the cube
         const geometry = RoundedBlock(1, 1, 1, 0.1, 10);
-        const material = new THREE.MeshBasicMaterial({ color: 0x0080FF });
+        const material = new THREE.MeshMatcapMaterial({ color: 0x0080FF });
         const cube = new THREE.Mesh(geometry, material);
 
         cube.position.set(position.x, position.y, position.z);

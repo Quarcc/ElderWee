@@ -11,9 +11,7 @@ const adminBC = () => {
             </div>
 
             <div className="main-dashboard">
-                <div className="title">
-                    <CubeContainer />
-                </div>
+                <CubeContainer />
             </div>
         </div>
     )

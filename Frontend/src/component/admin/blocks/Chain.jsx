@@ -11,7 +11,7 @@ const Chain = ({ start, end, scene }) => {
         const midPoint = new THREE.Vector3().addVectors(startVector, endVector).divideScalar(2);
 
         const geometry = new THREE.CylinderGeometry(0.05, 0.05, length, 12);
-        const material = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
+        const material = new THREE.MeshMatcapMaterial({color: 0xFFFFFF});
         const cylinder = new THREE.Mesh(geometry, material);
 
         cylinder.position.copy(midPoint);

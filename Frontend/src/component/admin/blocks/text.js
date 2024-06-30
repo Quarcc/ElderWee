@@ -8,17 +8,17 @@ const Text = (text, options) => {
         loader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
             const textGeometry = new TextGeometry(text, {
                 font: font,
-                size: options.size || 1,
+                size: options.size || 0.1, // Adjust font size
                 height: options.height || 0.1,
                 curveSegments: options.curveSegments || 12,
-                bevelEnabled: options.bevelEnabled || false,
-                bevelThickness: options.bevelThickness || 0.1,
-                bevelSize: options.bevelSize || 0.02,
+                bevelEnabled: options.bevelEnabled || false, //  true for outlines
+                bevelThickness: options.bevelThickness || 0.1, // thickness of outlines
+                bevelSize: options.bevelSize || 0.02, // size of outline
                 bevelOffset: options.bevelOffset || 0,
                 bevelSegments: options.bevelSegments || 5,
             });
             textGeometry.center();
-            const textMaterial = new THREE.MeshBasicMaterial({ color: options.color || 0xffffff});
+            const textMaterial = new THREE.MeshBasicMaterial({ color: options.color || 0xFFFFFF});
             const textMesh = new THREE.Mesh(textGeometry, textMaterial);
             resolve(textMesh);
         })
