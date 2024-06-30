@@ -43,19 +43,6 @@ const CubesContainer = () => {
 
         adjustCameraAndView();
 
-        const animate = () => {
-            requestAnimationFrame(animate);
-            scene.traverse((child) => {
-                if(child.isMesh && child.geometry.type === 'ExtrudeGeometry'){
-                    child.rotation.x += 0.005;
-                    child.rotation.y += 0.005;
-                }
-            });
-            renderer.render(scene, camera);
-        };
-
-        animate();
-
         return () => {
             window.removeEventListener('resize', adjustCameraAndView);
             mountRef.current.removeChild(renderer.domElement);
