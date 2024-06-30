@@ -2,6 +2,9 @@
     height: 100%;
     width: 250px;
     background-color: #012169;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 .Navbar-list {

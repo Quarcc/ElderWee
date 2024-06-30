@@ -9,8 +9,8 @@ const adminBC = () => {
             <div className="adminNavbar">
                 <AdminNavbar />
             </div>
-
-            <div className="main-dashboard">
+            
+            <div className="main-bc">
                 <CubeContainer />
             </div>
         </div>

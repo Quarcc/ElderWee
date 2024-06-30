@@ -45,7 +45,7 @@ export const NavbarData = [
     {
         title: "Geotracking",
         icon: <LocationOnIcon />,
-        link: "/adminGeotracking"
+        link: "/adminGeo"
     },
     {
         title: "Flagged Accounts",

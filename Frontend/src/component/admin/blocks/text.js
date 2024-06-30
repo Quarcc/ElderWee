@@ -9,7 +9,7 @@ const Text = (text, options) => {
             const textGeometry = new TextGeometry(text, {
                 font: font,
                 size: options.size || 0.1, // Adjust font size
-                height: options.height || 0.1,
+                depth: options.depth || 0.1,
                 curveSegments: options.curveSegments || 12,
                 bevelEnabled: options.bevelEnabled || false, //  true for outlines
                 bevelThickness: options.bevelThickness || 0.1, // thickness of outlines

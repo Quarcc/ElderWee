@@ -4,7 +4,8 @@
     height: 100vh;
     width: 100vw;
     display: flex;
-
+    flex-direction: row;
+    overflow-x: hidden;
 }
 
 .adminNavbar {
@@ -12,9 +13,9 @@
 }
 
 .main-dashboard {
-    margin: 40px;
-    background-color: rgb(171, 171, 171);
+    margin: 30px;
     width: 100%;
+    padding-left: 250px;
 }
 
 .main-dashboard .title {
@@ -23,24 +24,38 @@
 
 .main-dashboard .KPI {
     margin: 20px 0 20px 0;
-    display: flex;
-    justify-content: space-evenly;
 }
 
-.KPI-card {
-    margin: 20px 0 20px 0;
+#graph-row-1 {
     display: flex;
-    justify-content: space-evenly;
-}
-
-.main-dashboard .KPI-box1 {
-   
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .main-dashboard .line {
     background-color: white;
-    height: 250px;
-    width: 500px;
     border-radius: 20px;
     padding: 15px;
+    margin-right: 20px;
+    flex: 60%;
+}
+
+.main-dashboard .line-1 {
+    background-color: white;
+    border-radius: 20px;
+    padding: 15px;
+    flex: 40%;
+}
+
+#graph-row-2 {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.main-dashboard .line-2 {
+    background-color: white;
+    border-radius: 20px;
+    padding: 15px;
+    flex: 100%;
 }

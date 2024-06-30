@@ -18,7 +18,7 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
 
         // Adding text
         const addText = async (text, position, rotation) => {
-            const textMesh = await Text(text, { size: 0.2, height: 0.05, color: 0xffffff });
+            const textMesh = await Text(text, { size: 0.15, depth: 0.02, color: 0xFFFFFF });
             textMesh.position.set(position.x, position.y, position.z);
             textMesh.rotation.set(rotation.x, rotation.y, rotation.z);
             cube.add(textMesh);

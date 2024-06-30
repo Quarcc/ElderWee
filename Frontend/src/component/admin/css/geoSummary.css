@@ -1,10 +1,10 @@
-.geo-summaryContainer {
+.summaryContainer {
     display: flex;
     justify-content: space-around;
     margin-bottom: 20px;
   }
   
-  .geo-card {
+  .card {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
@@ -15,7 +15,7 @@
   }
   
   /* FlaggedAccountsTable styles */
-  .geo-container {
+  .container {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
@@ -23,17 +23,17 @@
     margin-bottom: 20px;
   }
   
-  .geo-table {
+  .table {
     width: 100%;
     border-collapse: collapse;
   }
   
-  .geo-th, .geo-td {
+  .th, .td {
     border-bottom: 1px solid #ddd;
     padding: 10px;
   }
   
-  .geo-th {
+  .th {
     text-align: left;
   }
  

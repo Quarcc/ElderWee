@@ -29,4 +29,10 @@ export const LineChartData = {
 export const LineChartOption = {
     tension: 0.3,
     responsive: true,
+    plugins: {
+        legend: {
+            display: true,
+            position: 'bottom',
+        },
+    },
 }

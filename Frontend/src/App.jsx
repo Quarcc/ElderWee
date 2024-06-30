@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import AdminNavbar from './component/admin/navbar/adminNavbar'
 import AdminDashboard from './component/admin/Dashboard/adminDashboard'
 import AdminBC from './component/admin/blockchain/adminBC'
+import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';
 
 import './component/admin/css/donttouchme.css'
@@ -19,6 +20,7 @@ function App(){
                 <Route path="/adminNavbar" element={<AdminNavbar/>} />
                 <Route path="/adminDashboard" element={<AdminDashboard/>} />
                 <Route path="/adminBC" element={<AdminBC/>} />
+                <Route path="/adminGeo" element={<GeoSummary/>} />
             </Routes>
         </>
     );
