@@ -50,7 +50,7 @@ const CubesContainer = () => {
     }, []);
 
 
-    const dataLength = 20;
+    const dataLength = 11;
     const cubeSpacing = 2;
 
     const cubePositions = Array.from({ length: dataLength }, (_, idx) => ({
