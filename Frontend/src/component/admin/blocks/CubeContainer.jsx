@@ -43,12 +43,12 @@ const CubesContainer = () => {
             renderer.render(scene, camera);
         }
 
-        const animate = () => {
+        const animate = (time) => {
             requestAnimationFrame(animate);
             scene.traverse((child) => {
                 if(child.isMesh && child.geometry.type === 'ExtrudeGeometry'){
-                    child.rotation.x += 0.005;
-                    child.rotation.y += 0.005;
+                    child.rotation.x = time / 1500;
+                    child.rotation.y = time / 1500;
                 }
             });
             renderer.render(scene, camera);
@@ -111,7 +111,7 @@ const CubesContainer = () => {
                 }
             }
         }
-        
+
         window.addEventListener('keydown', handleKeyDown);
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
