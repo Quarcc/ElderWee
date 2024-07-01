@@ -3,13 +3,13 @@ import './css/Login.css'
 
 function Login() {
     return (
-        <div id="container" className='d-flex justify-content-center align-items-center vh-100'>
+        <div id="container" className='d-flex justify-content-center align-items-center'>
             <div className='w'>
-                <div className='header text-center mb-4'>
+                <div className='header'>
                     <div className='text'>Log In</div>
                     <div className='underline'></div>
                 </div>
-                <div className='bg-white p-3 rounded login-box'>
+                <div className='login-box'>
                     <form action="">
                         <div className="mb-3">
                             <label htmlFor="email" className='form-label'>Email</label>

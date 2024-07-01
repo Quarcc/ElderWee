@@ -9,6 +9,9 @@ const CubesContainer = () => {
     const cameraRef = useRef(new THREE.OrthographicCamera());
     const rendererRef = useRef(new THREE.WebGLRenderer({ alpha: true }));
 
+    const dataLength = 60;
+    const cubeSpacing = 2;
+
     useEffect(() => {
         const scene = sceneRef.current;
         const camera = cameraRef.current;
@@ -18,16 +21,16 @@ const CubesContainer = () => {
         renderer.setClearColor(0x000000, 0);
         mountRef.current.appendChild(renderer.domElement);
 
-        const fixed = 10;
+        const fixed = 8;
         const cubeSpacing = 2;
         const sceneWidth = fixed * cubeSpacing;
-        
+
         const adjustCameraAndView = () =>{ 
             const aspectRatio = window.innerWidth / window.innerHeight;
             const viewWidth = sceneWidth + cubeSpacing;
             const viewHeight = viewWidth / aspectRatio;
 
-            camera.left = -viewWidth / 20;
+            camera.left = -viewWidth / 15;
             camera.right = viewWidth;
             camera.top = viewHeight / 8;
             camera.bottom = -viewHeight;
@@ -61,9 +64,36 @@ const CubesContainer = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const calculateMultiple = (dataLength) => {
+            return 1 + Math.floor(dataLength / 10) * 0.175;
+        }
 
-    const dataLength = 20;
-    const cubeSpacing = 2;
+        const handleKeyDown = (event) => {
+            const camera = cameraRef.current;
+            const moveDistance = 0.5;
+
+            const minX = 0;
+            const maxX = dataLength * calculateMultiple(dataLength);
+
+            switch (event.key) {
+                case 'ArrowLeft':
+                    camera.position.x = Math.max(minX, camera.position.x - moveDistance);
+                    break;
+                case 'ArrowRight':
+                    camera.position.x = Math.min(maxX, camera.position.x + moveDistance);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+
+    }, []);
 
     const cubePositions = Array.from({ length: dataLength }, (_, idx) => ({
         x: idx * cubeSpacing,
@@ -76,7 +106,7 @@ const CubesContainer = () => {
     const camera = cameraRef.current;
 
     return (
-        <div style={{ width: '100%', height: '100%', overflowY: 'hidden', overflowX: 'auto' }}>
+        <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
             <div ref={mountRef} style={{ width: `${dataLength * cubeSpacing}px`, height: '100%', position: 'relative' }}>
                 {cubePositions.map((pos,idx) => (
                     <CubeText key={idx} position={pos} textFront={`Cube ${idx + 1}`} textBack={'Back'} textTop={'Top'} textBot={'Bottom'} textLeft={'Left'} textRight={'Right'} url={`https://localhost:3000/${idx+1}`} scene={scene} renderer={renderer} camera={camera}></CubeText>
