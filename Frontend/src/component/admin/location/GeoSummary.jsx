@@ -4,14 +4,12 @@ import AdminNavbar from "../navbar/adminNavbar";
 
 const GeoSummary = ({ activeAccounts, flaggedAccounts }) => {
   return (
-    <div className="container-fluid">
+    <div className="geo-container-fluid">
         <AdminNavbar />
-        <div className="summaryContainer">
-            <div className="card">
+        <div className="geo-summaryContainer">
+            <div className="geo-card">
                 <h2>Active Accounts</h2>
                 <h1>{activeAccounts.toLocaleString()}</h1>
-            </div>
-            <div className="card">
                 <h2>Flagged Accounts</h2>
                 <h1>{flaggedAccounts.toLocaleString()}</h1>
             </div>

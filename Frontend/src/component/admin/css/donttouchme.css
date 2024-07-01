@@ -1,3 +1,24 @@
+@font-face {
+    font-family: 'Technor-Black';
+    src: url('../../../../public/fonts/Technor-Black.woff2') format('woff2'),
+         url('../../../../public/fonts/Technor-Black.woff') format('woff'),
+         url('../../../../public//fonts/Technor-Black.ttf') format('truetype');
+         font-weight: 900;
+         font-display: swap;
+         font-style: normal;
+}
+
+@font-face {
+    font-family: 'GeneralSans-Variable';
+    src: url('../../../../public/fonts/GeneralSans-Variable.woff2') format('woff2'),
+         url('../../../../public/fonts/GeneralSans-Variable.woff') format('woff'),
+         url('../../../../public/fonts/GeneralSans-Variable.ttf') format('truetype');
+         font-weight: 200 700;
+         font-display: swap;
+         font-style: normal;
+} 
+
 body{
+    font-family: 'GeneralSans-Variable';
     background-color: #FAF9F6;
 }

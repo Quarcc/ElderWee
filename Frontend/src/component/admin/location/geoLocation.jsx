@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import GeoSummary from './GeoSummary';
+import '../css/adminNavbar.css';
 import AdminNavBar from "../navbar/adminNavbar";
 import FlaggedAccountsTable from './flaggedAccountsTable';
 import '../css/geolocation.css';
-import '../css/geolocation.css';
+
 
 
 function geoSummary() {
@@ -21,13 +22,23 @@ function geoSummary() {
   ]);
 
   return (
-    <div className="app">
-      <GeoSummary
-        activeAccounts={activeAccounts.length} 
-        flaggedAccounts={flaggedAccounts.length} 
-      />
-      <div className="accountTables">
-        <flaggedAccountsTable flaggedAccountData={flaggedAccounts} />
+    <div>
+      <div> 
+        <AdminNavBar/>
+      </div>
+      <div className="main-dashboard">
+                <div className="title">
+                    Account
+                </div>
+      </div>
+      <div className="geoSummary">
+        <GeoSummary
+          activeAccounts={activeAccounts.length} 
+          flaggedAccounts={flaggedAccounts.length} 
+        />
+        <div className="accountTables">
+          <flaggedAccountsTable flaggedAccountData={flaggedAccounts} />
+        </div>
       </div>
     </div>
   );
