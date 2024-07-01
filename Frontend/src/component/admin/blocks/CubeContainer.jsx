@@ -9,7 +9,7 @@ const CubesContainer = () => {
     const cameraRef = useRef(new THREE.OrthographicCamera());
     const rendererRef = useRef(new THREE.WebGLRenderer({ alpha: true }));
 
-    const dataLength = 60;
+    const dataLength = 9;
     const cubeSpacing = 2;
 
     useEffect(() => {
@@ -66,7 +66,16 @@ const CubesContainer = () => {
 
     useEffect(() => {
         const calculateMultiple = (dataLength) => {
-            return 1 + Math.floor(dataLength / 10) * 0.175;
+            if (dataLength < 50){
+                return 1 + Math.floor(dataLength / 10) * 0.175;
+            }
+            else if (50 < dataLength < 60){
+                return 1 + Math.floor(dataLength / 10) * 0.125;
+            }
+            else if (60 < dataLength < 100){
+                return 1 + Math.floor(dataLength / 10) * 0.1;
+            }
+            
         }
 
         const handleKeyDown = (event) => {
@@ -74,9 +83,9 @@ const CubesContainer = () => {
             const moveDistance = 0.5;
 
             const minX = 0;
-            const maxX = dataLength * calculateMultiple(dataLength);
-
-            switch (event.key) {
+            if (dataLength == 9 || dataLength == 10){
+                const maxX = 5;
+                switch (event.key) {
                 case 'ArrowLeft':
                     camera.position.x = Math.max(minX, camera.position.x - moveDistance);
                     break;
@@ -85,9 +94,24 @@ const CubesContainer = () => {
                     break;
                 default:
                     break;
+                }
+            }
+            else{
+                const maxX = dataLength * calculateMultiple(dataLength);
+
+                switch (event.key) {
+                    case 'ArrowLeft':
+                        camera.position.x = Math.max(minX, camera.position.x - moveDistance);
+                        break;
+                    case 'ArrowRight':
+                        camera.position.x = Math.min(maxX, camera.position.x + moveDistance);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-
+        
         window.addEventListener('keydown', handleKeyDown);
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
