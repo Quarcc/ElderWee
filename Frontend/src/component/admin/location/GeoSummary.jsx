@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import AdminNavbar from "../navbar/adminNavbar";
+import FlaggedAccountsTable from "./flaggedAccountsTable";
 // import '../css/geoSummary.css';
 
 const GeoSummary = ({ activeAccounts, flaggedAccounts }) => {

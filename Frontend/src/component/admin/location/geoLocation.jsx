@@ -3,6 +3,7 @@ import GeoSummary from './GeoSummary';
 import '../css/adminNavbar.css';
 import AdminNavBar from "../navbar/adminNavbar";
 import FlaggedAccountsTable from './flaggedAccountsTable';
+import ActiveAccountsTable from './flaggedAccountsTable';
 import '../css/geolocation.css';
 
 
@@ -12,6 +13,7 @@ function geoSummary() {
     { id: '00645679', name: 'Jeremy Tay', contact: '91234567', lastIP: 'Singapore' },
     { id: '22374535', name: 'Jeren Goh', contact: '81234567', lastIP: 'Singapore' },
     { id: '27632543', name: 'Brandon Wee', contact: '61234567', lastIP: 'Singapore' },
+    { id: '27642543', name: 'Brandon Wee', contact: '61234567', lastIP: 'Singapore' },
   ]);
 
   const [flaggedAccounts] = useState([
@@ -37,7 +39,10 @@ function geoSummary() {
           flaggedAccounts={flaggedAccounts.length} 
         />
         <div className="accountTables">
-          <flaggedAccountsTable flaggedAccountData={flaggedAccounts} />
+          <FlaggedAccountsTable flaggedAccountData={flaggedAccounts} />
+        </div>
+        <div className="accountTables">
+          <ActiveAccountsTable activeAccountData={activeAccounts} />
         </div>
       </div>
     </div>

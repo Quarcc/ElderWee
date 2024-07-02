@@ -56,20 +56,25 @@
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  width: 850px;
+  height: 400px;
 }
 
 .geo-table {
-  width: 100%;
+  width: 800px;
   border-collapse: collapse;
+  text-align: center;
 }
 
 .geo-th, .geo-td {
   border-bottom: 1px solid #ddd;
   padding: 10px;
+
+
 }
 
 .geo-th {
-  text-align: left;
+  text-align: center;
 }
 
 .accountTables {

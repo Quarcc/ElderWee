@@ -6,7 +6,7 @@ const FlaggedAccountRow = ({ accNo, name, contactNo, lastLogin, reason }) => {
       <td>{accNo}</td>
       <td>{name}</td>
       <td>{contactNo}</td>
-      <td style={{ color: 'red' }}>{lastLogin}</td>
+      <td>{lastLogin}</td>
       <td>{reason}</td>
     </tr>
   );
