@@ -11,7 +11,7 @@ import {
     Legend,
     Filler,
 } from 'chart.js'
-// works horr
+
 ChartJS.register( 
     CategoryScale,
     LinearScale,
@@ -23,7 +23,7 @@ ChartJS.register(
     Filler,
 );
 
-export const LineGraph = () => {
+export const LineChart = () => {
 
     return (
         <Line options={LineChartOption} data={LineChartData} />

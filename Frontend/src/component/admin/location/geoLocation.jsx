@@ -3,7 +3,7 @@ import GeoSummary from './GeoSummary';
 import '../css/adminNavbar.css';
 import AdminNavBar from "../navbar/adminNavbar";
 import FlaggedAccountsTable from './flaggedAccountsTable';
-import ActiveAccountsTable from './flaggedAccountsTable';
+// import ActiveAccountsTable from './flaggedAccountsTable';
 import '../css/geolocation.css';
 
 
@@ -41,9 +41,9 @@ function geoSummary() {
         <div className="accountTables">
           <FlaggedAccountsTable flaggedAccountData={flaggedAccounts} />
         </div>
-        <div className="accountTables">
+        {/* <div className="accountTables">
           <ActiveAccountsTable activeAccountData={activeAccounts} />
-        </div>
+        </div> */}
       </div>
     </div>
   );

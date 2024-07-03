@@ -2,8 +2,10 @@ import React from "react";
 import '../css/adminDashboard.css';
 import AdminNavbar from "../navbar/adminNavbar";
 import { KPIBox } from "./adminKPI";
-import { LineGraph } from "./adminLine";
-import { PieChart } from "./adminPie"
+import { LineChart } from "./adminLineChart/adminLine";
+import { PieChart } from "./adminPieChart/adminPie"
+import { BarChart } from "./adminBarChart/adminBar"
+import { AdminTable } from "./adminTable/adminTable"
 
 
 function AdminDashboard() {
@@ -25,19 +27,25 @@ function AdminDashboard() {
                 <div id="graph-row-1">
                     <div className="line">
                         <h2 style={{ marginLeft: 30, marginBottom: 10, marginTop: 10 }}>Accounts Created</h2>
-                        <LineGraph />
+                        <LineChart />
                     </div>
                     <div className="line-1">
-                        <h2 style={{ marginLeft: 30, marginBottom: 10, marginTop: 10 }}>Customer Queries</h2>
+                        <h2 style={{ paddingLeft: 30, paddingBottom: 10, paddingTop: 10 }}>Customer Queries</h2>
                         <PieChart />
                     </div>
                 </div>
                 <br />
                 <div id="graph-row-2">
                     <div className="line-2">
-                        <LineGraph />
+                    <h2 style={{ paddingLeft: 30, paddingBottom: 10, paddingTop: 10 }}>Transaction Made</h2>
+                        <BarChart />
                     </div>
                 </div>
+                <br />
+                <div id="graph-row-3">
+                    <AdminTable />
+                </div>
+                <br />
             </div>
         </div>
     )

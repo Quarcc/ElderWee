@@ -34,5 +34,9 @@ export const LineChartOption = {
             display: true,
             position: 'bottom',
         },
+        title: {
+            display: true,
+            text: 'Weekly Account Comparison',
+        },
     },
 }
