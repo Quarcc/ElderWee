@@ -12,4 +12,6 @@ const FlaggedAccountRow = ({ accNo, name, contactNo, lastLogin, reason }) => {
   );
 };
 
+
+
 export default FlaggedAccountRow;
