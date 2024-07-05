@@ -1,9 +1,8 @@
 import React from "react";
-import '../css/adminBC.css';
+import '../css/adminDMZ.css';
 import AdminNavbar from "../navbar/adminNavbar";
-import CubeContainer from "./blocks/CubeContainer";
 
-const adminBC = () => {
+const adminDMZ = () => {
     return (
         <div className="container-fluid">
             <div className="adminNavbar">
@@ -11,10 +10,10 @@ const adminBC = () => {
             </div>
             
             <div className="main-bc">
-                <CubeContainer />      
+  
             </div>
         </div>
     )
 }
 
-export default adminBC;
+export default adminDMZ;

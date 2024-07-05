@@ -3,10 +3,14 @@ const express = require('express');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const cors = require('cors');
+const { Sequelize, DataTypes } = require('sequelize');
 
 // Database
 const elderwee = require('./config/DBConnection');
 const db = require('./config/db');
+
+const Location = require('./models/Geolocation');
+const Account = require('./models/Account');
 
 // Blockchain module
 const {Block, Blockchain} = require('./blockchain/blockchain');
@@ -29,7 +33,7 @@ const options = {
     key:'session_cookie_name',
     secret: 'session_cookie_secret',
     store: sessionStore,
-    resave:false,
+    resave: false,
     saveUninitialized:false
 }));
 
@@ -64,7 +68,54 @@ a.addNewBlock(
 
 console.log(JSON.stringify(a, null, 4));
 
+
+db.sync().then(() => {
+    console.log('Database synchronised');
+}).catch((err) => {
+    console.log('Error synchronising the database', err);
+})
+
+
+// API endpoint to get active accounts
+app.get('/api/activeAccounts', async(req, res) => {
+    try{
+        const accounts = await Account.findAll({
+            where: { AccountStatus: false }
+        });
+        res.json(accounts);
+    }  catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// API endpoint to get flagged accounts
+app.get('/api/flaggedAccounts', async (req, res) => {
+    try {
+        const accounts = await Account.findAll({
+            where: { Scammer: true }
+        });
+        res.json(accounts);
+    }   catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Last line of code
+
 app.listen(port, ()=>{
     console.log(`Server running on http://localhost:${port}`);
 });
+
 
