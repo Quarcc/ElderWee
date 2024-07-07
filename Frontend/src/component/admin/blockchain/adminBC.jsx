@@ -10,8 +10,16 @@ const adminBC = () => {
                 <AdminNavbar />
             </div>
             
-            <div className="main-bc">
-                <CubeContainer />      
+            <div className="BC-bg">
+                <div className="BC-top-bg mb-5">
+                    <h1 className="BC-header">Blockchain</h1>
+                    <div className="BC-THREE-bg">
+                        <CubeContainer />     
+                    </div>
+                </div>
+                <div className="BC-bot-bg mt-5">
+                    <h1 className="BC-transaction-header">Transaction History</h1>
+                </div>     
             </div>
         </div>
     )

@@ -30,7 +30,7 @@ const CubesContainer = () => {
             const viewWidth = sceneWidth + cubeSpacing;
             const viewHeight = viewWidth / aspectRatio;
 
-            camera.left = -viewWidth / 15;
+            camera.left = -viewWidth / 20;
             camera.right = viewWidth;
             camera.top = viewHeight / 8;
             camera.bottom = -viewHeight;

@@ -1,0 +1,11 @@
+.DMZ-top-bg, .DMZ-bot-bg {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 10px 10px 10px #AAAAAA;
+}
+
+.DMZ-bg{
+    margin: 30px;
+    width: 100%;
+    padding-left: 250px;
+}

@@ -8,10 +8,15 @@ const adminDMZ = () => {
             <div className="adminNavbar">
                 <AdminNavbar />
             </div>
-            
-            <div className="main-bc">
-  
+            <div className="DMZ-bg">
+                <div className="row DMZ-top-bg mb-5">
+                    <h1>DMZ</h1>
+                </div>
+                <div className="row DMZ-bot-bg mt-5">
+                    <h1>DMZ part 2</h1>
+                </div>
             </div>
+            
         </div>
     )
 }
