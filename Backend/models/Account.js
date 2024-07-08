@@ -13,7 +13,7 @@ const Account = db.define('account', {
         allowNull: false
     },
     DateOpened: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATE,   
         allowNull: false
     },
     AccountStatus: {
