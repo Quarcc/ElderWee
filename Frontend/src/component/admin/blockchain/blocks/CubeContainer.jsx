@@ -47,8 +47,8 @@ const CubesContainer = () => {
             requestAnimationFrame(animate);
             scene.traverse((child) => {
                 if(child.isMesh && child.geometry.type === 'ExtrudeGeometry'){
-                    child.rotation.x = time / 1500;
-                    child.rotation.y = time / 1500;
+                    child.rotation.x = time / 2000;
+                    child.rotation.y = time / 2000;
                 }
             });
             renderer.render(scene, camera);

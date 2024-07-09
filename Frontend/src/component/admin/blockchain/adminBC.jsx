@@ -52,13 +52,13 @@ const adminBC = () => {
             
             <div className="BC-bg">
                 <div className="BC-top-bg mb-5">
-                    <h1 className="BC-header">Blockchain</h1>
+                    <h1 className="BC-header">Transaction History</h1>
                     <div className="BC-THREE-bg">
                         <CubeContainer />     
                     </div>
                 </div>
                 <div className="BC-bot-bg mt-5">
-                    <h1 className="BC-transaction-header">Transaction History</h1>
+                    <h1 className="BC-transaction-header">Transaction Details</h1>
                     <pre>{JSON.stringify(transactions, null, 2)}</pre>
                 </div>     
             </div>

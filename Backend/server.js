@@ -8,10 +8,12 @@ const { Sequelize, DataTypes } = require('sequelize');
 // Database
 const elderwee = require('./config/DBConnection');
 const db = require('./config/db');
+const { Op } = require('sequelize');
 
+const User = require('./models/User');
+const Account = require('./models/Account');
 const Transaction = require('./models/Transaction');
 const Location = require('./models/Geolocation');
-const Account = require('./models/Account');
 
 // Blockchain module
 const {Block, Blockchain} = require('./blockchain/blockchain');
@@ -168,6 +170,119 @@ app.get('/api/flaggedAccounts', async (req, res) => {
 // GeoinsertDummyData();
 
 
+
+app.get('/users', async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.json(users);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/users/:userID', async (req, res) => {
+    const { userID } = req.params
+    try {
+        const user = await User.findOne({ where: {UserID: userID }});
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ error: 'User not found' } );
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/userCount', async (req, res) => {
+    try {
+        const userCount = await User.count();
+        res.json({ count: userCount })
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/accounts', async (req, res) => {
+    try {
+        const accounts = await Account.findAll({
+            order: [['UserID', 'ASC']]
+        });
+        res.json(accounts);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.put('/accounts/:accountNo', async (req, res) => {
+  const { accountNo } = req.params;
+  const { AccountStatus, Scammer } = req.body;
+  try {
+    const account = await Account.findOne({ where: { AccountNo: accountNo } });
+    if (account) {
+      account.AccountStatus = AccountStatus;
+      account.Scammer = Scammer;
+      await account.save();
+      res.status(200).json({ message: 'Account updated successfully' });
+    } else {
+      res.status(404).json({ error: 'Account not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/accounts/weekly', async (req, res) => {
+    try {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 13);
+
+        const accounts = await Account.findAll({
+            where: {
+                DateOpened: {
+                    [Op.between]: [startDate, endDate]
+                }
+            },
+            order: [['DateOpened', 'ASC']]
+        });
+
+        // Group accounts by date
+        const groupedData = accounts.reduce((acc, account) => {
+            const date = account.DateOpened.toISOString().split('T')[0];
+            if (!acc[date]) {
+                acc[date] = 0;
+            }
+            acc[date]++;
+            return acc;
+        }, {});
+
+        // Initialize arrays to hold the account counts for the last 14 days
+        const currentWeekData = Array(7).fill(0);
+        const previousWeekData = Array(7).fill(0);
+
+        const labels = [];
+        for (let i = 0; i < 14; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            const dateString = date.toISOString().split('T')[0];
+
+            if (i < 7) {
+                previousWeekData[i] = groupedData[dateString] || 0;
+            } else {
+                currentWeekData[i - 7] = groupedData[dateString] || 0;
+            }
+
+            if (i >= 7) {
+                labels.push(dateString);
+            }
+        }
+
+        res.json({ labels, currentWeekData, previousWeekData });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
 // Last line of code
 app.listen(port, ()=>{

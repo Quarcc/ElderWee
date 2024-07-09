@@ -1,5 +1,5 @@
 import Card from 'react-bootstrap/Card'
-
+import React, { useEffect, useState } from 'react';
 
 import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
 import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
@@ -14,8 +14,42 @@ import { blue } from '@mui/material/colors';
 
 
 export const KPIBox = () => {
+    const [userCount, setUserCount] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchUserCount = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/userCount');
+                if (!response.ok) {
+                    throw new Error('Netowork response was not ok');
+                }
+                const data = await response.json()
+                setUserCount(data.count);
+                setLoading(false);
+            } catch (err) {
+                setError(err)
+                setLoading(false);
+            }
+
+        };
+
+        fetchUserCount();
+    }, []);
+
+    if (loading) {
+        return <div>Loading ...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
+
+
+
     const KPIData = [
-        { icon: <PersonAddAltRoundedIcon sx={{ fontSize: 40, color: pink[600] }} />, total: 149, title: 'New Account', style: { width: '23rem', borderRadius: "20px" } },
+        { icon: <PersonAddAltRoundedIcon sx={{ fontSize: 40, color: pink[600] }} />, total: userCount, title: 'New Account', style: { width: '23rem', borderRadius: "20px" } },
         { icon: <PaidRoundedIcon sx={{ fontSize: 40, color: purple[300] }} />, total: 1905, title: 'New Transaction', style: {  width: '23rem', borderRadius: "20px" } },
         { icon: <PollRoundedIcon sx={{ fontSize: 40, color: orange[600] }} />, total: '$45,945', title: 'Amount Saved', style: {  width: '23rem', borderRadius: "20px"} },
         { icon: <ArticleRoundedIcon sx={{ fontSize: 40, color: blue[600] }}  />, total: 63, title: 'New Queries', style: {  width: '23rem', borderRadius: "20px" }}

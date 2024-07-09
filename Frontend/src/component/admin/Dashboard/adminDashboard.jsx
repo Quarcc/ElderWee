@@ -5,7 +5,8 @@ import { KPIBox } from "./adminKPI";
 import { LineChart } from "./adminLineChart/adminLine";
 import { PieChart } from "./adminPieChart/adminPie"
 import { BarChart } from "./adminBarChart/adminBar"
-import { AdminTable } from "./adminTable/adminTable"
+import { UserTable } from "./adminTable/userTable"
+import { AccountTable } from "./adminTable/accountTable"
 
 
 function AdminDashboard() {
@@ -43,7 +44,11 @@ function AdminDashboard() {
                 </div>
                 <br />
                 <div id="graph-row-3">
-                    <AdminTable />
+                    <AccountTable />
+                </div>
+                <br />
+                <div id="graph-row-3">
+                    <UserTable />
                 </div>
                 <br />
             </div>

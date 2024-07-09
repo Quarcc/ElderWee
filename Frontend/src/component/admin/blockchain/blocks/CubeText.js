@@ -16,12 +16,6 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
         cubeRef.current = cube;
         scene.add(cube);
 
-        const animate = () => {
-            requestAnimationFrame(animate);
-            cube.rotation.x += 0.0015;
-            cube.rotation.y += 0.0015;
-        };
-
         // Adding text
         const addText = async (text, position, rotation) => {
             const textMesh = await Text(text, { size: 0.15, depth: 0.02, color: 0xFFFFFF });
@@ -79,8 +73,6 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
                 handleCubeClick();
             }; 
         };
-
-        animate();
 
         window.addEventListener('mousemove', onMouseMove, false);
         window.addEventListener('click', onClick, false);
