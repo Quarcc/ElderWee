@@ -121,7 +121,20 @@ app.get('/api/flaggedAccounts', async (req, res) => {
     }   catch (error) {
         res.status(500).json({ error: error.message });
     }
+
 });
+
+app.get('/api/displayallaccounts',async (req,res)=>{
+    try{
+        const accounts = await Account.findAll();
+        res.json(accounts);
+    }
+    catch(error){
+        res.status(500).json({error:message});
+    }
+})
+
+
 
 // Geolocation dummy data
 // const GeodummyData = [
@@ -155,6 +168,8 @@ app.get('/api/flaggedAccounts', async (req, res) => {
 // }
 
 // GeoinsertDummyData();
+
+// === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
 app.get('/api/Blockchain', async (req, res) => {
     res.status(200).send(Bc)

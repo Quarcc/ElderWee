@@ -1,9 +1,12 @@
 import React from 'react';
-import FlaggedAccountRow from './flaggedAccounts';
+import FlaggedAccountRow from './flaggedAccountsRow';
 
 const FlaggedAccountsTable = ({ flaggedAccountData }) => {
+
+  
+  
   return (
-    <div className="geo-container">
+    <div className="geo-container overflow-y-scroll">
       <h2>Flagged Accounts</h2>
       <table className="geo-table">
         <thead>
@@ -15,19 +18,20 @@ const FlaggedAccountsTable = ({ flaggedAccountData }) => {
             <th className="geo-th">Reason</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="">
           {flaggedAccountData.map(account => (
             <FlaggedAccountRow 
-              key={account.accNo} 
-              accNo={account.accNo} 
-              name={account.name} 
-              contactNo={account.contactNo} 
-              lastLogin={account.lastLogin} 
-              reason={account.reason} 
+              key={account.AccountNo} 
+              accNo={account.AccountNo} 
+              name={account.UserID} 
+              //contactNo={account.contactNo} 
+              //lastLogin={account.lastLogin} 
+              //reason={account.reason} 
             />
           ))}
         </tbody>
       </table>
+
     </div>
   );
 };
