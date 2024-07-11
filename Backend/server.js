@@ -51,31 +51,53 @@ const options = {
     saveUninitialized:false
 }));
 
-let a = new Blockchain();
+let Bc = new Blockchain();
 
-console.log('The blockchain mining in progres..')
-a.addNewBlock(
-    new Block(1, "02/02/2024", {
-        sender: "test",
-        receipient: "test2",
-        amount: 100.00,
-    })
-);
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
 
-a.addNewBlock(
-    new Block(2, "03/02/2024", {
-        sender: "test3",
-        receipient: "test4",
-        amount: 1000.00,
-    })
-);
+    const day = date.getDate();
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
 
-console.log(JSON.stringify(a, null, 4));
+    return `${day} ${month} ${year}`;
+};
 
-app.get('/api/transactions', async (req, res) => {
-    const transaction = await Transaction.findAll();    
-    return res.status(200).send(JSON.stringify(transaction));
-})
+const initBc = async () => {
+    try {
+        const transactions = await Transaction.findAll();
+        let i = 1;
+        transactions.forEach(transaction => {
+            const blockNumber = i.toString().padStart(6, '0');
+            console.log(i)
+            const formattedDate = formatDate(transaction.TransactionDate);
+            Bc.addNewBlock(
+                new Block (blockNumber, formattedDate, {
+                    TransactionID: transaction.TransactionID,
+                    TransactionDate: transaction.TransactionDate,
+                    TransactionAmount: transaction.TransactionAmount,
+                    TransactionStatus: transaction.TransactionStatus,
+                    TransactionType: transaction.TransactionType,
+                    TransactionDesc: transaction.TransactionDesc,
+                    ReceiverID: transaction.ReceiverID,
+                    ReceiverAccountNo: transaction.ReceiverAccountNo,
+                    SenderID: transaction.SenderID,
+                    SenderAccountNo: transaction.SenderAccountNo
+                })
+            );
+            i++;
+        })
+    } catch (err) {
+        console.log(err);
+    }
+    console.log(JSON.stringify(Bc, null, 2));
+}
+
+initBc();
 
 // API endpoint to get active accounts
 app.get('/api/activeAccounts', async(req, res) => {
@@ -100,41 +122,6 @@ app.get('/api/flaggedAccounts', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-// Accounts dummy data 
-// const AccdummyData = [
-//     { AccountNo: 'ACC001', Balance: 1000.50, DateOpened: '2022-01-15', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC002', Balance: 200.75, DateOpened: '2022-02-20', AccountStatus: false, Scammer: true },
-//     { AccountNo: 'ACC003', Balance: 1500.00, DateOpened: '2022-03-05', AccountStatus: true, Scammer: false },
-//     { AccountNo: 'ACC004', Balance: 500.25, DateOpened: '2022-04-10', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC005', Balance: 300.60, DateOpened: '2022-05-15', AccountStatus: true, Scammer: true },
-//     { AccountNo: 'ACC006', Balance: 750.45, DateOpened: '2022-06-20', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC007', Balance: 50.30, DateOpened: '2022-07-25', AccountStatus: true, Scammer: false },
-//     { AccountNo: 'ACC008', Balance: 1100.80, DateOpened: '2022-08-30', AccountStatus: false, Scammer: true },
-//     { AccountNo: 'ACC009', Balance: 650.00, DateOpened: '2022-09-05', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC010', Balance: 400.95, DateOpened: '2022-10-10', AccountStatus: true, Scammer: true },
-//     { AccountNo: 'ACC011', Balance: 1200.75, DateOpened: '2022-11-15', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC012', Balance: 800.20, DateOpened: '2022-12-20', AccountStatus: false, Scammer: true },
-//     { AccountNo: 'ACC013', Balance: 300.15, DateOpened: '2023-01-25', AccountStatus: true, Scammer: false },
-//     { AccountNo: 'ACC014', Balance: 450.90, DateOpened: '2023-02-28', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC015', Balance: 100.00, DateOpened: '2023-03-15', AccountStatus: true, Scammer: true },
-//     { AccountNo: 'ACC016', Balance: 550.25, DateOpened: '2023-04-20', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC017', Balance: 650.80, DateOpened: '2023-05-25', AccountStatus: false, Scammer: true },
-//     { AccountNo: 'ACC018', Balance: 250.35, DateOpened: '2023-06-30', AccountStatus: true, Scammer: false },
-//     { AccountNo: 'ACC019', Balance: 950.45, DateOpened: '2023-07-05', AccountStatus: false, Scammer: false },
-//     { AccountNo: 'ACC020', Balance: 700.60, DateOpened: '2023-08-10', AccountStatus: true, Scammer: true }
-// ];
-
-// async function AccinsertDummyData() {
-//     for (const data of AccdummyData) {
-//         await Account.create(data);
-//     }
-//     console.log('20 dummy data entries have been inserted');
-// }
-
-// AccinsertDummyData();
-
-
 
 // Geolocation dummy data
 // const GeodummyData = [
@@ -169,7 +156,18 @@ app.get('/api/flaggedAccounts', async (req, res) => {
 
 // GeoinsertDummyData();
 
+app.get('/api/Blockchain', async (req, res) => {
+    res.status(200).send(Bc)
+})
 
+app.get('/api/allTransactions', async (req, res) => {
+    try {
+        const transactions = await Transaction.findAll();
+        res.json(transactions);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
 app.get('/users', async (req, res) => {
     try {

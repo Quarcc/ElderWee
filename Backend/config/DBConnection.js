@@ -15,7 +15,7 @@ const setUpDB = (drop) => {
         })
         .then(() => {
             User.hasMany(Account, { foreignKey: 'UserID' });
-            User.hasMany(Transaction, { foreignKey: 'SenderUserID' });
+            User.hasMany(Transaction, { foreignKey: 'SenderID' });
             Account.hasMany(Transaction, { foreignKey: 'SenderAccountNo' });
             User.hasMany(Enquiry, { foreignKey: 'UserID' });
             Account.hasMany(Enquiry, { foreignKey: 'AccountNo' });

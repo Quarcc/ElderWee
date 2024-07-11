@@ -1,9 +1,19 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
+import axios from 'axios';
+
 import CubeText from './CubeText';
 import Chain from './Chain';
 
+const APIEndPoint = 'localhost:8000';
+
+const getTransactions = async () => {
+    const { data } = await axios.get(`http://${APIEndPoint}/api/allTransactions`);
+    return data;
+};
+
 const CubesContainer = () => {
+    const [transactions, setTransactions] = useState([]);
     const mountRef = useRef(null);
     const sceneRef = useRef(new THREE.Scene());
     const cameraRef = useRef(new THREE.OrthographicCamera());
@@ -130,7 +140,7 @@ const CubesContainer = () => {
     const camera = cameraRef.current;
 
     return (
-        <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: '250px', overflow: 'hidden' }}>
             <div ref={mountRef} style={{ width: `${dataLength * cubeSpacing}px`, height: '100%', position: 'relative' }}>
                 {cubePositions.map((pos,idx) => (
                     <CubeText key={idx} position={pos} textFront={`Cube ${idx + 1}`} textBack={'Back'} textTop={'Top'} textBot={'Bottom'} textLeft={'Left'} textRight={'Right'} url={`https://localhost:3000/${idx+1}`} scene={scene} renderer={renderer} camera={camera}></CubeText>

@@ -28,7 +28,7 @@ export const UserTable = () => {
   const [filter, setFilter] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('UserID'); // default column to sort by
+  const [orderBy, setOrderBy] = useState('UserID'); // default column to sort byr
 
   useEffect(() => {
     const fetchUsers = async () => {
