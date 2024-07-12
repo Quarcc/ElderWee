@@ -11,6 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from '@mui/material/TextField';
 import Toolbar from "@mui/material/Toolbar";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
@@ -107,12 +108,18 @@ const TransactionTable = () => {
         return 0;
     };
 
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { day: '2-digit', month: 'long', year: 'numeric' };
+        return date.toLocaleDateString('en-GB', options);
+    };
+
     const columns = [
         {id: 'TransactionID', label: 'Transaction ID', minWidth: 100},
         {id: 'SenderAccountNo', label: 'Sender Account Number', minWidth: 150},
         {id: 'ReceiverAccountNo', label: 'Receiver Account Number', minWidth: 150},
         {id: 'TransactionDate', label: 'Transaction Date', minWidth: 170},
-        {id: 'TransactionAmount', label: 'Amount', minWidth: 100},
+        {id: 'TransactionAmount', label: 'Amount ($)', minWidth: 100},
         {id: 'TransactionStatus', label: 'Status', minWidth: 100},
         {id: 'TransactionTrace', label: 'Trace', minWidth: 100},
     ];
@@ -177,7 +184,9 @@ const TransactionTable = () => {
                     <TableRow key={transaction.TransactionID} hover role="checkbox" tabIndex={-1}>
                         {columns.map(column => (
                         <TableCell key={column.id} align="left">
-                            {transaction[column.id]}
+                            {column.id === 'TransactionDate' ? formatDate(transaction[column.id]) : transaction[column.id]}
+                            {column.id === 'TransactionTrace' && transaction.TransactionStatus === 'Pending' ? (
+                                <Button variant="contained" color="primary">Trace</Button>) : null}
                         </TableCell>
                         ))}
                     </TableRow>

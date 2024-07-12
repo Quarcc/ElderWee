@@ -29,7 +29,7 @@ export const AccountTable = () => {
 
   const fetchAccounts = async () => {
     try {
-      const response = await fetch('http://localhost:8000/accounts');
+      const response = await fetch('http://localhost:8000/api/accounts');
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

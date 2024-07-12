@@ -63,7 +63,7 @@ export const LineChart = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/accounts/weekly');
+                const response = await axios.get('http://localhost:8000/api/accounts/weekly');
                 const { labels, currentWeekData, previousWeekData } = response.data;
 
                 setLineChartData({

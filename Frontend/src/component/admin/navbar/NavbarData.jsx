@@ -20,11 +20,6 @@ export const NavbarData = [
     {
         title: "Transaction",
         icon: <PaidIcon />,
-        link: "/adminNavbar"
-    },
-    {
-        title: "Blockchain",
-        icon: <CurrencyBitcoinIcon />,
         link: "/adminBC"
     },
     {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Paper, Typography, Checkbox, FormControlLabel, Box, Grid } from '@mui/material';
+import { Button, Typography, FormControlLabel, Box, Grid, Switch } from '@mui/material';
 
 const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onClose, accountDetails }) => {
   const [accountStatus, setAccountStatus] = useState(currentStatus);
@@ -9,7 +9,7 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/accounts/${accountNo}`, {
+      const response = await fetch(`http://localhost:8000/api/accounts/${accountNo}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -53,30 +53,28 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
             <Typography variant="body1"><strong>{key}:</strong> {value.toString()}</Typography>
           </Grid>
         ))}
-        <Grid xs={12}>
-            <br />
+        <Grid item xs={12}>
           <FormControlLabel
             control={
-              <Checkbox
+              <Switch
                 checked={accountStatus}
                 onChange={(e) => setAccountStatus(e.target.checked)}
               />
             }
-            label="Toggle Account Status: "
+            label="Account Status:"
             labelPlacement='start'
-            color='red'
           />
         </Grid>
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <FormControlLabel
             control={
-              <Checkbox
+              <Switch
                 checked={scammer}
                 onChange={(e) => setScammer(e.target.checked)}
               />
             }
-            label="Toggle Scammer: "
-            labelPlacement='start'
+            label="Scammer"
+            labelPlacement="start"
           />
         </Grid>
         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>

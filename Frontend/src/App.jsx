@@ -8,6 +8,7 @@ import AdminDMZ from './component/admin/DMZ/DMZ'
 import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';
 import Login from './component/user/Login';
+import SignUp from './component/user/Signup';
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -25,6 +26,8 @@ function App(){
                 <Route path="/adminDMZ" element={<AdminDMZ/>} />
                 <Route path="/adminGeo" element={<GeoSummary/>} />
                 <Route path="/Login" element={<Login/>} />
+                <Route path="/Signup" element={<SignUp/>} />
+
             </Routes>
         </>
     );

@@ -2,6 +2,7 @@
 const express = require('express');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
+const bodyParser = require('body-parser')
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 
@@ -22,7 +23,7 @@ const app = express();
 
 let port = 8000;
 
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(
@@ -184,7 +185,31 @@ app.get('/api/allTransactions', async (req, res) => {
     }
 });
 
-app.get('/users', async (req, res) => {
+app.get('/api/transactions/:transactionID', async (req, res) => {
+    const { transactionID } = req.params;
+    
+})
+
+app.get('/api/transactionCount', async (req, res) => {
+    try {
+        const transactionCount = await Transaction.count();
+        res.json({ count: transactionCount });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/api/totalTransactionAmount', async (req, res) => {
+    try {
+        const totalAmount = await Transaction.sum('TransactionAmount');
+        res.json({ totalAmount });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+
+app.get('/api/users', async (req, res) => {
     try {
         const users = await User.findAll();
         res.json(users);
@@ -193,7 +218,7 @@ app.get('/users', async (req, res) => {
     }
 });
 
-app.get('/users/:userID', async (req, res) => {
+app.get('/api/users/:userID', async (req, res) => {
     const { userID } = req.params
     try {
         const user = await User.findOne({ where: {UserID: userID }});
@@ -207,7 +232,7 @@ app.get('/users/:userID', async (req, res) => {
     }
 });
 
-app.get('/userCount', async (req, res) => {
+app.get('/api/userCount', async (req, res) => {
     try {
         const userCount = await User.count();
         res.json({ count: userCount })
@@ -216,7 +241,7 @@ app.get('/userCount', async (req, res) => {
     }
 });
 
-app.get('/accounts', async (req, res) => {
+app.get('/api/accounts', async (req, res) => {
     try {
         const accounts = await Account.findAll({
             order: [['UserID', 'ASC']]
@@ -227,7 +252,7 @@ app.get('/accounts', async (req, res) => {
     }
 });
 
-app.put('/accounts/:accountNo', async (req, res) => {
+app.put('/api/accounts/:accountNo', async (req, res) => {
   const { accountNo } = req.params;
   const { AccountStatus, Scammer } = req.body;
   try {
@@ -245,7 +270,7 @@ app.put('/accounts/:accountNo', async (req, res) => {
   }
 });
 
-app.get('/accounts/weekly', async (req, res) => {
+app.get('/api/accounts/weekly', async (req, res) => {
     try {
         const endDate = new Date();
         const startDate = new Date();
@@ -294,6 +319,46 @@ app.get('/accounts/weekly', async (req, res) => {
         res.json({ labels, currentWeekData, previousWeekData });
     } catch (err) {
         res.status(500).json(err);
+    }
+});
+
+app.post('/signup', async (req, res) => {
+    try {
+        const { fullName, dob, email, phoneNo, password } = req.body;
+        
+        // Create user in database using Sequelize model
+        const newUser = await User.create({
+            FullName: fullName,
+            DOB: dob,
+            Email: email,
+            PhoneNo: phoneNo,
+            Password: password,
+        });
+
+        // Respond with the newly created user object
+        res.status(201).json(newUser);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findOne({ where: { Email: email } });
+
+        if (!user || user.Password !== password) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // You can customize what data to send back to the frontend upon successful login
+        res.status(200).json({ message: 'Login successful', user });
+
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
