@@ -52,6 +52,9 @@ Run:
 
 #### You're done! Happy coding
 
+# IMPORTANT :exclamation: :exclamation: :exclamation: :exclamation: :exclamation:
+IF YOU ARE GOING TO INSTALL DEPENDENCIES, FIGURE OUT WHERE IT GOES, FRONTEND OR BACKEND
+
 # MAKE YOUR LIFE EASIER AND SAFE :exclamation: :
 ### Open VSC
 1. Hit ```"Ctrl" + "+"``` / "File > Preference > Settings"
