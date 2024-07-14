@@ -9,6 +9,7 @@ import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';
 import Login from './component/user/Login';
 import SignUp from './component/user/Signup';
+import UserLocation from './component/admin/location/userLocation';
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -27,7 +28,7 @@ function App(){
                 <Route path="/adminGeo" element={<GeoSummary/>} />
                 <Route path="/Login" element={<Login/>} />
                 <Route path="/Signup" element={<SignUp/>} />
-
+                <Route path="/user" element={<UserLocation/>}/>
             </Routes>
         </>
     );
