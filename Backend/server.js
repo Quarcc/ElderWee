@@ -198,6 +198,20 @@ app.get('/api/displayallaccounts',async (req,res)=>{
 
 // === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
+app.get('/admin/transaction/detail/id/:transactionID', async (req, res) => {
+    const { transactionID } = req.params
+    try {
+        const transaction = await Transaction.findOne({ where: {TransactionID: transactionID}});
+        if (transaction) {
+            res.json(transaction);
+        } else {
+            res.status(404).json({ error: 'Transaction not found' } );
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
 app.get('/api/Blockchain', async (req, res) => {
     try{
         res.status(200).send(Bc)
@@ -216,11 +230,6 @@ app.get('/api/allTransactions', async (req, res) => {
         res.status(500).json(err);
     }
 });
-
-app.get('/api/transactions/:transactionID', async (req, res) => {
-    const { transactionID } = req.params;
-    
-})
 
 app.get('/api/transactionCount', async (req, res) => {
     try {

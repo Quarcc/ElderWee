@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -11,8 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from '@mui/material/TextField';
 import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
+import SearchIcon from '@mui/icons-material/Search';
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
@@ -32,9 +31,9 @@ const TransactionTable = () => {
     const [filter, setFilter] = useState('');
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [order, setOrder] = useState('desc');
-    const [orderBy, setOrderBy] = useState('TransactionID'); // default column to sort byr
+    const [orderBy, setOrderBy] = useState('TransactionID'); // default column to sort by
 
-    useEffect (() => {
+    useEffect(() => {
         const getTransactions = async () => {
             await axios.get(`http://${APIEndPoint}/api/allTransactions`).then(
                 res => {
@@ -42,21 +41,21 @@ const TransactionTable = () => {
                     setLoading(false);
                 }
             ).catch(
-                error=>{
+                error => {
                     // anything outside the status code 2xx range
-                    if(error.response){
-                        console.log('Error Response: ' + error.repsonse);
+                    if (error.response) {
+                        console.log('Error Response: ' + error.response);
                     }
                     // Request made with no response
-                    else if(error.request){
+                    else if (error.request) {
                         console.log('Error Request: ' + error.request);
                     }
                     // Any other error
-                    else{
+                    else {
                         console.log('Error Message: ' + error.message);
                     }
-                } 
-            )  
+                }
+            )
         }
         getTransactions();
     }, []);
@@ -90,7 +89,7 @@ const TransactionTable = () => {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
             const order = comparator(a[0], b[0]);
-            if (order !== 0) return order;  
+            if (order !== 0) return order;
             return a[1] - b[1];
         });
         return stabilizedThis.map((el) => el[0]);
@@ -115,13 +114,13 @@ const TransactionTable = () => {
     };
 
     const columns = [
-        {id: 'TransactionID', label: 'Transaction ID', minWidth: 100},
-        {id: 'SenderAccountNo', label: 'Sender Account Number', minWidth: 150},
-        {id: 'ReceiverAccountNo', label: 'Receiver Account Number', minWidth: 150},
-        {id: 'TransactionDate', label: 'Transaction Date', minWidth: 170},
-        {id: 'TransactionAmount', label: 'Amount ($)', minWidth: 100},
-        {id: 'TransactionStatus', label: 'Status', minWidth: 100},
-        {id: 'TransactionTrace', label: 'Trace', minWidth: 100},
+        { id: 'TransactionID', label: 'Transaction ID', minWidth: 100 },
+        { id: 'SenderAccountNo', label: 'Sender Account Number', minWidth: 150 },
+        { id: 'ReceiverAccountNo', label: 'Receiver Account Number', minWidth: 150 },
+        { id: 'TransactionDate', label: 'Transaction Date', minWidth: 170 },
+        { id: 'TransactionAmount', label: 'Amount ($)', minWidth: 100 },
+        { id: 'TransactionStatus', label: 'Status', minWidth: 100 },
+        { id: 'TransactionTrace', label: 'Trace', minWidth: 100 },
     ];
 
     const visibleTransactions = React.useMemo(() => {
@@ -141,57 +140,62 @@ const TransactionTable = () => {
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <Toolbar>
                 <TextField
-                label="Filter"
-                variant="outlined"
-                size="small"
-                value={filter}
-                onChange={e => setFilter(e.target.value)}
+                    label="Filter"
+                    variant="outlined"
+                    size="small"
+                    value={filter}
+                    onChange={e => setFilter(e.target.value)}
                 />
                 <Tooltip title="Filter list">
-                <IconButton>
-                    <FilterListIcon />
-                </IconButton>
+                    <IconButton>
+                        <FilterListIcon />
+                    </IconButton>
                 </Tooltip>
             </Toolbar>
             <TableContainer sx={{ maxHeight: 440 }}>
                 <Table stickyHeader aria-label="sticky table">
-                <TableHead>
-                    <TableRow>
-                    {columns.map(column => (
-                        <TableCell
-                        key={column.id}
-                        align="left"
-                        padding="normal"
-                        >
-                        <TableSortLabel
-                            active={orderBy === column.id}
-                            direction={orderBy === column.id ? order : 'desc'}
-                            onClick={handleSort(column.id)}
-                        >
-                            {column.label}
-                            {orderBy === column.id ? (
-                            <Box component="span" sx={visuallyHidden}>
-                                {order === 'asc' ? 'sorted ascending' : 'sorted descending'}
-                            </Box>
-                            ) : null}
-                        </TableSortLabel>
-                        </TableCell>
-                    ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {visibleTransactions.map(transaction => (
-                    <TableRow key={transaction.TransactionID} hover role="checkbox" tabIndex={-1}>
-                        {columns.map(column => (
-                        <TableCell key={column.id} align="left">
-                            {column.id === 'TransactionDate' ? formatDate(transaction[column.id]) : transaction[column.id]}
-                            {column.id === 'TransactionTrace' && transaction.TransactionStatus === 'Pending' ? (
-                                <Button variant="contained" color="primary">Trace</Button>) : null}
-                        </TableCell>
+                    <TableHead>
+                        <TableRow>
+                            {columns.map(column => (
+                                <TableCell
+                                    key={column.id}
+                                    align="left"
+                                    padding="normal"
+                                >
+                                    <TableSortLabel
+                                        active={orderBy === column.id}
+                                        direction={orderBy === column.id ? order : 'desc'}
+                                        onClick={handleSort(column.id)}
+                                    >
+                                        {column.label}
+                                        {orderBy === column.id ? (
+                                            <Box component="span" sx={visuallyHidden}>
+                                                {order === 'asc' ? 'sorted ascending' : 'sorted descending'}
+                                            </Box>
+                                        ) : null}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {visibleTransactions.map(transaction => (
+                            <TableRow key={transaction.TransactionID} hover role="checkbox" tabIndex={-1}>
+                                {columns.map(column => (
+                                    <TableCell key={column.id} align="left">
+                                        <>
+                                            {column.id === 'TransactionDate' ? formatDate(transaction[column.id]) : transaction[column.id]}
+                                            {column.id === 'TransactionTrace' && transaction.TransactionStatus === 'Pending' ? (
+                                                <a href={`http://localhost:3000/admin/transaction/trace/id/${transaction.TransactionID}`}>
+                                                    <SearchIcon fontSize='medium'></SearchIcon>
+                                                </a>
+                                            ) : null}
+                                        </>
+                                    </TableCell>
+                                ))}
+                            </TableRow>
                         ))}
-                    </TableRow>
-                    ))}
-                </TableBody>
+                    </TableBody>
                 </Table>
             </TableContainer>
             <TablePagination
