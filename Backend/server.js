@@ -14,6 +14,7 @@ const { Op } = require('sequelize');
 const User = require('./models/User');
 const Account = require('./models/Account');
 const Transaction = require('./models/Transaction');
+const BlockchainDB = require('./models/Blockchain')
 const Location = require('./models/Geolocation');
 
 // Blockchain module
@@ -70,33 +71,58 @@ const formatDate = (dateString) => {
 
 const initBc = async () => {
     try {
-        const transactions = await Transaction.findAll();
-        let i = 1;
-        transactions.forEach(transaction => {
-            const blockNumber = i.toString().padStart(6, '0');
-            console.log(i)
-            const formattedDate = formatDate(transaction.TransactionDate);
-            Bc.addNewBlock(
-                new Block (blockNumber, formattedDate, {
-                    TransactionID: transaction.TransactionID,
-                    TransactionDate: transaction.TransactionDate,
-                    TransactionAmount: transaction.TransactionAmount,
-                    TransactionStatus: transaction.TransactionStatus,
-                    TransactionType: transaction.TransactionType,
-                    TransactionDesc: transaction.TransactionDesc,
-                    ReceiverID: transaction.ReceiverID,
-                    ReceiverAccountNo: transaction.ReceiverAccountNo,
-                    SenderID: transaction.SenderID,
-                    SenderAccountNo: transaction.SenderAccountNo
-                })
-            );
-            i++;
-        })
+        // Fetch data from database
+        const BlockchainDBData = await BlockchainDB.findAll({
+            order: [['TransactionID', 'ASC']]
+        });
+
+        // Create a map to store transactions grouped by TransactionID
+        const transactionMap = new Map();
+
+        // Group transactions by TransactionID
+        BlockchainDBData.forEach(data => {
+            if (!transactionMap.has(data.TransactionID)) {
+                transactionMap.set(data.TransactionID, []);
+            }
+            transactionMap.get(data.TransactionID).push(data);
+        });
+
+        // Process transactions and add to blockchain
+        transactionMap.forEach(transactions => {
+            // Sort transactions by TransactionStatus order: Pending, Completed, Returned
+            transactions.sort((a, b) => {
+                const statusOrder = { 'Pending': 1, 'Completed': 2, 'Returned': 3 };
+                return statusOrder[a.TransactionStatus] - statusOrder[b.TransactionStatus];
+            });
+
+            // Add each sorted transaction to blockchain
+            transactions.forEach((data) => {
+                const blockNumber = data.BlockNo;
+                const formattedDate = formatDate(data.TransactionDate);
+                Bc.addNewBlock(
+                    new Block(blockNumber, formattedDate, {
+                        TransactionID: data.TransactionID,
+                        TransactionDate: data.TransactionDate,
+                        TransactionAmount: data.TransactionAmount,
+                        TransactionStatus: data.TransactionStatus,
+                        TransactionType: data.TransactionType,
+                        TransactionDesc: data.TransactionDesc,
+                        ReceiverID: data.ReceiverID,
+                        ReceiverAccountNo: data.ReceiverAccountNo,
+                        SenderID: data.SenderID,
+                        SenderAccountNo: data.SenderAccountNo
+                    })
+                );
+            });
+        });
+
     } catch (err) {
         console.log(err);
     }
+
+    // Output the blockchain data
     console.log(JSON.stringify(Bc, null, 2));
-}
+};
 
 initBc();
 
@@ -173,7 +199,13 @@ app.get('/api/displayallaccounts',async (req,res)=>{
 // === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
 app.get('/api/Blockchain', async (req, res) => {
-    res.status(200).send(Bc)
+    try{
+        res.status(200).send(Bc)
+    }
+    catch (err){
+        res.status(500).json(err);
+    }
+    
 })
 
 app.get('/api/allTransactions', async (req, res) => {

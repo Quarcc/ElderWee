@@ -8,8 +8,8 @@ import Chain from './Chain';
 const APIEndPoint = 'localhost:8000';
 
 const getTransactions = async () => {
-    const { data } = await axios.get(`http://${APIEndPoint}/api/allTransactions`);
-    return data;
+    const { data } = await axios.get(`http://${APIEndPoint}/api/Blockchain`);
+    return data.blockchain;
 };
 
 const getLength = async () => {
@@ -167,12 +167,12 @@ const CubesContainer = () => {
             <div ref={mountRef} style={{ width: `${dataLength * cubeSpacing}px`, height: '100%', position: 'relative' }}>
                 {cubePositions.map((pos,idx) => {
                     const transaction = transactions[idx]
-                    const transUrl = transaction ? `https://localhost:3000/${transaction.TransactionID}` : "#";
-                    const transID = transaction ? `ID:\n${transaction.TransactionID}` : "ID:\nN/A";
-                    const transAmt = transaction ? `Amount:\n$${transaction.TransactionAmount}` : "Amount:\nN/A";
-                    const transStat = transaction ? `Status:\n${transaction.TransactionStatus}` : "Status:\nN/A";
-                    const transType = transaction ? `Type:\n${transaction.TransactionType}` : "Type:\nN/A";
-                    const transDate = transaction ? `Date:\n${formatDate(transaction.TransactionDate)}` : "Date:\nN/A";
+                    const transUrl = transaction ? `https://localhost:3000/${transaction.data.TransactionID}` : "#";
+                    const transID = transaction ? `ID:\n${transaction.data.TransactionID}` : "ID:\nN/A";
+                    const transAmt = transaction ? `Amount:\n$${transaction.data.TransactionAmount}` : "Amount:\nN/A";
+                    const transStat = transaction ? `Status:\n${transaction.data.TransactionStatus}` : "Status:\nN/A";
+                    const transType = transaction ? `Type:\n${transaction.data.TransactionType}` : "Type:\nN/A";
+                    const transDate = transaction ? `Date:\n${formatDate(transaction.data.TransactionDate)}` : "Date:\nN/A";
                     
                     return(
                         <CubeText key={idx} position={pos} textFront={transAmt} textBack={'nothing\nhere :)'} textTop={transID} textBot={transDate} textLeft={transStat} textRight={transType} url={transUrl} scene={scene} renderer={renderer} camera={camera}></CubeText>

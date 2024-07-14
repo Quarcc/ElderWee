@@ -31,12 +31,11 @@ const User = db.define('user', {
         allowNull: false,
     },
 
-
-    // FaceID: {
-    //     type: Sequelize.STRING,
-    //     allowNull: false,
-    //     defaultValue: "1"
-    // }
+    FaceID: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "1"
+    }
 });
 
 module.exports = User;
