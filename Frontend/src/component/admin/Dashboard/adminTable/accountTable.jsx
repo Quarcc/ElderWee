@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,6 +11,8 @@ import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import EditNoteIcon from '@mui/icons-material/EditNote'
 
 import UpdateAccount from './updateAccount'; // Ensure this path is correct
 import '../../css/adminDashboard.css';
@@ -111,13 +114,12 @@ export const AccountTable = () => {
                         if (column.id === 'Actions') {
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              <Button sx={{ backgroundColor: "#fabd05", color: "white", fontWeight: 'bold'}}
+                              <IconButton sx={{ backgroundColor: "#fabd05", color: "white", fontWeight: 'bold'}}
                                 variant="contained"
-                                color="primary"
                                 onClick={() => handleEditClick(account)}
                               >
-                                Edit
-                              </Button>
+                                <EditNoteIcon/>
+                              </IconButton>
                               <i></i>
                             </TableCell>
                           );
