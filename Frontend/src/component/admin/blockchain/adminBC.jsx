@@ -8,18 +8,18 @@ import TransactionTable from "./transactionTable/transactionTable";
 import Preload from "../../preloader/preloader";
 
 const AdminBC = () => {
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // Simulate a data fetch or any loading operation
-        setTimeout(() => {
-            setLoading(false);
-        }, 500); // Adjust the timeout as needed to simulate your loading time
-    }, []);
+    // useEffect(() => {
+    //     // Simulate a data fetch or any loading operation
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //     }, 500); // Adjust the timeout as needed to simulate your loading time
+    // }, []);
 
-    if (loading) {
-        return <Preload />;
-    }
+    // if (loading) {
+    //     return <Preload />;
+    // }
 
     return (
         <div className="container-fluid">

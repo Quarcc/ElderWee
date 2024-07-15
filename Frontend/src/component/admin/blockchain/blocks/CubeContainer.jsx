@@ -167,7 +167,7 @@ const CubesContainer = () => {
             <div ref={mountRef} style={{ width: `${dataLength * cubeSpacing}px`, height: '100%', position: 'relative' }}>
                 {cubePositions.map((pos,idx) => {
                     const transaction = transactions[idx]
-                    const transUrl = transaction ? `https://localhost:3000/admin/transaction/details/id/${transaction.data.TransactionID}` : "#";
+                    const transUrl = transaction ? `http://localhost:3000/admin/transaction/details/id/${transaction.data.TransactionID}` : "#";
                     const transID = transaction ? `ID:\n${transaction.data.TransactionID}` : "ID:\nN/A";
                     const transAmt = transaction ? `Amount:\n$${transaction.data.TransactionAmount}` : "Amount:\nN/A";
                     const transStat = transaction ? `Status:\n${transaction.data.TransactionStatus}` : "Status:\nN/A";

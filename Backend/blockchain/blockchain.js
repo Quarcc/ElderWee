@@ -40,7 +40,7 @@ class Blockchain{
             year: 'numeric'
         });
 
-        return new Block('000000', formattedDate, "Initial block in the chain", "0");
+        return new Block('0000000000000000', formattedDate, "Genesis Block", "0");
     }
 
     obtainLatestBlock(){
