@@ -1,31 +1,41 @@
 import React from 'react';
 import axios from 'axios';
+import FlaggedAccountRow from './flaggedAccountsRow';
 
 // Define API endpoint and sanctioned countries list
 const GeoAPIEndPoint = process.env.API_ENDPOINT;
 const sanctionedCountries = ['Russia', 'Cuba', 'Iran', 'North Korea', 'Syria']; 
 
-async function getAllAccounts() {
-    try{
-        const response = await axios.get(`https://${GeoAPIEndPoint}/getAll`)
-        const allAccounts = response.data;
+const ActiveAccountsTable = ({activeAccountData}) =>{
+    return (
+        <div className="geo-container overflow-y-scroll">
+        <h2>Active Accounts</h2>
+        <table className="geo-table">
+            <thead>
+            <tr>
+                <th className="geo-th">Account No</th>
+                <th className="geo-th">UserID</th>
+                <th className="geo-th">Contact Number</th>
+                <th className="geo-th">Last IP Login</th>
+                <th className="geo-th">Reason</th>
+            </tr>
+            </thead>
+            <tbody className="">
+            {activeAccountData.map(account => (
+                <FlaggedAccountRow 
+                key={account.AccountNo} 
+                accNo={account.AccountNo} 
+                userID={account.UserID} 
+                //contactNo={account.contactNo} 
+                //lastLogin={account.lastLogin} 
+                //reason={account.reason} 
+                />
+            ))}
+            </tbody>
+        </table>
 
-        const activeAccounts = allAccounts.filter(account => {
-            return !sanctionedCountries.includes(account.LastIPLoginCountry);
-        });
-
-        return activeAccounts;
-    } catch (error) {
-        if (error.response){
-            console.log('Error response: ' + error.response.data);
-        } else if (error.request) {
-            console.log('Error Request: ' + error.request);
-        } else {
-            console.log('Error Message: ' + error.message);
-        }
-    }
+        </div>
+  );
 }
 
-getAllAccounts().then(accounts => {
-    console.log('Filtered Accounts', accounts)
-})
+export default ActiveAccountsTable;

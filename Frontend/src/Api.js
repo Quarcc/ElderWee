@@ -3,12 +3,13 @@ import axios from 'axios';
 const APIEndPoint = 'localhost:8000';
 
 // Example
-async function getAll(){ 
-    await axios.get(`https://${APIEndPoint}/getAll`).then(
-        res=>{
-            return res.data
-        }
-    ).catch(
+export async function getAllAccounts(){ 
+    try{
+        let res = await fetch(`http://${APIEndPoint}/api/accounts`);
+        let data = await res.json();
+        return data;
+    }
+    catch(error){
         error=>{
             // anything outside the status code 2xx range
             if(error.response){
@@ -23,7 +24,7 @@ async function getAll(){
                 console.log('Error Message: ' + error.message);
             }
         } 
-    )
+    }
 }
 
 export async function getAccountLog(accountNo){

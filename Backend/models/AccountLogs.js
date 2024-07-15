@@ -18,7 +18,11 @@ const AccountLogs = db.define('accountlogs', {
     Flagged:{
         type: Sequelize.BOOLEAN,
         allowNull:false,
-    }
+    },
+    // LoginTime:{
+    //     type: Sequelize.STRING,
+    //     allowNull:false,
+    // }
 });
 
 module.exports = AccountLogs;

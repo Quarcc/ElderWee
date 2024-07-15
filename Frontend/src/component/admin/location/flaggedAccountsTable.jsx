@@ -12,7 +12,7 @@ const FlaggedAccountsTable = ({ flaggedAccountData }) => {
         <thead>
           <tr>
             <th className="geo-th">Account No</th>
-            <th className="geo-th">Name</th>
+            <th className="geo-th">UserID</th>
             <th className="geo-th">Contact Number</th>
             <th className="geo-th">Last IP Login</th>
             <th className="geo-th">Reason</th>
@@ -23,7 +23,7 @@ const FlaggedAccountsTable = ({ flaggedAccountData }) => {
             <FlaggedAccountRow 
               key={account.AccountNo} 
               accNo={account.AccountNo} 
-              name={account.UserID} 
+              userID={account.UserID} 
               //contactNo={account.contactNo} 
               //lastLogin={account.lastLogin} 
               //reason={account.reason} 

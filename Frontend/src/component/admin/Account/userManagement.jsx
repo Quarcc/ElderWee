@@ -13,8 +13,13 @@ import TextField from '@mui/material/TextField';
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
+import Modal from '@mui/material/Modal';
 import { visuallyHidden } from "@mui/utils";
 
+import IconButton from '@mui/material/IconButton';
+import EditNoteIcon from '@mui/icons-material/EditNote'
+
+import UpdateUser from './updateUser';
 import '../css/adminAccount.css';
 
 export const UserManagement = () => {
@@ -28,23 +33,27 @@ export const UserManagement = () => {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('UserID'); // default column to sort byr
 
+  const [open, setOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/users');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setUsers(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err);
-        setLoading(false);
-      }
-    };
     fetchUsers();
-  }, []);
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/users');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setUsers(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     setFilteredUsers(
@@ -56,6 +65,7 @@ export const UserManagement = () => {
     );
   }, [filter, users]);
 
+  // Sorting and Filtering of Pages and Rows
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -93,6 +103,21 @@ export const UserManagement = () => {
     return 0;
   };
 
+  // Update User
+  const handleEditClick = (user) => {
+    setSelectedUser(user);
+    setOpen(true)
+  };
+
+  const handleClose = () => {
+    setOpen(false)
+    setSelectedUser(null);
+  }
+
+  const handleUpdate = () => {
+    fetchUsers();
+  }
+
   const columns = [
     { id: 'UserID', label: 'User ID', minWidth: 100 },
     { id: 'FullName', label: 'Full Name', minWidth: 170 },
@@ -101,6 +126,7 @@ export const UserManagement = () => {
     { id: 'PhoneNo', label: 'Phone No.', minWidth: 100 },
     { id: 'Password', label: 'Password', minWidth: 150 },
     { id: 'FaceID', label: 'Face ID', minWidth: 100 },
+    { id: 'Actions', label: 'Actions', minWidth: 100 }
   ];
 
   const visibleUsers = React.useMemo(() => {
@@ -118,68 +144,112 @@ export const UserManagement = () => {
   }
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: '0px 0px rgba(0,0,0,0)', paddingX: 2}}>
-      <Toolbar sx={{marginBottom: 2}}>
-        <Typography sx={{ flex: '1 1 100%', fontSize: 40}} variant="h1" id="tableTitle" component="div">
-          User Management
-        </Typography>
-        <TextField
-          label="Filter"
-          variant="outlined"
-          size="small"
-          value={filter}
-          onChange={e => setFilter(e.target.value)}
-        />
-      </Toolbar>
-      <TableContainer sx={{ maxHeight: 600 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map(column => (
-                <TableCell sx={{backgroundColor: '#E8E8E8', fontWeight: 900}}
-                  key={column.id}
-                  align="left"
-                  padding="normal"
-                >
-                  <TableSortLabel
-                    active={orderBy === column.id}
-                    direction={orderBy === column.id ? order : 'asc'}
-                    onClick={handleRequestSort(column.id)}
-                    style={{color: 'black'}}
-                  >
-                    {column.label}
-                    {orderBy === column.id ? (
-                      <Box component="span" sx={visuallyHidden}>
-                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                      </Box>
-                    ) : null}
-                  </TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {visibleUsers.map(user => (
-              <TableRow key={user.UserID} hover role="checkbox" tabIndex={-1}>
+    <>
+      <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: '0px 0px rgba(0,0,0,0)', paddingX: 2}}>
+        <Toolbar sx={{marginBottom: 2}}>
+          <Typography sx={{ flex: '1 1 100%', fontSize: 40}} variant="h1" id="tableTitle" component="div">
+            User Management
+          </Typography>
+          <TextField
+            label="Filter"
+            variant="outlined"
+            size="small"
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+          />
+        </Toolbar>
+        <TableContainer sx={{ maxHeight: 600 }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
                 {columns.map(column => (
-                  <TableCell key={column.id} align="left">
-                    {user[column.id]}
+                  <TableCell sx={{backgroundColor: '#E8E8E8', fontWeight: 900}}
+                    key={column.id}
+                    align="left"
+                    padding="normal"
+                  >
+                    <TableSortLabel
+                      active={orderBy === column.id}
+                      direction={orderBy === column.id ? order : 'asc'}
+                      onClick={handleRequestSort(column.id)}
+                      style={{color: 'black'}}
+                    >
+                      {column.label}
+                      {orderBy === column.id ? (
+                        <Box component="span" sx={visuallyHidden}>
+                          {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        </Box>
+                      ) : null}
+                    </TableSortLabel>
                   </TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={filteredUsers.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </Paper>
+            </TableHead>
+            <TableBody>
+              {visibleUsers.map(user => (
+                <TableRow key={user.UserID} hover role="checkbox" tabIndex={-1}>
+                  {columns.map(column => {
+                    const value = user[column.id];
+                    return (
+                      <TableCell key={column.id} align="left">
+                        {column.id === 'Actions' ? (
+                          <IconButton sx={{ backgroundColor: "#fabd05", color: "white", fontWeight: 'bold'}}
+                            variant="contained"
+                            onClick={() => handleEditClick(user)} // Change account to user
+                          >
+                            <EditNoteIcon/>
+                          </IconButton>
+                        ) : (
+                          value
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={filteredUsers.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+
+      <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="simple-modal-title"
+      aria-describedby="simple-modal-description"
+      >
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        {selectedUser && (
+          <UpdateUser
+            userID={selectedUser.UserID}
+            currentFullName={selectedUser.FullName}
+            currentDOB={selectedUser.DOB}
+            currentEmail={selectedUser.Email}
+            currentPhoneNo={selectedUser.PhoneNo}
+            userDetails={selectedUser}
+            onUpdate={handleUpdate}
+            onClose={handleClose}
+          />
+        )}
+      </Box>
+      </Modal>
+    </>
   );
 };

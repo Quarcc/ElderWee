@@ -4,66 +4,66 @@ import GeoSummary from './GeoSummary';
 import '../css/adminNavbar.css';
 import AdminNavBar from "../navbar/adminNavbar";
 import FlaggedAccountsTable from './flaggedAccountsTable';
-// import ActiveAccountsTable from './flaggedAccountsTable';
+import ActiveAccountsTable from './activeAccounts';
 import '../css/geolocation.css';
+import {getAllAccounts} from "../../../Api.js";
 
 const APIEndPoint = 'localhost:8000';
 
 function geoSummary() {
-  const [activeAccounts, setActiveAccounts] = useState([]);
-  const [flaggedAccounts, setFlaggedAccounts] = useState([]);
+  
+  const [accounts, setAccounts] = useState({
+    flagged: [],
+    active:[],
+  })
 
-  useEffect(async () => {
-    // Fetching active accounts
-    const activeAccRes = await fetch('http://localhost:8000/api/activeAccounts',{
-      headers:{
-        "Content-Type":"application/json",
-      },
-      method:"GET"
-    });
-    const activeAccData = await activeAccRes.json();
-
-    setActiveAccounts(activeAccData);
-    
-    const flaggedAccRes = await fetch('http://localhost:8000/api/flaggedAccounts',{
-      headers:{
-        "Content-Type":"application/json",
-      },
-      method:"GET"
-    });
-    const flaggedAccData = await flaggedAccRes.json();
-
-    setFlaggedAccounts(flaggedAccData)
-    // Fetch flagged Accounts
-    
-
-      return ()=>{}
-      
-  }, []);
+  useEffect(()=>{
+    const filterAccounts = async () =>{
+      let data = await getAllAccounts();
+      console.log(data);
+      let accountData = {
+        flagged:[],
+        active:[]
+      }
+      data.forEach((acc)=>{
+        if(acc.Scammer){
+          accountData.flagged.push(acc);
+        }
+        else{
+          accountData.active.push(acc);
+        }
+      });
+      console.log(accountData);
+      setAccounts(accountData);
+    }
+    filterAccounts();
+  },[]);
 
   return (
-    <div>
-      <div> 
+    <div className=''>
+      <div className='w-[25%]'> 
         <AdminNavBar/>
       </div>
-      <div className="main-dashboard">
-                <div className="title">
-                    Account
-                </div>
-      </div>
-      <div className="geoSummary">
-        <GeoSummary
-          activeAccounts={activeAccounts.length} 
-          flaggedAccounts={flaggedAccounts.length} 
-        />
+      <div className="container">
+        <h1 className="title">
+            Account
+        </h1> 
+        <div className="geoSummary">
+          <div className='flex flex-row'>
+            <GeoSummary
+              activeAccounts={accounts.active.length} 
+              flaggedAccounts={accounts.flagged.length} 
+            />
+            <ActiveAccountsTable activeAccountData={accounts.active} />
+          </div>
+
         <div className="accountTables">
-          <FlaggedAccountsTable flaggedAccountData={activeAccounts} />
+          <FlaggedAccountsTable flaggedAccountData={accounts.flagged} />
         </div>
-        {/* <div className="accountTables">
-          <ActiveAccountsTable activeAccountData={activeAccounts} />
-        </div> */}
       </div>
     </div>
+      </div>
+
   );
 }
 
