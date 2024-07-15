@@ -42,8 +42,8 @@ const options = {
     port:db.port,
     user:db.username,
     password:db.password,
-    database:db.database
-    }
+        database:db.database
+        }
     const sessionStore = new MySQLStore(options);
     app.use(session({
     key:'session_cookie_name',

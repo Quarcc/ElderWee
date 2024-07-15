@@ -22,7 +22,6 @@ const TransactionDetail = () => {
     const [TransactionDesc, setTransactionDesc] = useState('');
 
     useEffect(() => {
-        setTransactionID(transactionID);
         const getTransactions = async () => {
             await axios.get(`http://${APIEndPoint}/admin/transaction/detail/id/${transactionID}`).then(
                 res => {
@@ -44,7 +43,7 @@ const TransactionDetail = () => {
                     }
                 }
             )
-        };
+        }
 
         const getBlockchainData = async () => {
             await axios.get(`http://${APIEndPoint}/api/Blockchain`).then(
@@ -67,11 +66,11 @@ const TransactionDetail = () => {
                     }
                 }
             )
-        };
+        }
 
         getTransactions();
         getBlockchainData();
-    });
+    }, []);
 
     useEffect(() => {
         

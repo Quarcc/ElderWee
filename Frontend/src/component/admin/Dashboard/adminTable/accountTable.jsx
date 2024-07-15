@@ -120,7 +120,6 @@ export const AccountTable = () => {
                               >
                                 <EditNoteIcon/>
                               </IconButton>
-                              <i></i>
                             </TableCell>
                           );
                         } else {
