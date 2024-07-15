@@ -111,13 +111,14 @@ export const AccountTable = () => {
                         if (column.id === 'Actions') {
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              <Button
+                              <Button sx={{ backgroundColor: "#fabd05", color: "white", fontWeight: 'bold'}}
                                 variant="contained"
                                 color="primary"
                                 onClick={() => handleEditClick(account)}
                               >
                                 Edit
                               </Button>
+                              <i></i>
                             </TableCell>
                           );
                         } else {

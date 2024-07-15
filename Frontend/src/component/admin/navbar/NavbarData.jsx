@@ -20,7 +20,7 @@ export const NavbarData = [
     {
         title: "Account",
         icon: <AccountCircleIcon />,
-        link: "/adminAccountr"
+        link: "/adminAccount"
     },
     {
         title: "Transaction",

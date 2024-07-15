@@ -33,27 +33,27 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
 
   return (
     <Box sx={{
-      width: '400px',
+      width: '700px',
       backgroundColor: '#FAF9F6',
       borderRadius: 2,
       boxShadow: 24,
-      p: 4,
-      mx: 'auto',
-      mt: '10%',
+      p: 6,
+      px: 10,
+      mx: '10%',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center'
     }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom mb={5} fontWeight={'bold'} fontSize={28}>
         Update Account: {accountNo}
       </Typography>
       <Grid container spacing={2}>
         {Object.entries(accountDetails).map(([key, value]) => (
-          <Grid item xs={12} key={key}>
+          <Grid item xs={6} key={key}>
             <Typography variant="body1"><strong>{key}:</strong> {value.toString()}</Typography>
           </Grid>
         ))}
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <FormControlLabel
             control={
               <Switch
@@ -63,9 +63,10 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
             }
             label="Account Status:"
             labelPlacement='start'
+            style={{marginLeft: 0, marginTop: 5, color: "red"}}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <FormControlLabel
             control={
               <Switch
@@ -75,6 +76,7 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
             }
             label="Scammer"
             labelPlacement="start"
+            style={{marginLeft: 0, marginTop: 5, color: "red"}}
           />
         </Grid>
         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>

@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import AdminNavbar from './component/admin/navbar/adminNavbar';
 import AdminDashboard from './component/admin/Dashboard/adminDashboard';
+import AdminAccount from './component/admin/Account/Account';
 import AdminBC from './component/admin/blockchain/adminBC';
 import AdminBCdetailded from './component/admin/blockchain/adminBCdetailed';
 import AdminDMZ from './component/admin/DMZ/DMZ';
@@ -15,8 +16,6 @@ import UserLocation from './component/admin/location/userLocation';
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
-
 function App(){
     return(
         <>
@@ -24,13 +23,14 @@ function App(){
                 <Route path="/" element={<PlaceHolder/>} />
                 <Route path="/adminNavbar" element={<AdminNavbar/>} />
                 <Route path="/adminDashboard" element={<AdminDashboard/>} />
+                <Route path="/adminAccount" element={<AdminAccount/>} />
                 <Route path="/adminBC" element={<AdminBC/>} />
                 <Route path="/admin/transaction/details/id/:transactionID" element={<AdminBCdetailded/>} />
                 <Route path="/adminDMZ" element={<AdminDMZ/>} />
                 <Route path="/adminGeo" element={<GeoSummary/>} />
                 <Route path="/Login" element={<Login/>} />
                 <Route path="/Signup" element={<SignUp/>} />
-                <Route path="/user" element={<UserLocation/>}/>
+                <Route path="/UserLocation" element={<UserLocation/>}/>
             </Routes>
         </>
     );

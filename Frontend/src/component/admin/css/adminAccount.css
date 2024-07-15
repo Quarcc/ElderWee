@@ -1,0 +1,15 @@
+.Account-top-bg, .Account-bot-bg {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 10px 10px 10px #AAAAAA;
+}
+
+.Account-bg{
+    margin: 30px;
+    width: 100%;
+    padding-left: 250px;
+}
+
+.css-pdct74-MuiTablePagination-selectLabel, .css-levciy-MuiTablePagination-displayedRows {
+    margin: 0;
+}
