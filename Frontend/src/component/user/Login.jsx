@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -8,46 +7,57 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
+import axios from 'axios';
+import Validation from './LoginValidation';
 
 const defaultTheme = createTheme();
 
 export default function Login() {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [errors, setErrors] = React.useState({});
+  const [formData, setFormData] = React.useState({
+    email: '',
+    password: ''
+  });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
+    const validationErrors = Validation(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
     try {
-      const response = await fetch('http://localhost:8000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.get('email'),
-          password: formData.get('password'),
-        }),
+      const response = await axios.post('http://localhost:8000/login', {
+        email: formData.email,
+        password: formData.password,
       });
 
-      if (!response.ok) {
-        alert('Invalid credentials');
-        return;
+      if (response.status === 200) {
+        navigate('/features'); // Replace with your desired route
       }
-
-      // If login is successful, navigate to a new route
-      navigate('/Signup'); // Replace with your desired route
-
     } catch (error) {
-      console.error('Login error:', error.message);
-      // Handle error: show error message to the user
+      if (error.response && error.response.status === 401) {
+        setErrors({ general: 'Email address and Password does not match' });
+      } else {
+        console.error('Login error:', error.message);
+        setErrors({ general: 'An error occurred. Please try again.' });
+      }
     }
   };
 
@@ -63,12 +73,23 @@ export default function Login() {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
+          <RouterLink to="/home">
+            <img
+              src='/elderwee-logo/svg/logo-no-background.svg'
+              alt="logo"
+              style={{ width: '80px', height: '40px' }}
+            />
+          </RouterLink>
           <Typography component="h1" variant="h5">
-            Sign in
+            Log in
           </Typography>
+          {location.state && (
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <Typography variant="body2" color="success.main">
+                {location.state.message}
+              </Typography>
+            </Box>
+          )}
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
@@ -79,6 +100,10 @@ export default function Login() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={formData.email}
+              onChange={handleChange}
+              error={Boolean(errors.email)}
+              helperText={errors.email}
             />
             <TextField
               margin="normal"
@@ -89,7 +114,16 @@ export default function Login() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
+              error={Boolean(errors.password)}
+              helperText={errors.password}
             />
+            {errors.general && (
+              <Typography color="error" variant="body2">
+                {errors.general}
+              </Typography>
+            )}
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -100,11 +134,11 @@ export default function Login() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Log In
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link href="/forgot" variant="body2">
                   Forgot password?
                 </Link>
               </Grid>

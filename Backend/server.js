@@ -17,6 +17,10 @@ const Transaction = require('./models/Transaction');
 const BlockchainDB = require('./models/Blockchain')
 const Location = require('./models/Geolocation');
 
+// send mail
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
 // Blockchain module
 const {Block, Blockchain} = require('./blockchain/blockchain');
 
@@ -423,6 +427,7 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        req.session.userId = user.UserID;
         // You can customize what data to send back to the frontend upon successful login
         res.status(200).json({ message: 'Login successful', user });
 
@@ -432,6 +437,77 @@ app.post('/login', async (req, res) => {
     }
 });
 
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'justprepco@gmail.com',
+        pass: 'uhru lnfq oalh duxz', // Use your app-specific password here
+    },
+});
+
+app.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ where: { Email: email } });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const resetLink = `http://localhost:3000/reset-password/${token}`;
+
+        // Save the token to the user record in the database
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000; // 1 hour
+        await user.save();
+
+        const mailOptions = {
+            from: 'justprepco@gmail.com',
+            to: user.Email,
+            subject: 'Password Reset',
+            html: `<p>You requested a password reset</p>
+                   <p>Click this <a href="${resetLink}">link</a> to set a new password.</p>`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+                return res.status(500).json({ error: 'Error sending email' });
+            }
+            res.status(200).json({ message: 'Password reset link sent' });
+        });
+    } catch (error) {
+        console.error('Error processing request:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.post('/reset-password', async (req, res) => {
+    const { token, password } = req.body;
+  
+    try {
+      const user = await User.findOne({ where: { resetToken: token, resetTokenExpiration: { [Op.gt]: Date.now() } } });
+  
+      if (!user) {
+        return res.status(400).json({ error: 'Invalid or expired token' });
+      }
+  
+      // const hashedPassword = await bcrypt.hash(password, 10); // Comment this line out for now
+      user.Password = password; // Save the plain text password for now
+      user.resetToken = null;
+      user.resetTokenExpiration = null;
+      await user.save();
+  
+      res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+  
 // Last line of code
 app.listen(port, ()=>{
     console.log(`Server running on http://localhost:${port}`);
