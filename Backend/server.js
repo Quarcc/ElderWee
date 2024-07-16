@@ -326,9 +326,31 @@ app.delete('/api/users/:userID', async (req, res) => {
             console.log(`Updating accounts from userID ${userID} to ${newUserID}`);
 
             const updatedAccounts = await Account.update(
-                { userID: newUserID },
-                { where: { userID } }
+                { UserID: newUserID },
+                { where: { UserID : userID } }
             );
+
+            const updatedSTransactions = await Transaction.update(
+                { SenderID: newUserID },
+                { where: { SenderID : userID } }
+            );
+
+            const updatedRTransactions = await Transaction.update(
+                { ReceiverID: newUserID },
+                { where: { ReceiverID : userID } }
+            );
+
+            const updateSBlockchainDB = await BlockchainDB.update(
+                { SenderID: newUserID },
+                { where: { SenderID : userID } }
+            );
+
+            const updateRBlockchainDB = await BlockchainDB.update(
+                { ReceiverID: newUserID },
+                { where: { ReceiverID : userID } }
+            );
+
+            initBc();
 
             console.log(`${updatedAccounts[0]} accounts updated.`);
 
