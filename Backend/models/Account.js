@@ -12,6 +12,11 @@ const Account = db.define('account', {
         defaultValue: 0,
         allowNull: false
     },
+    BalanceDisplay: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0,
+        allowNull: false
+    },
     DateOpened: {
         type: Sequelize.DATE,   
         allowNull: false
