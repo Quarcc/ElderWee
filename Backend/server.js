@@ -315,6 +315,35 @@ app.put('/api/users/:userID', async (req, res) => {
     }
 });
 
+app.delete('/api/users/:userID', async (req, res) => {
+    const { userID } = req.params;
+    const newUserID = 999;
+
+    try {
+        const user = await User.findOne({ where: { UserID: userID }});
+        if (user) {
+
+            console.log(`Updating accounts from userID ${userID} to ${newUserID}`);
+
+            const updatedAccounts = await Account.update(
+                { userID: newUserID },
+                { where: { userID } }
+            );
+
+            console.log(`${updatedAccounts[0]} accounts updated.`);
+
+            await user.destroy();
+            res.status(200).json({ message: "User Deleted Successfully" });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+
 app.get('/api/accounts', async (req, res) => {
     try {
         const accounts = await Account.findAll({

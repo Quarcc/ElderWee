@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -17,9 +16,11 @@ import Modal from '@mui/material/Modal';
 import { visuallyHidden } from "@mui/utils";
 
 import IconButton from '@mui/material/IconButton';
-import EditNoteIcon from '@mui/icons-material/EditNote'
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import UpdateUser from './updateUser';
+import DeleteUser from './deleteUser';
 import '../css/adminAccount.css';
 
 export const UserManagement = () => {
@@ -31,14 +32,15 @@ export const UserManagement = () => {
   const [filter, setFilter] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('UserID'); // default column to sort byr
+  const [orderBy, setOrderBy] = useState('UserID');
 
-  const [open, setOpen] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     fetchUsers();
-  }, [])
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -65,7 +67,6 @@ export const UserManagement = () => {
     );
   }, [filter, users]);
 
-  // Sorting and Filtering of Pages and Rows
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -103,20 +104,35 @@ export const UserManagement = () => {
     return 0;
   };
 
-  // Update User
   const handleEditClick = (user) => {
     setSelectedUser(user);
-    setOpen(true)
+    setOpenUpdate(true);
   };
 
-  const handleClose = () => {
-    setOpen(false)
+  const handleDeleteClick = (user) => {
+    setSelectedUser(user);
+    setOpenDelete(true);
+  };
+
+  const handleCloseUpdate = () => {
+    setOpenUpdate(false);
     setSelectedUser(null);
-  }
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+    setSelectedUser(null);
+  };
 
   const handleUpdate = () => {
     fetchUsers();
-  }
+    handleCloseUpdate();
+  };
+
+  const handleDelete = () => {
+    fetchUsers();
+    handleCloseDelete();
+  };
 
   const columns = [
     { id: 'UserID', label: 'User ID', minWidth: 100 },
@@ -126,7 +142,7 @@ export const UserManagement = () => {
     { id: 'PhoneNo', label: 'Phone No.', minWidth: 100 },
     { id: 'Password', label: 'Password', minWidth: 150 },
     { id: 'FaceID', label: 'Face ID', minWidth: 100 },
-    { id: 'Actions', label: 'Actions', minWidth: 100 }
+    { id: 'Actions', label: '', minWidth: 100 }
   ];
 
   const visibleUsers = React.useMemo(() => {
@@ -145,9 +161,9 @@ export const UserManagement = () => {
 
   return (
     <>
-      <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: '0px 0px rgba(0,0,0,0)', paddingX: 2}}>
-        <Toolbar sx={{marginBottom: 2}}>
-          <Typography sx={{ flex: '1 1 100%', fontSize: 40}} variant="h1" id="tableTitle" component="div">
+      <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: '0px 0px rgba(0,0,0,0)', paddingX: 2 }}>
+        <Toolbar sx={{ marginBottom: 2 }}>
+          <Typography sx={{ flex: '1 1 100%', fontSize: 40 }} variant="h1" id="tableTitle" component="div">
             User Management
           </Typography>
           <TextField
@@ -163,7 +179,7 @@ export const UserManagement = () => {
             <TableHead>
               <TableRow>
                 {columns.map(column => (
-                  <TableCell sx={{backgroundColor: '#E8E8E8', fontWeight: 900}}
+                  <TableCell sx={{ backgroundColor: '#E8E8E8', fontWeight: 900 }}
                     key={column.id}
                     align="left"
                     padding="normal"
@@ -172,7 +188,7 @@ export const UserManagement = () => {
                       active={orderBy === column.id}
                       direction={orderBy === column.id ? order : 'asc'}
                       onClick={handleRequestSort(column.id)}
-                      style={{color: 'black'}}
+                      style={{ color: 'black' }}
                     >
                       {column.label}
                       {orderBy === column.id ? (
@@ -193,12 +209,20 @@ export const UserManagement = () => {
                     return (
                       <TableCell key={column.id} align="left">
                         {column.id === 'Actions' ? (
-                          <IconButton sx={{ backgroundColor: "#fabd05", color: "white", fontWeight: 'bold'}}
-                            variant="contained"
-                            onClick={() => handleEditClick(user)} // Change account to user
-                          >
-                            <EditNoteIcon/>
-                          </IconButton>
+                          <div>
+                            <IconButton sx={{ backgroundColor: "#fabd05", color: "white", fontWeight: 'bold' }}
+                              variant="contained"
+                              onClick={() => handleEditClick(user)}
+                            >
+                              <EditNoteIcon />
+                            </IconButton>
+                            <IconButton sx={{ backgroundColor: "#d32f2f", color: "white", fontWeight: 'bold', marginLeft: 1 }}
+                              variant="contained"
+                              onClick={() => handleDeleteClick(user)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </div>
                         ) : (
                           value
                         )}
@@ -223,32 +247,57 @@ export const UserManagement = () => {
       </Paper>
 
       <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="simple-modal-title"
-      aria-describedby="simple-modal-description"
+        open={openUpdate}
+        onClose={handleCloseUpdate}
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
       >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+        >
+          {selectedUser && (
+            <UpdateUser
+              userID={selectedUser.UserID}
+              currentFullName={selectedUser.FullName}
+              currentDOB={selectedUser.DOB}
+              currentEmail={selectedUser.Email}
+              currentPhoneNo={selectedUser.PhoneNo}
+              userDetails={selectedUser}
+              onUpdate={handleUpdate}
+              onClose={handleCloseUpdate}
+            />
+          )}
+        </Box>
+      </Modal>
+
+      <Modal
+        open={openDelete}
+        onClose={handleCloseDelete}
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
       >
-        {selectedUser && (
-          <UpdateUser
-            userID={selectedUser.UserID}
-            currentFullName={selectedUser.FullName}
-            currentDOB={selectedUser.DOB}
-            currentEmail={selectedUser.Email}
-            currentPhoneNo={selectedUser.PhoneNo}
-            userDetails={selectedUser}
-            onUpdate={handleUpdate}
-            onClose={handleClose}
-          />
-        )}
-      </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+        >
+          {selectedUser && (
+            <DeleteUser
+              userID={selectedUser.UserID}
+              userDetails={selectedUser}
+              onDelete={handleDelete}
+              onClose={handleCloseDelete}
+            />
+          )}
+        </Box>
       </Modal>
     </>
   );

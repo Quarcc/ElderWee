@@ -13,3 +13,11 @@
 .css-pdct74-MuiTablePagination-selectLabel, .css-levciy-MuiTablePagination-displayedRows {
     margin: 0;
 }
+
+.css-j3yc8r-MuiButtonBase-root-MuiIconButton-root:hover {
+    background-color: #ab003c !important;
+}
+
+.css-cyspv6-MuiButtonBase-root-MuiIconButton-root:hover{
+    background-color: #faa005 !important;
+}

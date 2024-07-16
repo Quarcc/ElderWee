@@ -44,7 +44,7 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
       flexDirection: 'column',
       alignItems: 'center'
     }}>
-      <Typography variant="h5" gutterBottom mb={5} fontWeight={'bold'} fontSize={28}>
+      <Typography variant="h5" gutterBottom mb={5} fontWeight={'bold'} fontSize={28} color={"orange"}>
         Update Account: {accountNo}
       </Typography>
       <Grid container spacing={2}>
@@ -53,37 +53,55 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
             <Typography variant="body1"><strong>{key}:</strong> {value.toString()}</Typography>
           </Grid>
         ))}
-        <Grid item xs={6}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={accountStatus}
-                onChange={(e) => setAccountStatus(e.target.checked)}
-              />
-            }
-            label="Account Status:"
-            labelPlacement='start'
-            style={{marginLeft: 0, marginTop: 5, color: "red"}}
-          />
+        <Grid container spacing={2} marginTop={1}>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={accountStatus}
+                  onChange={(e) => setAccountStatus(e.target.checked)}
+                />
+              }
+              label="Account Status:"
+              labelPlacement='start'
+              style={{color: "red"}}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={scammer}
+                  onChange={(e) => setScammer(e.target.checked)}
+                />
+              }
+              label="Scammer"
+              labelPlacement="start"
+              style={{color: "red"}}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={scammer}
-                onChange={(e) => setScammer(e.target.checked)}
-              />
-            }
-            label="Scammer"
-            labelPlacement="start"
-            style={{marginLeft: 0, marginTop: 5, color: "red"}}
-          />
-        </Grid>
-        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button variant="contained" color="primary" onClick={handleUpdate}>
+        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 3}}>
+          <Button 
+            sx={{
+              backgroundColor: "#ffc107",
+              fontWeight: 'bold',
+              '&:hover': {
+                  backgroundColor: "#ffb300",
+              },}}
+            variant="contained" 
+            onClick={handleUpdate}>
             Update
           </Button>
-          <Button variant="outlined" color="warning" onClick={onClose}>
+          <Button
+            sx={{
+              backgroundColor: '#9e9e9e',
+              color: 'white',
+              '&:hover': {
+                  backgroundColor: "#616161",
+              },}}
+            variant="contained"
+            onClick={onClose}>
             Cancel
           </Button>
         </Grid>
