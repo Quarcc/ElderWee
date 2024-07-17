@@ -6,7 +6,6 @@ import { LineChart } from "./adminLineChart/adminLine";
 import { PieChart } from "./adminPieChart/adminPie"
 import { BarChart } from "./adminBarChart/adminBar"
 import { UserTable } from "./adminTable/userTable"
-import { AccountTable } from "./adminTable/accountTable"
 
 
 function AdminDashboard() {
@@ -41,10 +40,6 @@ function AdminDashboard() {
                     <h2 style={{ paddingLeft: 30, paddingBottom: 10, paddingTop: 10 }}>Transaction Made</h2>
                         <BarChart />
                     </div>
-                </div>
-                <br />
-                <div id="graph-row-3">
-                    <AccountTable />
                 </div>
                 <br />
                 <div id="graph-row-3">

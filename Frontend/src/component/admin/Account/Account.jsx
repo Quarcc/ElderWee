@@ -1,6 +1,6 @@
 import React from "react";
 import { UserManagement } from "./userManagement"
-
+import { AccountManagement } from "./accountManagement"
 import '../css/adminAccount.css';
 import AdminNavbar from "../navbar/adminNavbar";
 
@@ -16,10 +16,11 @@ const adminAccount = () => {
 
                 </div>
                 <div className="row Account-bot-bg mt-5 p-3">
-                    <h1>Account Management</h1>
+                    <AccountManagement />
                 </div>
+                <br />
+                <br />
             </div>
-
         </div>
     )
 }

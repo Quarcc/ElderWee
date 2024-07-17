@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Typography, FormControlLabel, Box, Grid, Switch } from '@mui/material';
+import '../css/adminAccount.css';
+
 
 const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onClose, accountDetails }) => {
   const [accountStatus, setAccountStatus] = useState(currentStatus);
@@ -23,13 +25,17 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
 
       setSuccess('Account updated successfully');
       setError(null);
-      onUpdate(); // Call onUpdate to refresh the account list
-      onClose();  // Close the modal after successful update
+      onUpdate();
+      onClose();
     } catch (err) {
       setError(err.message);
       setSuccess(null);
     }
   };
+
+  const filterAccountDetails = Object.entries(accountDetails).filter(
+    ([key]) => key !== 'BalanceDisplay'
+  );
 
   return (
     <Box sx={{
@@ -48,7 +54,7 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
         Update Account: {accountNo}
       </Typography>
       <Grid container spacing={2}>
-        {Object.entries(accountDetails).map(([key, value]) => (
+        {filterAccountDetails.map(([key, value]) => (
           <Grid item xs={6} key={key}>
             <Typography variant="body1"><strong>{key}:</strong> {value.toString()}</Typography>
           </Grid>
@@ -75,7 +81,7 @@ const UpdateAccount = ({ accountNo, currentStatus, currentScammer, onUpdate, onC
                   onChange={(e) => setScammer(e.target.checked)}
                 />
               }
-              label="Scammer"
+              label="Scammer:"
               labelPlacement="start"
               style={{color: "red"}}
             />

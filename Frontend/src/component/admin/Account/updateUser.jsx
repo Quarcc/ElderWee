@@ -85,6 +85,7 @@ const UpdateUser = ({ userID, currentFullName, currentDOB, currentEmail, current
                             required
                             id="outlined-dob"
                             label="Date of Birth"
+                            type="date"
                             value={DOB}
                             variant="outlined"
                             fullWidth

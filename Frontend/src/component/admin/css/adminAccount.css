@@ -21,3 +21,16 @@
 .css-cyspv6-MuiButtonBase-root-MuiIconButton-root:hover{
     background-color: #faa005 !important;
 }
+
+.css-1yjjitx-MuiSwitch-track {
+    background-color: green !important;
+    opacity: 1 !important;
+}
+
+.css-byenzh-MuiButtonBase-root-MuiSwitch-switchBase.Mui-checked{
+    color: white !important;
+}
+
+.css-byenzh-MuiButtonBase-root-MuiSwitch-switchBase.Mui-checked+.MuiSwitch-track {
+    background-color: red !important;
+}
