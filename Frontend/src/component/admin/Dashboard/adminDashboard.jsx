@@ -4,7 +4,7 @@ import AdminNavbar from "../navbar/adminNavbar";
 import { KPIBox } from "./adminKPI";
 import { LineChart } from "./adminLineChart/adminLine";
 import { PieChart } from "./adminPieChart/adminPie"
-import { BarChart } from "./adminBarChart/adminBar"
+import { TransactionChart } from "./adminBarChart/adminBar"
 import { UserTable } from "./adminTable/userTable"
 
 
@@ -38,7 +38,7 @@ function AdminDashboard() {
                 <div id="graph-row-2">
                     <div className="line-2">
                     <h2 style={{ paddingLeft: 30, paddingBottom: 10, paddingTop: 10 }}>Transaction Made</h2>
-                        <BarChart />
+                        <TransactionChart />
                     </div>
                 </div>
                 <br />

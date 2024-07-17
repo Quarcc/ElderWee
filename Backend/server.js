@@ -248,6 +248,57 @@ app.get('/api/totalTransactionAmount', async (req, res) => {
     }
 });
 
+app.get('/api/transaction/weeklyTransaction', async (req, res) => {
+    try {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 13);
+
+        const transactions = await Transaction.findAll({
+            where: {
+                TransactionDate: {
+                    [Op.between]: [startDate, endDate]
+                }
+            },
+            order: [['TransactionDate', 'ASC']]
+        });
+
+        // Group accounts by date
+        const groupedData = transactions.reduce((acc, transaction) => {
+            const date = transaction.TransactionDate.toISOString().split('T')[0];
+            if (!acc[date]) {
+                acc[date] = 0;
+            }
+            acc[date]++;
+            return acc;
+        }, {});
+
+        // Initialize arrays to hold the account counts for the last 14 days
+        const currentWeekData = Array(7).fill(0);
+        const previousWeekData = Array(7).fill(0);
+
+        const labels = [];
+        for (let i = 0; i < 14; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            const dateString = date.toISOString().split('T')[0];
+
+            if (i < 7) {
+                previousWeekData[i] = groupedData[dateString] || 0;
+            } else {
+                currentWeekData[i - 7] = groupedData[dateString] || 0;
+            }
+
+            if (i >= 7) {
+                labels.push(dateString);
+            }
+        }
+
+        res.json({ labels, currentWeekData, previousWeekData });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
 app.get('/api/users', async (req, res) => {
     try {
@@ -274,7 +325,7 @@ app.get('/api/users/:userID', async (req, res) => {
 
 app.get('/api/userCount', async (req, res) => {
     try {
-        const userCount = await User.count();
+        const userCount = await User.count() - 1;
         res.json({ count: userCount })
     } catch (err) {
         res.status(500).json(err);
