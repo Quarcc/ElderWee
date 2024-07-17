@@ -107,8 +107,11 @@ const TransactionDetail = () => {
                 return (
                     <div className="row">
                         <div className="col d-flex justify-content-end">
-                            <Button variant="outlined" color="error" disabled> 
+                            <Button variant="outlined" color="error" className="me-3" disabled> 
                                 Rollback
+                            </Button>
+                            <Button variant="outlined" color="success" className="ms-3" disabled> 
+                                Release
                             </Button>
                         </div>
                         <div className="row mt-2">
