@@ -4,9 +4,9 @@ import '../css/adminBC.css';
 
 import AdminNavbar from "../navbar/adminNavbar";
 import CubeContainer from "./blocks/CubeContainer";
-import TransactionDetail from "./transactionDetail/transactionDetail";
+import TransactionTrace from "./transactionTracing/transactionTracing";
 
-const adminBCdetailed = () => {
+const adminBCtrace = () => {
 
     return (
         <div className="container-fluid">
@@ -23,12 +23,12 @@ const adminBCdetailed = () => {
                     </div>
                 </div>
                 <div className="BC-bot-bg mt-5 mb-5">
-                    <h1 className="BC-transaction-header">Transaction Details</h1>
-                    <TransactionDetail />
+                    <h1 className="BC-transaction-header">Tracing Transaction Origin</h1>
+                    <TransactionTrace />
                 </div>     
             </div>
         </div>
     )
 }
 
-export default adminBCdetailed;
+export default adminBCtrace;

@@ -5,7 +5,8 @@ import AdminNavbar from './component/admin/navbar/adminNavbar';
 import AdminDashboard from './component/admin/Dashboard/adminDashboard';
 import AdminAccount from './component/admin/Account/Account';
 import AdminBC from './component/admin/blockchain/adminBC';
-import AdminBCdetailded from './component/admin/blockchain/adminBCdetailed';
+import AdminBCdetails from './component/admin/blockchain/adminBCdetailed';
+import AdminBCtrace from './component/admin/blockchain/adminBCtrace';
 import AdminDMZ from './component/admin/DMZ/DMZ';
 import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';
@@ -33,7 +34,8 @@ function App() {
                 <Route path="/adminDashboard" element={<AdminDashboard />} />
                 <Route path="/adminAccount" element={<AdminAccount />} />
                 <Route path="/adminBC" element={<AdminBC />} />
-                <Route path="/admin/transaction/details/id/:transactionID" element={<AdminBCdetailded />} />
+                <Route path="/admin/transaction/details/id/:transactionID" element={<AdminBCdetails />} />
+                <Route path="/admin/transaction/trace/id/:transactionID" element={<AdminBCtrace />} />
                 <Route path="/adminDMZ" element={<AdminDMZ />} />
                 <Route path="/adminGeo" element={<GeoSummary />} />
                 <Route path="/Login" element={<Login />} />

@@ -77,6 +77,7 @@ const initBc = async () => {
     try {
         // Fetch data from database
         const BlockchainDBData = await BlockchainDB.findAll({
+            attributes: ['BlockNo', 'TransactionID', 'TransactionDate', 'TransactionAmount', 'TransactionStatus', 'TransactionType', 'TransactionDesc', 'ReceiverID', 'ReceiverAccountNo', 'SenderID', 'SenderAccountNo'],
             order: [['TransactionID', 'ASC']]
         });
 
@@ -211,28 +212,13 @@ app.get('/api/accounts', async (req,res) =>{
 
 // === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
-app.get('/admin/transaction/detail/id/:transactionID', async (req, res) => {
-    const { transactionID } = req.params
-    try {
-        const transaction = await Transaction.findOne({ where: {TransactionID: transactionID}});
-        if (transaction) {
-            res.json(transaction);
-        } else {
-            res.status(404).json({ error: 'Transaction not found' } );
-        }
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
 app.get('/api/Blockchain', async (req, res) => {
     try{
-        res.status(200).send(Bc)
+        res.status(200).send(JSON.stringify(Bc, null, 2));
     }
     catch (err){
         res.status(500).json(err);
     }
-    
 })
 
 app.get('/api/allTransactions', async (req, res) => {
@@ -558,7 +544,6 @@ app.post('/reset-password', async (req, res) => {
     }
   });
 
-  
 // Last line of code
 app.listen(port, ()=>{
     console.log(`Server running on http://localhost:${port}`);
