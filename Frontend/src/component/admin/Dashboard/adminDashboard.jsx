@@ -37,7 +37,7 @@ function AdminDashboard() {
                 <br />
                 <div id="graph-row-2">
                     <div className="line-2">
-                    <h2 style={{ paddingLeft: 30, paddingBottom: 10, paddingTop: 10 }}>Transaction Made</h2>
+                    <h2 style={{ paddingLeft: 30, paddingBottom: 10, paddingTop: 10 }}>Transactions</h2>
                         <TransactionChart />
                     </div>
                 </div>

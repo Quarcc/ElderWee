@@ -76,7 +76,7 @@ export const KPIBox = () => {
     const KPIData = [
         { icon: <PersonAddAltRoundedIcon sx={{ fontSize: 40, color: pink[600] }} />, total: userCount, title: 'New Account', style: { width: '23rem', borderRadius: "20px" } },
         { icon: <PaidRoundedIcon sx={{ fontSize: 40, color: purple[300] }} />, total: transactionCount, title: 'New Transaction', style: { width: '23rem', borderRadius: "20px" } },
-        { icon: <PollRoundedIcon sx={{ fontSize: 40, color: orange[600] }} />, total: `$${totalTransactionAmount}`, title: 'Amount Saved', style: { width: '23rem', borderRadius: "20px" } },
+        { icon: <PollRoundedIcon sx={{ fontSize: 40, color: orange[600] }} />, total: `$${totalTransactionAmount}`, title: 'Transacted Amount', style: { width: '23rem', borderRadius: "20px" } },
         { icon: <ArticleRoundedIcon sx={{ fontSize: 40, color: blue[600] }} />, total: 63, title: 'New Queries', style: { width: '23rem', borderRadius: "20px" } }
     ];
 
