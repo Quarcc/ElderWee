@@ -50,31 +50,42 @@
 }
 
 /* FlaggedAccountsTable styles */
-.geo-container {
-  background-color: white;
-  padding: 20px;  
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  margin-top: 60px;
-  width: 820px;
-  height: 400px;
+.admingeo-container {
+  margin: 30px;
+  width: 100%;
+  padding-left: 250px;
+}
+
+.toprow-container{
+  display: flex;
+  flex-direction: row; 
+}
+
+.geo-acc-table {
+  padding: 10px;
+  border: 1px solid #ccc; /* Optional: for visual separation */
+}
+
+.geo-container-activeAcc{
+  max-height: 440px;
+}
+
+.rowacc{
+  padding-top: 10px;
 }
 
 .geo-table {
   width: 800px;
   border-collapse: collapse;
-  text-align: center;
 }
 
 .geo-th, .geo-td {
   border-bottom: 1px solid #ddd;
   padding: 10px;
 
-
 }
 
 .geo-th {
-  text-align: center;
 }
 
 .accountTables {
