@@ -49,7 +49,11 @@ export default function Login() {
       });
 
       if (response.status === 200) {
-        navigate('/features'); // Replace with your desired route
+        if (formData.email === "DELETED@gmail.com") {
+          navigate('/adminDashboard')
+        } else {
+          navigate('/features'); // Replace with your desired route
+        }
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
