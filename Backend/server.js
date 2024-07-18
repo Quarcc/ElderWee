@@ -239,20 +239,6 @@ app.get('/api/transactionCount', async (req, res) => {
     }
 });
 
-app.get('/api/transaction/id/:transactionID', async (req, res) => {
-    const { transactionID } = req.params;
-    try {
-        const transaction = await Transaction.findOne({ where: { TransactionID: transactionID } });
-        if (transaction) {
-            res.json(transaction);
-        } else {
-            res.status(404).json({ error: 'Transaction not found' });
-        }
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
 app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
     const { transactionID } = req.params;
     let transactionDate;

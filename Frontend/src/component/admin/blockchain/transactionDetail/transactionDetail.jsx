@@ -15,7 +15,6 @@ const APIEndPoint = "localhost:8000";
 const TransactionDetail = () => {
     const { transactionID } = useParams();
     const [Transactions, setTransactions] = useState([]);
-    const [DBTransactions, setDBTransactions] = useState([]);
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -24,26 +23,6 @@ const TransactionDetail = () => {
         getBlockchainData();
         getDBData();
     }, []);
-
-    const getDBData = async () => {
-        try{
-            const res = await axios.get(`http://${APIEndPoint}/api/transactions/id/${transactionID}`);
-            setTransactions(res.data.blockchain);
-            
-        } catch (error) {
-            if (error.response) {
-                console.log('Error Response: ' + error.response);
-            }
-            // Request made with no response
-            else if (error.request) {
-                console.log('Error Request: ' + error.request);
-            }
-            // Any other error
-            else {
-                console.log('Error Message: ' + error.message);
-            }
-        }
-    };
 
     const getBlockchainData = async () => {
         try{
@@ -102,6 +81,8 @@ const TransactionDetail = () => {
             }
         }
     };
+
+    let checkSum = [];
 
     return (
         <div className="container">
