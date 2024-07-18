@@ -61,7 +61,7 @@ export const UserManagement = () => {
     setFilteredUsers(
       users.filter(user =>
         Object.values(user).some(value =>
-          value.toString().toLowerCase().includes(filter.toLowerCase())
+          value != null && value.toString().toLowerCase().includes(filter.toLowerCase())
         )
       )
     );

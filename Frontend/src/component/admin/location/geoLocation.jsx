@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import GeoSummary from './GeoSummary';
+import { ActiveAccountsSummary, FlaggedAccountsSummary } from './GeoSummary';
 import '../css/adminNavbar.css';
 import AdminNavBar from "../navbar/adminNavbar";
 import FlaggedAccountsTable from './flaggedAccountsTable';
@@ -40,28 +40,37 @@ function geoSummary() {
   },[]);
 
   return (
-    <div className=''>
+    <div className='container-fluid'>
       <div className='w-[25%]'> 
         <AdminNavBar/>
       </div>
-      <div className="container">
+      <div className="admingeo-container">
         <h1 className="title">
             Account
         </h1> 
-        <div className="geoSummary">
-          <div className='flex flex-row'>
-            <GeoSummary
-              activeAccounts={accounts.active.length} 
-              flaggedAccounts={accounts.flagged.length} 
-            />
+        <div className="toprow-container">
+          <div className='col-3 geo-row2'>
+            <div className='row rowacc'>
+              <ActiveAccountsSummary
+                activeAccounts={accounts.active.length} 
+              />
+            </div>
+            <div className='row rowacc'>
+              <FlaggedAccountsSummary
+                flaggedAccounts={accounts.flagged.length} 
+              />
+            </div>
+          </div>
+          <div className='col-9 geo-acc-table'>
             <ActiveAccountsTable activeAccountData={accounts.active} />
           </div>
-
-        <div className="accountTables">
+        </div>
+        <br />
+        <div className="">
           <FlaggedAccountsTable flaggedAccountData={accounts.flagged} />
         </div>
       </div>
-    </div>
+    
       </div>
 
   );

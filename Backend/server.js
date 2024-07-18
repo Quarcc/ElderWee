@@ -132,16 +132,21 @@ const initBc = async () => {
 initBc();
 
 // API endpoint to get active accounts
-app.get('/api/activeAccounts', async(req, res) => {
-    try{
+app.get('/api/activeAccounts', async (req, res) => {
+    try {
         const accounts = await Account.findAll({
-            where: { AccountStatus: false }
+            where: { AccountStatus: false },
+            include: [{
+                model: User,
+                attributes: ['FullName', 'PhoneNo']
+            }]
         });
         res.json(accounts);
-    }  catch (error) {
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // API endpoint to get flagged accounts
 app.get('/api/flaggedAccounts', async (req, res) => {
