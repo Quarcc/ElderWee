@@ -45,15 +45,15 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
             window.location.href = url; // Redirect to the specific url
         };
 
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
+        const raycaster = new THREE.Raycaster(); // mouse intersect 3d model
+        const mouse = new THREE.Vector2(); // mouse is detected as a 2d model
 
         const onMouseMove = (event) => {
             event.preventDefault();
 
             // Calculate mouse position in normalized device coordinates
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            const rect = renderer.domElement.getBoundingClientRect(); // gets the entire page view size
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1; // tracking movement
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);

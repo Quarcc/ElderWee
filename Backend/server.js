@@ -239,6 +239,70 @@ app.get('/api/transactionCount', async (req, res) => {
     }
 });
 
+app.get('/api/transaction/id/:transactionID', async (req, res) => {
+    const { transactionID } = req.params;
+    try {
+        const transaction = await Transaction.findOne({ where: { TransactionID: transactionID } });
+        if (transaction) {
+            res.json(transaction);
+        } else {
+            res.status(404).json({ error: 'Transaction not found' });
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
+    const { transactionID } = req.params;
+    let transactionDate;
+    let transactionAmt;
+    let transactionType;
+    let transactionDesc;
+    let receiverid;
+    let receiveraccountnum;
+    let senderid;
+    let senderaccountnum;
+    try {
+        const transaction = await Transaction.findOne({ where: { TransactionID: transactionID } });
+        if (transaction) {
+            transactionDate = transaction.TransactionDate;
+            transactionAmt = transaction.TransactionAmount;
+            transactionType = transaction.TransactionType;
+            transactionDesc = transaction.TransactionDesc;
+            receiverid = transaction.ReceiverID;
+            receiveraccountnum = transaction.ReceiverAccountNo;
+            senderid = transaction.SenderID;
+            senderaccountnum = transaction.SenderAccountNo;
+            transaction.TransactionStatus = 'Returned';
+            await transaction.save();
+            res.status(200).json({ message: 'Transaction updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Transaction not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+
+    const newTransactionDB = await BlockchainDB.create({
+        BlockNo: (Math.random()+' ').substring(2,10)+(Math.random()+' ').substring(2,10),
+        TransactionID: transactionID,
+        TransactionDate: transactionDate,
+        TransactionAmount: transactionAmt,
+        TransactionStatus: 'Returned',
+        TransactionType: transactionType,
+        TransactionDesc: transactionDesc,
+        ReceiverID: receiverid,
+        ReceiverAccountNo: receiveraccountnum,
+        SenderID: senderid,
+        SenderAccountNo: senderaccountnum
+    });
+
+    if (newTransactionDB) {
+        initBc();
+    }
+})
+
 app.get('/api/totalTransactionAmount', async (req, res) => {
     try {
         const totalAmount = await Transaction.sum('TransactionAmount');
