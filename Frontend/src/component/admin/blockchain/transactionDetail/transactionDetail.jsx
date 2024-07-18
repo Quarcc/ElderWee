@@ -21,13 +21,12 @@ const TransactionDetail = () => {
 
     useEffect(() => {
         getBlockchainData();
-        getDBData();
     }, []);
 
     const getBlockchainData = async () => {
         try{
             const res = await axios.get(`http://${APIEndPoint}/api/Blockchain`);
-            setTransactions(res.data.blockchain);
+            setTransactions(res.data.blockchain.reverse());
             
         } catch (error) {
             if (error.response) {
@@ -82,12 +81,16 @@ const TransactionDetail = () => {
         }
     };
 
-    let checkSum = [];
+    const checkSum = new Set();
 
     return (
         <div className="container">
           {Transactions.map((block) => {
+            if (checkSum.has(block.data.TransactionID)){
+                return null;
+            }
             if (block.data.TransactionID === transactionID && block.data.TransactionStatus === "Completed") {
+                checkSum.add(block.data.TransactionID);
                 return (
                     <div className="row">
                         <div className="col d-flex justify-content-end">
@@ -146,6 +149,7 @@ const TransactionDetail = () => {
                 );
             }
             else if (block.data.TransactionID === transactionID && block.data.TransactionStatus === "Returned") {
+                checkSum.add(block.data.TransactionID);
                 return (
                     <div className="row">
                         <div className="col d-flex justify-content-end">
@@ -204,6 +208,7 @@ const TransactionDetail = () => {
                 );
             }
             else if (block.data.TransactionID === transactionID && block.data.TransactionStatus === "Pending") {
+                checkSum.add(block.data.TransactionID);
                 return (
                     <div className="row">
                         <div className="col d-flex justify-content-end">
