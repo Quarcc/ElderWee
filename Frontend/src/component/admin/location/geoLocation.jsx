@@ -6,7 +6,7 @@ import AdminNavBar from "../navbar/adminNavbar";
 import FlaggedAccountsTable from './flaggedAccountsTable';
 import ActiveAccountsTable from './activeAccounts';
 import '../css/geolocation.css';
-import {getAllAccounts} from "../../../Api.js";
+import {getAllAccounts,getAllUsers} from "../../../Api.js";
 
 const APIEndPoint = 'localhost:8000';
 
@@ -15,22 +15,35 @@ function geoSummary() {
   const [accounts, setAccounts] = useState({
     flagged: [],
     active:[],
-  })
+  });
 
   useEffect(()=>{
     const filterAccounts = async () =>{
       let data = await getAllAccounts();
-      console.log(data);
+      let userData = await getAllUsers();
+
+      console.log(userData);
+
       let accountData = {
         flagged:[],
         active:[]
       }
       data.forEach((acc)=>{
+        let user = {};
+        for(let i = 0; i < userData.length; i++){
+          let u = userData[i];
+          if(u.UserID == acc.UserID){
+            user["AccountNo"] = acc.AccountNo;
+            user["Name"] = u.FullName;
+            user["ContactNumber"] = u.PhoneNo;
+            break;
+          }
+        }
         if(acc.Scammer){
-          accountData.flagged.push(acc);
+          accountData.flagged.push(user);
         }
         else{
-          accountData.active.push(acc);
+          accountData.active.push(user);
         }
       });
       console.log(accountData);
