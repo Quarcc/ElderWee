@@ -10,11 +10,11 @@ export default function Validation(values) {
         errors.email = "Invalid Email Format";
     }
 
-    if (!values.password) {
-        errors.password = "Password is required";
-    } else if (!password_pattern.test(values.password)) {
-        errors.password = "Password did not match the required format";
-    }
+    // if (!values.password) {
+    //     errors.password = "Password is required";
+    // } else if (!password_pattern.test(values.password)) {
+    //     errors.password = "Password did not match the required format";
+    // }
 
     return errors;
 }
