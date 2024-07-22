@@ -3,13 +3,13 @@ import '../css/adminNavbar.css';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PaidIcon from '@mui/icons-material/Paid';
-import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import FlagIcon from '@mui/icons-material/Flag';
 import LogoutIcon from '@mui/icons-material/Logout';
+import EmailIcon from '@mui/icons-material/Email';
 
 export const NavbarData = [
     {
@@ -18,13 +18,13 @@ export const NavbarData = [
         link: "/adminDashboard"
     },
     {
-        title: "Transaction",
-        icon: <PaidIcon />,
-        link: "/adminNavbar"
+        title: "Account",
+        icon: <AccountCircleIcon />,
+        link: "/adminAccount"
     },
     {
-        title: "Blockchain",
-        icon: <CurrencyBitcoinIcon />,
+        title: "Transaction",
+        icon: <PaidIcon />,
         link: "/adminBC"
     },
     {
@@ -33,9 +33,9 @@ export const NavbarData = [
         link: "/adminDMZ"
     },
     {
-        title: "Account",
-        icon: <AccountCircleIcon />,
-        link: "/adminAccountr"
+        title: "Email",
+        icon: <EmailIcon />,
+        link: "/adminEmail"
     },
     {
         title: "Report",
@@ -55,7 +55,7 @@ export const NavbarData = [
     {
         title: "Logout",
         icon: <LogoutIcon />,
-        link: "/logout"
+        link: "/login"
     },
 
 ]

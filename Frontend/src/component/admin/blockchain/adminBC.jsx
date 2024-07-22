@@ -1,12 +1,26 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
 import '../css/adminBC.css';
 
 import AdminNavbar from "../navbar/adminNavbar";
 import CubeContainer from "./blocks/CubeContainer";
 import TransactionTable from "./transactionTable/transactionTable";
 
-const adminBC = () => {
+import Preload from "../../preloader/preloader";
+
+const AdminBC = () => {
+    // const [loading, setLoading] = useState(true);
+
+    // useEffect(() => {
+    //     // Simulate a data fetch or any loading operation
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //     }, 500); // Adjust the timeout as needed to simulate your loading time
+    // }, []);
+
+    // if (loading) {
+    //     return <Preload />;
+    // }
+
     return (
         <div className="container-fluid">
             <div className="adminNavbar">
@@ -27,7 +41,7 @@ const adminBC = () => {
                 </div>     
             </div>
         </div>
-    )
+    );
 }
 
-export default adminBC;
+export default AdminBC;

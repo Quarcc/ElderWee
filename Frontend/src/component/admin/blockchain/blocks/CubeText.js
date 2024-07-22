@@ -9,7 +9,11 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
     useEffect(() => {
         // Creating the cube
         const geometry = RoundedBlock(1, 1, 1, 0.1, 10);
-        const material = new THREE.MeshMatcapMaterial({ color: 0x0080FF });
+        let materialColor = 0x0080FF;
+        if (textLeft.includes("Pending")) {
+            materialColor = 0xFF0000;
+        };
+        const material = new THREE.MeshMatcapMaterial({ color: materialColor });
         const cube = new THREE.Mesh(geometry, material);
 
         cube.position.set(position.x, position.y, position.z);
@@ -18,7 +22,7 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
 
         // Adding text
         const addText = async (text, position, rotation) => {
-            const textMesh = await Text(text, { size: 0.15, depth: 0.02, color: 0xFFFFFF });
+            const textMesh = await Text(text, { size: 0.12, depth: 0.02, color: 0xFFFFFF });
             textMesh.position.set(position.x, position.y, position.z);
             textMesh.rotation.set(rotation.x, rotation.y, rotation.z);
             cube.add(textMesh);
@@ -41,15 +45,15 @@ const CubeText = ({ position, textFront, textBack, textTop, textBot, textLeft, t
             window.location.href = url; // Redirect to the specific url
         };
 
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
+        const raycaster = new THREE.Raycaster(); // mouse intersect 3d model
+        const mouse = new THREE.Vector2(); // mouse is detected as a 2d model
 
         const onMouseMove = (event) => {
             event.preventDefault();
 
             // Calculate mouse position in normalized device coordinates
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            const rect = renderer.domElement.getBoundingClientRect(); // gets the entire page view size
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1; // tracking movement
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);

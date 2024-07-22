@@ -69,8 +69,13 @@
     width: 100%;
 }
 
+/* Pagination for Table  */
 .css-pdct74-MuiTablePagination-selectLabel, .css-levciy-MuiTablePagination-displayedRows {
     margin: 0;
 }
 
+/* CSS hover for edit button */
+.css-cyspv6-MuiButtonBase-root-MuiIconButton-root:hover {
+    background-color: #faa005 !important;
+}
 
