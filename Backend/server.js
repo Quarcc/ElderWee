@@ -16,6 +16,7 @@ const Account = require('./models/Account');
 const Transaction = require('./models/Transaction');
 const BlockchainDB = require('./models/Blockchain')
 const Location = require('./models/Geolocation');
+const AccountLog = require('./models/AccountLogs');
 
 // send mail
 const nodemailer = require('nodemailer');
@@ -364,6 +365,21 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
+app.get('/api/users/email/:email',async (req, res)=>{
+    const {email} = req.params;
+    console.log(req.params);
+    try {
+      const user = await User.findOne({ where: { Email: email } });
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+})
+
 app.get('/api/users/:userID', async (req, res) => {
     const { userID } = req.params
     try {
@@ -456,7 +472,25 @@ app.delete('/api/users/:userID', async (req, res) => {
     }
 });
 
-
+app.post('/api/accounts/log',async(req,res)=>{
+    const {AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime} = req.body;
+    //res.status(200).json({"message":"message"});
+    
+    try {
+      const newLog = await AccountLog.create({
+        AccountNo,
+        LoginCoords,
+        LastIPLoginCountry,
+        Flagged,
+        LoginTime,
+      });
+      console.log("New user created:", newLog.toJSON());
+      res.json(newLog);
+    } catch (error) {
+      console.error("Error creating new user:", error);
+      return res.status(404).json({error:error});
+    }
+})
 
 app.get('/api/accounts', async (req, res) => {
     try {
@@ -468,6 +502,20 @@ app.get('/api/accounts', async (req, res) => {
         res.status(500).json(err);
     }
 });
+
+app.get('/api/accounts/userid/:userid',async (req,res)=>{
+    const {userid} = req.params;
+    try {
+      const acc = await Account.findOne({ where: { UserID: userid } });
+      if (acc) {
+        res.json(acc);
+      } else {
+        res.status(404).json({ error: "Account not found" });
+      }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+})
 
 app.put('/api/accounts/:accountNo', async (req, res) => {
   const { accountNo } = req.params;

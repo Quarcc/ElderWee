@@ -1,40 +1,66 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
-import axios from 'axios';
-import Validation from './LoginValidation';
+import * as React from "react";
+import { useEffect } from "react";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
+import axios from "axios";
+import Validation from "./LoginValidation";
+import { retrieveAccountDetailsWithEmail } from "../../Api";
 
 const defaultTheme = createTheme();
 
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [coordinates, setCoordinates] = React.useState(null);
   const [errors, setErrors] = React.useState({});
   const [formData, setFormData] = React.useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCoordinates({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (err) => {
+          confirm("Please enable geolocation to use this application."); 
+        }
+      );
+    } else {
+      confirm("Please enable geolocation to use this application."); 
+    }
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if(!coordinates){
+      confirm("Please enable geolocation to use this application.");
+      return;
+    }
 
     const validationErrors = Validation(formData);
     if (Object.keys(validationErrors).length > 0) {
@@ -43,24 +69,48 @@ export default function Login() {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/login', {
+      const response = await axios.post("http://localhost:8000/login", {
         email: formData.email,
         password: formData.password,
       });
 
+      let accountData = await retrieveAccountDetailsWithEmail(formData.email);
+      let LoginCoords = JSON.stringify(coordinates);
+      let currentDateTime = new Date();
+      const accountLogData = {
+        AccountNo:accountData.AccountNo,
+        LoginCoords:LoginCoords,
+        LastIPLoginCountry:"Singapore",
+        Flagged:accountData.Scammed ? true : false,
+        LoginTime:JSON.stringify(currentDateTime),
+      }
+
+      const addAccountLog = await fetch("http://localhost:8000/api/accounts/log",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(accountLogData),
+      });
+
+      let res = await addAccountLog.json()
+
+      console.log(res);
+
+      return;
       if (response.status === 200) {
         if (formData.email === "DELETED@gmail.com") {
-          navigate('/adminDashboard')
+          navigate("/adminDashboard");
         } else {
-          navigate('/features'); // Replace with your desired route
+          navigate("/features"); // Replace with your desired route
         }
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        setErrors({ general: 'Email address and Password does not match' });
+        setErrors({ general: "Email address and Password does not match" });
       } else {
-        console.error('Login error:', error.message);
-        setErrors({ general: 'An error occurred. Please try again.' });
+        console.error("Login error:", error.message);
+        setErrors({ general: "An error occurred. Please try again." });
       }
     }
   };
@@ -72,16 +122,16 @@ export default function Login() {
         <Box
           sx={{
             marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
           <RouterLink to="/home">
             <img
-              src='/elderwee-logo/svg/logo-no-background.svg'
+              src="/elderwee-logo/svg/logo-no-background.svg"
               alt="logo"
-              style={{ width: '80px', height: '40px' }}
+              style={{ width: "80px", height: "40px" }}
             />
           </RouterLink>
           <Typography component="h1" variant="h5">
@@ -94,7 +144,12 @@ export default function Login() {
               </Typography>
             </Box>
           )}
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <TextField
               margin="normal"
               required
