@@ -1,6 +1,7 @@
 const mySQLDB = require('./DBConfig');
 const User = require('../models/User');
 const Account = require('../models/Account');
+const AccountLogs = require('../models/AccountLogs');
 const Announcement = require('../models/Announcement');
 const BlockchainDB = require('../models/Blockchain');
 const Enquiry = require('../models/Enquiry');

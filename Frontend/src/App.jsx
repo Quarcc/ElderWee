@@ -7,7 +7,7 @@ import AdminAccount from './component/admin/Account/Account';
 import AdminBC from './component/admin/blockchain/adminBC';
 import AdminBCdetails from './component/admin/blockchain/adminBCdetailed';
 import AdminBCtrace from './component/admin/blockchain/adminBCtrace';
-import AdminDMZ from './component/admin/DMZ/DMZ';
+import AdminDMZ from './component/admin/dmz/dmz';
 import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';
 import Login from './component/user/Login';
@@ -46,7 +46,6 @@ function App() {
                 <Route path="/forgot" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
-
             </Routes>
 
         </>
