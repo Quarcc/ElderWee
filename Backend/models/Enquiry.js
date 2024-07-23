@@ -17,7 +17,7 @@ const Enquiry = db.define('enquiry', {
         allowNull: false,
     },
     EnquiryDetails: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
     }
 });
