@@ -1,5 +1,6 @@
 import React from "react";
 import '../css/adminDMZ.css';
+import io from 'socket.io-client'
 import AdminNavbar from "../navbar/adminNavbar";
 
 const adminDMZ = () => {
