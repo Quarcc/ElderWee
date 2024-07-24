@@ -9,3 +9,23 @@
     width: 100%;
     padding-left: 250px;
 }
+
+.DMZTopThreeCards{
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.dmz-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+  
+.dmz-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    min-width: 150px;
+}

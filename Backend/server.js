@@ -5,6 +5,8 @@ const MySQLStore = require('express-mysql-session')(session);
 const bodyParser = require('body-parser')
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
+const http = require('http');
+const { Server } = require('socket.io');
 
 // Database
 const elderwee = require('./config/DBConnection');
@@ -26,6 +28,26 @@ const crypto = require('crypto');
 const {Block, Blockchain} = require('./blockchain/blockchain');
 
 const app = express();
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+      origin: "http://localhost:3000", // Frontend URL
+      methods: ["GET", "POST"]
+    }
+  });
+
+const connectedSockets = new Set();
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    connectedSockets.add(socket);
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+        connectedSockets.delete(socket);
+    });
+});
 
 let port = 8000;
 
@@ -59,6 +81,24 @@ const options = {
 }));
 
 let Bc = new Blockchain();
+
+function getTodayDate() {
+    // Create a date object for the current date and time
+    const now = new Date();
+    const offset = 8 * 60;
+    const localOffset = now.getTimezoneOffset();
+    const gmt8Time = new Date(now.getTime() + (offset - localOffset) * 60000);
+    const year = gmt8Time.getFullYear();
+    const month = String(gmt8Time.getMonth() + 1).padStart(2, '0');
+    const day = String(gmt8Time.getDate()).padStart(2, '0');
+
+    return {
+        startOfToday: `${year}-${month}-${day - 1} 08:00:00`,
+        endOfToday: `${year}-${month}-${day} 07:59:59`,
+        startOfYesterday: `${year}-${month}-${day - 2} 08:00:00`,
+        endOfYesterday: `${year}-${month}-${day - 1} 07:59:59`
+    }
+}
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -181,42 +221,70 @@ app.get('/api/accounts', async (req,res) =>{
     }
 })
 
-
-
-// Geolocation dummy data
-// const GeodummyData = [
-//     { LocationID: 1, Latitude: 37.7749, Longitude: -122.4194, LastIPLoginCountry: 'United States' },
-//     { LocationID: 2, Latitude: 51.5074, Longitude: -0.1278, LastIPLoginCountry: 'United Kingdom' },
-//     { LocationID: 3, Latitude: 48.8566, Longitude: 2.3522, LastIPLoginCountry: 'France' },
-//     { LocationID: 4, Latitude: 35.6895, Longitude: 139.6917, LastIPLoginCountry: 'Japan' },
-//     { LocationID: 5, Latitude: -33.8688, Longitude: 151.2093, LastIPLoginCountry: 'Australia' },
-//     { LocationID: 6, Latitude: 52.5200, Longitude: 13.4050, LastIPLoginCountry: 'Germany' },
-//     { LocationID: 7, Latitude: 40.7128, Longitude: -74.0060, LastIPLoginCountry: 'United States' },
-//     { LocationID: 8, Latitude: 55.7558, Longitude: 37.6173, LastIPLoginCountry: 'Russia' },
-//     { LocationID: 9, Latitude: 34.0522, Longitude: -118.2437, LastIPLoginCountry: 'United States' },
-//     { LocationID: 10, Latitude: -23.5505, Longitude: -46.6333, LastIPLoginCountry: 'Brazil' },
-//     { LocationID: 11, Latitude: 19.4326, Longitude: -99.1332, LastIPLoginCountry: 'Mexico' },
-//     { LocationID: 12, Latitude: 28.6139, Longitude: 77.2090, LastIPLoginCountry: 'India' },
-//     { LocationID: 13, Latitude: 1.3521, Longitude: 103.8198, LastIPLoginCountry: 'Singapore' },
-//     { LocationID: 14, Latitude: -26.2041, Longitude: 28.0473, LastIPLoginCountry: 'South Africa' },
-//     { LocationID: 15, Latitude: 39.9042, Longitude: 116.4074, LastIPLoginCountry: 'China' },
-//     { LocationID: 16, Latitude: 41.9028, Longitude: 12.4964, LastIPLoginCountry: 'Italy' },
-//     { LocationID: 17, Latitude: 35.6762, Longitude: 139.6503, LastIPLoginCountry: 'Japan' },
-//     { LocationID: 18, Latitude: 40.4168, Longitude: -3.7038, LastIPLoginCountry: 'Spain' },
-//     { LocationID: 19, Latitude: -34.6037, Longitude: -58.3816, LastIPLoginCountry: 'Argentina' },
-//     { LocationID: 20, Latitude: 31.2304, Longitude: 121.4737, LastIPLoginCountry: 'China' }
-// ];
-
-// async function GeoinsertDummyData() {
-//     for (const data of GeodummyData) {
-//         await Location.create(data);
-//     }
-//     console.log('20 dummy data entries have been inserted');
-// }
-
-// GeoinsertDummyData();
-
 // === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
+
+function padWithZeros(value) {
+    let strValue = value.toString();
+    let zerosNeeded = 8 - strValue.length;
+    let zeros = '0'.repeat(zerosNeeded);
+    return zeros + strValue;
+}
+
+app.post('/api/transaction/send/:sender/receive/:receiver', async (req, res) => {
+    const { sender, receiver } = req.params;
+    const { amt } = req.body;
+    
+    try {
+        const senderAccount = await Account.findOne({ where: { AccountNo: sender } });
+        const receiverAccount = await Account.findOne({ where: { AccountNo: receiver } });
+        if (!senderAccount || !receiverAccount) {
+            res.status(404).json({ error: 'Account not found' });
+            return;
+        }
+        if (senderAccount.Balance < amt) {   
+            res.status(400).json({ error: 'Insufficient balance' });
+            return;
+        }
+        const trans = await Transaction.findAll();
+
+        const newTransID = padWithZeros(trans.length + 1);
+
+        const DMZNewTransaction = {
+            id: newTransID,
+            amount: amt,
+            status: 'Checking...'
+        }
+
+        // Emit to all connected sockets
+        for (let socket of connectedSockets) {
+            socket.emit('newTransaction', DMZNewTransaction);
+        }
+
+        const transaction = await Transaction.create({
+            TransactionID: newTransID,
+            TransactionDate: new Date(),
+            TransactionAmount: amt,
+            TransactionStatus: 'Completed',
+            TransactionType: 'Withdrawal',
+            TransactionDesc: null,
+            ReceiverID: receiverAccount.UserID,
+            ReceiverAccountNo: receiverAccount.AccountNo,
+            SenderID: senderAccount.UserID,
+            SenderAccountNo: senderAccount.AccountNo
+        })
+
+        const newSenderBalance = parseInt(senderAccount.Balance) - parseInt(amt);
+        const newReceiverBalance = parseInt(receiverAccount.Balance) + parseInt(amt);
+        await Account.update({ Balance: newSenderBalance }, { where: { AccountNo: sender } });
+        await Account.update({ Balance: newReceiverBalance }, { where: { AccountNo: receiver } });
+        res.status(200).json({ message: 'Transaction completed successfully' });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 app.get('/api/Blockchain', async (req, res) => {
     try{
@@ -294,6 +362,47 @@ app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
         initBc();
     }
 })
+
+app.get('/api/FrozenFunds', async (req, res) => {
+    try {
+        const frozenFunds = await Transaction.findAll();
+        res.json(frozenFunds);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/api/FrozenFunds/Today', async (req, res) => {
+    const { startOfToday, endOfToday } = getTodayDate();
+    try {
+        const frozenFunds = await Transaction.findAll({
+            where: {
+                TransactionDate: {
+                    [Op.between]: [startOfToday, endOfToday]
+                }
+            }
+        });
+        res.send(frozenFunds);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/api/FrozenFunds/Yesterday', async (req, res) => {
+    const { startOfYesterday, endOfYesterday } = getTodayDate();
+    try {
+        const frozenFunds = await Transaction.findAll({
+            where: {
+                TransactionDate: {
+                    [Op.between]: [startOfYesterday, endOfYesterday]
+                }
+            }
+        });
+        res.send(frozenFunds);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
 app.get('/api/totalTransactionAmount', async (req, res) => {
     try {
@@ -698,7 +807,11 @@ app.post('/reset-password', async (req, res) => {
     }
   });
 
+server.listen(4000, () => {
+    console.log(`Server running on http://localhost:4000`);
+});
+
 // Last line of code
 app.listen(port, ()=>{
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`App running on http://localhost:${port}`);
 });

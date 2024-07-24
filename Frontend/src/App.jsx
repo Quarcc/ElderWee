@@ -20,6 +20,7 @@ import Home from './component/user/landing-page/components/Home';
 import ResetPassword from './component/user/ResetPassword';
 import ForgotPassword from './component/user/ForgotPassword';
 import ProfilePage from './component/user/Profile';
+import TransactionTest from './component/user/transactionTest'
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -46,8 +47,8 @@ function App() {
                 <Route path="/forgot" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path='/transactionTest' element={<TransactionTest />} />
             </Routes>
-
         </>
     );
 }
