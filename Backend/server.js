@@ -403,6 +403,17 @@ app.get('/api/userCount', async (req, res) => {
     }
 });
 
+app.get('/api/accountlogs',async(req,res)=>{
+    try{
+        const logs = await AccountLog.findAll();
+        if(logs){
+            res.json(logs);
+        }
+    }catch(err){
+        res.status(500).json(err);
+    }
+});
+
 app.put('/api/users/:userID', async (req, res) => {
     const { userID } = req.params;
     const { FullName, DOB, Email, PhoneNo } = req.body;

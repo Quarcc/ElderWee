@@ -33,8 +33,8 @@ export default function Login() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setCoordinates({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
           });
         },
         (err) => {
@@ -95,9 +95,6 @@ export default function Login() {
 
       let res = await addAccountLog.json()
 
-      console.log(res);
-
-      return;
       if (response.status === 200) {
         if (formData.email === "DELETED@gmail.com") {
           navigate("/adminDashboard");
