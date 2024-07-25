@@ -86,7 +86,6 @@ const ActiveAccountsTable = ({ activeAccountData }) => {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: '0px 0px rgba(0,0,0,0)', paddingX: 2 }}>
-      <button type='button' onClick={()=>{console.log(filteredAccounts)}}>Test</button>
       <Toolbar sx={{ marginBottom: 2 }}>
         <Typography sx={{ flex: '1 1 100%', fontSize: 40 }} variant="h1" id="tableTitle" component="div">
           Active Accounts

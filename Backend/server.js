@@ -136,13 +136,28 @@ initBc();
 app.get('/api/activeAccounts', async (req, res) => {
     try {
         const accounts = await Account.findAll({
+            attributes: ['AccountNo'],
             where: { AccountStatus: false },
-            include: [{
-                model: User,
-                attributes: ['FullName', 'PhoneNo']
-            }]
         });
-        res.json(accounts);
+
+        const users = await User.findAll({
+            attributes: ['PhoneNo', 'FullName']
+        })
+
+        const userMap = {};
+        users.forEach(user => {
+            userMap[user.UserID] = {
+                PhoneNo: user.PhoneNo,
+                FullName: user.FullName
+            };
+        });
+
+        const formattedData = accounts.map(account => ({
+            AccountNo: account.AccountNo,
+            FullName: userMap[account.UserID] ? userMap[account.UserID].FullName : null,
+            PhoneNo: userMap[account.UserID] ? userMap[account.UserID].PhoneNo : null,
+        }));
+        res.json(formattedData);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

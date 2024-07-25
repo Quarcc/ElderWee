@@ -23,7 +23,7 @@ function geoSummary() {
 
   const getAccountLogsWithAccountNo = (accNo, logs) =>{
     let accLogs = logs.filter((log) => {
-        return accNo == JSON.parse(log.AccountNo);
+        return accNo == log.AccountNo;
       });
       return accLogs;
   }

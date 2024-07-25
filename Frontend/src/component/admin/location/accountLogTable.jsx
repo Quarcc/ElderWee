@@ -95,23 +95,17 @@ function AccountLogTable({logs}) {
 
   return (
     <div>
-        <table>
-            <th>
-                <tr>
-                    <td>Login Time</td>
-                    <td>Last IP Login</td>
-                </tr>
-            </th>
-            <tbody>
-                {logs.map((log,idx)=>{
-                    console.log(log);
-                    return (<tr key = {idx}>
-                        <td>{JSON.parse(log.LoginTime)}</td>
-                        <td>{log.LastIPLoginCountry}</td>
-                    </tr>)
-                })}
-            </tbody>
-        </table>
+      <div>Login Time</div>
+      <div>Last IP Login</div>
+    <div>
+      {logs.map((log,idx)=>{
+          console.log(log);
+          return (<div key = {idx}>
+              <div>{JSON.parse(log.LoginTime)}</div>
+              <div>{log.LastIPLoginCountry}</div>
+          </div>)
+      })}
+    </div>
     </div>
   );
 }
