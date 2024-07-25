@@ -17,9 +17,10 @@
 }
 
 .dmz-container {
+    margin: 20px;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 15px;
 }
   
 .dmz-box {
@@ -28,4 +29,17 @@
     border-radius: 5px;
     background-color: #f9f9f9;
     min-width: 150px;
+    margin: auto;
+}
+
+.mainZoneBox{
+    min-height: 600px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.outer-dmz-container{
+    margin-left: 10px;
+    margin-right: 10px;
 }
