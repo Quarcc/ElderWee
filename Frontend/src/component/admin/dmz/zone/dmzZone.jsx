@@ -8,6 +8,7 @@ const socket = io(`http://${ServerEndPoint}`);
 
 const DMZZone = () => {
     const [transactions, setTransactions] = useState([]);
+    const [funds, setFunds] = useState([]);
 
     useEffect(() => {
         socket.on('newTransaction', (transaction) => {
@@ -25,19 +26,50 @@ const DMZZone = () => {
         };
     }, [])
 
+    useEffect(() => {
+        const getFunds = async () => {
+            try{
+               const FrozenFunds = await axios.get(`http://${APIEndPoint}/api/FrozenFunds`);
+                setFunds(FrozenFunds.data); 
+            }
+            catch (err) {
+                console.log('Error getting frozen funds' + err);
+            }   
+        }
+
+        getFunds();
+    })
+
     return(
-        <div>
-            <h2>Demilitarized Zone</h2>
-            <div className="dmz-container">
-                {transactions.map((transaction) => (
-                    <div key={transaction.id} className="dmz-box">
-                        <p>ID : {transaction.id}</p>
-                        <p>Amount : ${transaction.amount}</p>
-                        <p>Status : {transaction.status}</p>
-                    </div>
-                ))}
+        <div className="d-flex justify-content-center ms-auto me-auto mt-5">
+            <div className="col ms-5">
+                <h2>Demilitarized Zone</h2>
+                <div className="dmz-container d-flex justify-content-center">
+                    {transactions.map((transaction) => (
+                        <div key={transaction.id} className="dmz-box">
+                            <p>ID : {transaction.id}</p>
+                            <p>Amount : ${transaction.amount}</p>
+                            <p>Status : {transaction.status}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
+            <div className="col me-5">
+                <h2>Frozen Funds</h2>
+                <div className="dmz-container d-flex justify-content-center">   
+                {funds.map((transaction) => (
+                    transaction.TransactionStatus === "Pending" ? (
+                        <div key={transaction.TransactionID} className="dmz-box">
+                        <p>ID : {transaction.TransactionID}</p>
+                        <p>Amount : ${transaction.TransactionAmount}</p>
+                        <p>Status : {transaction.TransactionStatus}</p>
+                        </div>
+                    ) : null
+                    ))}
+                </div>
+            </div> 
         </div>
+        
     )
 }
 
