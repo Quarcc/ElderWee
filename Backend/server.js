@@ -19,7 +19,7 @@ const Transaction = require('./models/Transaction');
 const BlockchainDB = require('./models/Blockchain')
 const Location = require('./models/Geolocation');
 const AccountLog = require('./models/AccountLogs');
-
+const Enquiry = require('./models/Enquiry');
 // send mail
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
@@ -691,6 +691,51 @@ app.get('/api/accounts/weekly', async (req, res) => {
         }
 
         res.json({ labels, currentWeekData, previousWeekData });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/api/enquiries', async (req, res) => {
+    try {
+        const enquiries = await Enquiry.findAll({
+            attributes: ['EnquiryID', 'EnquiryDate', 'EnquiryType', 'EnquiryStatus','EnquiryDetails', 'UserID', 'AccountNo']
+        });
+
+        const users = await User.findAll({
+            attributes: ['UserID', 'FullName', 'Email']
+        });
+
+        const userMap = {};
+        users.forEach(user => {
+            userMap[user.UserID] = {
+                FullName: user.FullName,
+                Email: user.Email
+            };
+        });
+
+        const formattedData = enquiries.map(enquiry => ({
+            EnquiryID: enquiry.EnquiryID,
+            EnquiryDate: enquiry.EnquiryDate,
+            EnquiryType: enquiry.EnquiryType,
+            EnquiryStatus: enquiry.EnquiryStatus,
+            EnquiryDetails: enquiry.EnquiryDetails,
+            AccountNo: enquiry.AccountNo,
+            FullName: userMap[enquiry.UserID] ? userMap[enquiry.UserID].FullName : null,
+            Email: userMap[enquiry.UserID] ? userMap[enquiry.UserID].Email : null
+        }));
+
+        res.json(formattedData);
+    } catch (error) {
+        console.error('Error fetching enquiries:', error.stack);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/enquiriesCount', async (req, res) => {
+    try {
+        const enquiryCount = await Enquiry.count();
+        res.json({ count: enquiryCount })
     } catch (err) {
         res.status(500).json(err);
     }

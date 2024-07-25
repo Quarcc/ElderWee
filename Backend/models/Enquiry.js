@@ -19,7 +19,11 @@ const Enquiry = db.define('enquiry', {
     EnquiryDetails: {
         type: Sequelize.TEXT,
         allowNull: false,
-    }
+    },
+    EnquiryStatus: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
 });
 
 module.exports = Enquiry;

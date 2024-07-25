@@ -25,6 +25,7 @@ const setUpDB = (drop) => {
             User.hasMany(Announcement, { foreignKey: 'UserID' });
             Account.hasMany(Announcement, { foreignKey: 'AccountNo' });
             Account.hasMany(Geolocation, { foreignKey: 'AccountNo' });
+            Enquiry.belongsTo(User, { foreignKey: 'UserID' });
             mySQLDB.sync({ // Creates table if none exists
                 force: drop
             }).then(() => {
