@@ -110,7 +110,7 @@ function geoSummary() {
             </div>
           </div>
           <div className="col-9 geo-acc-table">
-            <ActiveAccountsTable activeAccountData={accounts.active} />
+            <ActiveAccountsTable activeAccountData={accounts.active} handleClickedFlaggedAccount={handleClickedFlaggedAccount}/>
           </div>
         </div>
         <br />

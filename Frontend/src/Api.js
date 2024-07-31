@@ -119,3 +119,29 @@ export async function retrieveAccountDetailsWithEmail(email){
     }
 }
 
+export async function getCountry(coords){
+  let lat = coords.latitude ? coords.latitude : coords.lat;
+  let lng = coords.longitude ? coords.longitude: coords.lng;
+  const apiKey = process.env.REACT_APP_GMAPSAPIKEY;
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${apiKey}`;
+  try {
+    let res = await fetch(url);
+    
+    const results = await res.json();
+    let country = "NIL"
+    //console.log("COUNTRY RESULTS:", results, coords);
+
+    results.results.forEach((address)=>{
+      //console.log(address);
+      if(address.types.includes("country")){
+        console.log("INCLUDES");
+        country = address.formatted_address;
+      }
+    });
+
+    return country;
+  } catch (error) {
+    console.error("Error getting country name:", error);
+    return error;
+  }
+}

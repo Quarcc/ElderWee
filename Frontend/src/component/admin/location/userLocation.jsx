@@ -68,7 +68,6 @@ function UserLocation(){
           lng:coords.longitude
         }
       }
-      // hi
       setCenter(coords);
 
       return latestRecord;

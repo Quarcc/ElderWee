@@ -16,7 +16,7 @@ import { visuallyHidden } from "@mui/utils";
 
 import '../css/adminAccount.css';
 
-const ActiveAccountsTable = ({ activeAccountData }) => {
+const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filter, setFilter] = useState('');
@@ -85,9 +85,21 @@ const ActiveAccountsTable = ({ activeAccountData }) => {
   }, [filteredAccounts, order, orderBy, page, rowsPerPage]);
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: '0px 0px rgba(0,0,0,0)', paddingX: 2 }}>
+    <Paper
+      sx={{
+        width: "100%",
+        overflow: "hidden",
+        boxShadow: "0px 0px rgba(0,0,0,0)",
+        paddingX: 2,
+      }}
+    >
       <Toolbar sx={{ marginBottom: 2 }}>
-        <Typography sx={{ flex: '1 1 100%', fontSize: 40 }} variant="h1" id="tableTitle" component="div">
+        <Typography
+          sx={{ flex: "1 1 100%", fontSize: 40 }}
+          variant="h1"
+          id="tableTitle"
+          component="div"
+        >
           Active Accounts
         </Typography>
         <TextField
@@ -95,7 +107,7 @@ const ActiveAccountsTable = ({ activeAccountData }) => {
           variant="outlined"
           size="small"
           value={filter}
-          onChange={e => setFilter(e.target.value)}
+          onChange={(e) => setFilter(e.target.value)}
         />
       </Toolbar>
       <TableContainer sx={{ maxHeight: 600 }}>
@@ -103,21 +115,24 @@ const ActiveAccountsTable = ({ activeAccountData }) => {
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell sx={{ backgroundColor: '#E8E8E8', fontWeight: 900 }}
+                <TableCell
+                  sx={{ backgroundColor: "#E8E8E8", fontWeight: 900 }}
                   key={column.id}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
                 >
                   <TableSortLabel
                     active={orderBy === column.id}
-                    direction={orderBy === column.id ? order : 'asc'}
+                    direction={orderBy === column.id ? order : "asc"}
                     onClick={handleRequestSort(column.id)}
-                    style={{ color: 'black' }}
+                    style={{ color: "black" }}
                   >
                     {column.label}
                     {orderBy === column.id ? (
                       <Box component="span" sx={visuallyHidden}>
-                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        {order === "desc"
+                          ? "sorted descending"
+                          : "sorted ascending"}
                       </Box>
                     ) : null}
                   </TableSortLabel>
@@ -126,8 +141,16 @@ const ActiveAccountsTable = ({ activeAccountData }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {visibleAccounts.map(account => (
-              <TableRow hover role="checkbox" tabIndex={-1} key={account.AccountNo}>
+            {visibleAccounts.map((account) => (
+              <TableRow
+                hover
+                role="checkbox"
+                tabIndex={-1}
+                key={account.AccountNo}
+                onClick={(e) => {
+                  handleClickedFlaggedAccount(e);
+                }}
+              >
                 {columns.map((column) => {
                   const value = account[column.id];
                   return (

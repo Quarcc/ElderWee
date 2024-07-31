@@ -14,7 +14,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
 import axios from "axios";
 import Validation from "./LoginValidation";
-import { retrieveAccountDetailsWithEmail } from "../../Api";
+import { getCountry, retrieveAccountDetailsWithEmail } from "../../Api";
 
 const defaultTheme = createTheme();
 
@@ -76,11 +76,13 @@ export default function Login() {
 
       let accountData = await retrieveAccountDetailsWithEmail(formData.email);
       let LoginCoords = JSON.stringify(coordinates);
+      let lastIPLogin = await getCountry(coordinates);
+      //console.log("LAST IP Login",lastIPLogin);
       let currentDateTime = new Date();
       const accountLogData = {
         AccountNo:accountData.AccountNo,
         LoginCoords:LoginCoords,
-        LastIPLoginCountry:"Singapore",
+        LastIPLoginCountry:lastIPLogin,
         Flagged:accountData.Scammed ? true : false,
         LoginTime:JSON.stringify(currentDateTime),
       }
