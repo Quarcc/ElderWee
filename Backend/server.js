@@ -852,6 +852,8 @@ app.post('/reset-password', async (req, res) => {
     }
   });
 
+console.log("Hello World");
+
 server.listen(4000, () => {
     console.log(`Server running on http://localhost:4000`);
 });
