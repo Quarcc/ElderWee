@@ -56,53 +56,55 @@ export default function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    if(!coordinates){
+  
+    if (!coordinates) {
       confirm("Please enable geolocation to use this application.");
       return;
     }
-
+  
     const validationErrors = Validation(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-
+  
     try {
+      // Perform login request
       const response = await axios.post("http://localhost:8000/login", {
         email: formData.email,
         password: formData.password,
-      });
-
+      }, { withCredentials: true });
+  
+      // Retrieve account details
       let accountData = await retrieveAccountDetailsWithEmail(formData.email);
+  
+      // Create account log
       let LoginCoords = JSON.stringify(coordinates);
       let currentDateTime = new Date();
       const accountLogData = {
-        AccountNo:accountData.AccountNo,
-        LoginCoords:LoginCoords,
-        LastIPLoginCountry:"Singapore",
-        Flagged:accountData.Scammed ? true : false,
-        LoginTime:JSON.stringify(currentDateTime),
-      }
-
-      const addAccountLog = await fetch("http://localhost:8000/api/accounts/log",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
+        AccountNo: accountData.AccountNo,
+        LoginCoords: LoginCoords,
+        LastIPLoginCountry: "Singapore",
+        Flagged: accountData.Scammed ? true : false,
+        LoginTime: JSON.stringify(currentDateTime),
+      };
+      
+      const addAccountLog = await fetch("http://localhost:8000/api/accounts/log", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(accountLogData),
+        body: JSON.stringify(accountLogData),
       });
-
-      let res = await addAccountLog.json()
-
-      console.log(res);
-
-      return;
+  
+      let logRes = await addAccountLog.json();
+  
+      // Proceed with login if the account log creation is successful
       if (response.status === 200) {
         if (formData.email === "DELETED@gmail.com") {
           navigate("/adminDashboard");
         } else {
-          navigate("/features"); // Replace with your desired route
+          navigate("/home"); // Replace with your desired route
         }
       }
     } catch (error) {
@@ -114,6 +116,7 @@ export default function Login() {
       }
     }
   };
+  
 
   return (
     <ThemeProvider theme={defaultTheme}>

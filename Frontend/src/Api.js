@@ -68,6 +68,7 @@ export async function retrieveAccountDetailsWithEmail(email){
     try{
         let userRes = await fetch(`http://localhost:8000/api/users/email/${email}`);
         let data = await userRes.json();
+        console.log({email})
         
         let userID = data.UserID;
         let res = await fetch(

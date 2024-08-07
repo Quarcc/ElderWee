@@ -21,21 +21,40 @@ const logoStyle = {
 function AppAppBar() {
   const [open, setOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkSession = async () => {
       try {
         const response = await axios.get('http://localhost:8000/check-session', { withCredentials: true });
-        if (response.status === 200) {
+        console.log('Session response:', response.data);
+        if (response.data.loggedIn) {
           setLoggedIn(true);
+          setUser(response.data.user);
+        } else {
+          setLoggedIn(false);
+          setUser(null);
         }
       } catch (error) {
         setLoggedIn(false);
+        setUser(null);
+        console.error('Session check error:', error);
       }
     };
     checkSession();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8000/logout', {}, { withCredentials: true });
+      setLoggedIn(false);
+      setUser(null);
+      navigate('/landing');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -93,11 +112,11 @@ function AppAppBar() {
               </Link>
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                 <MenuItem
-                  onClick={() => navigate('/features')}
+                  onClick={() => navigate('/home')}
                   sx={{ py: '6px', px: '12px' }}
                 >
                   <Typography variant="body2" color="text.primary">
-                    Features
+                    Home
                   </Typography>
                 </MenuItem>
 
@@ -127,82 +146,53 @@ function AppAppBar() {
                 </MenuItem>
               </Box>
             </Box>
-            <Box
-              sx={{
-                display: { xs: 'none', md: 'flex' },
-                gap: 0.5,
-                alignItems: 'center',
-              }}
-            >
-              <Button
-                color="primary"
-                variant="text"
-                size="small"
-                onClick={() => navigate('/Login')}
-              >
-                Log in
-              </Button>
-              <Button
-                color="primary"
-                variant="contained"
-                size="small"
-                onClick={() => navigate('/signup')}
-              >
-                Sign up
-              </Button>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, alignItems: 'center' }}>
+              {!loggedIn ? (
+                <>
+                  <Button color="primary" variant="text" size="small" onClick={() => navigate('/login')}>
+                    Log in
+                  </Button>
+                  <Button color="primary" variant="contained" size="small" onClick={() => navigate('/signup')}>
+                    Sign up
+                  </Button>
+                </>
+              ) : (
+                <Button color="primary" variant="contained" size="small" onClick={handleLogout}>
+                  Log out
+                </Button>
+              )}
             </Box>
             <Box sx={{ display: { sm: '', md: 'none' } }}>
-              <Button
-                variant="text"
-                color="primary"
-                aria-label="menu"
-                onClick={toggleDrawer(true)}
-                sx={{ minWidth: '30px', p: '4px' }}
-              >
+              <Button variant="text" color="primary" aria-label="menu" onClick={toggleDrawer(true)} sx={{ minWidth: '30px', p: '4px' }}>
                 <MenuIcon />
               </Button>
               <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
-                <Box
-                  sx={{
-                    minWidth: '60dvw',
-                    p: 2,
-                    backgroundColor: 'background.paper',
-                    flexGrow: 1,
-                  }}
-                >
-                  <MenuItem onClick={() => navigate('/features')}>
-                    Features
-                  </MenuItem>
-                  <MenuItem onClick={() => navigate('/profile')}>
-                    Profile
-                  </MenuItem>
-                  <MenuItem onClick={() => navigate('/pricing')}>
-                    Pricing
-                  </MenuItem>
-                  <MenuItem onClick={() => navigate('/faq')}>
-                    FAQ
-                  </MenuItem>
+                <Box sx={{ minWidth: '60dvw', p: 2, backgroundColor: 'background.paper', flexGrow: 1 }}>
+                  <MenuItem onClick={() => navigate('/home')}>Home</MenuItem>
+                  <MenuItem onClick={() => navigate('/profile')}>Profile</MenuItem>
+                  <MenuItem onClick={() => navigate('/pricing')}>Pricing</MenuItem>
+                  <MenuItem onClick={() => navigate('/faq')}>FAQ</MenuItem>
                   <Divider />
-                  <MenuItem>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={() => navigate('/signup')}
-                      sx={{ width: '100%' }}
-                    >
-                      Sign up
-                    </Button>
-                  </MenuItem>
-                  <MenuItem>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      onClick={() => navigate('/login')}
-                      sx={{ width: '100%' }}
-                    >
-                      Log in
-                    </Button>
-                  </MenuItem>
+                  {!loggedIn ? (
+                    <>
+                      <MenuItem>
+                        <Button color="primary" variant="contained" onClick={() => navigate('/signup')} sx={{ width: '100%' }}>
+                          Sign up
+                        </Button>
+                      </MenuItem>
+                      <MenuItem>
+                        <Button color="primary" variant="outlined" onClick={() => navigate('/login')} sx={{ width: '100%' }}>
+                          Log in
+                        </Button>
+                      </MenuItem>
+                    </>
+                  ) : (
+                    <MenuItem>
+                      <Button color="primary" variant="contained" onClick={handleLogout} sx={{ width: '100%' }}>
+                        Log out
+                      </Button>
+                    </MenuItem>
+                  )}
                 </Box>
               </Drawer>
             </Box>

@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const db = require('../config/DBConfig');
+const User = require('./User');
 
 const Account = db.define('account', {
     AccountNo: {
@@ -29,6 +30,15 @@ const Account = db.define('account', {
     Scammer: {
         type: Sequelize.BOOLEAN,
         defaultValue: false, // False = Not a scammer, True = Scammer
+        allowNull: false
+    },
+
+    UserID: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: 'users',
+            key: 'UserID'
+        },
         allowNull: false
     }
 });

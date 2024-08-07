@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route} from 'react-router-dom';
+import { Routes, Route, Link} from 'react-router-dom';
 
 import AdminNavbar from './component/admin/navbar/adminNavbar';
 import AdminDashboard from './component/admin/Dashboard/adminDashboard';
@@ -14,14 +14,15 @@ import PlaceHolder from './Placeholder';
 import Login from './component/user/Login';
 import SignUp from './component/user/Signup';
 import UserLocation from './component/admin/location/userLocation';
-import AppAppBar from './component/user/landing-page/components/AppAppBar';
-import Features from './component/user/landing-page/components/Feature';
-import Footer from './component/user/landing-page/components/Footer';
-import Home from './component/user/landing-page/components/Home';
+import AppAppBar from './component/user/landing-page/AppAppBar';
+import Home from './component/user/landing-page/Home';
+import Footer from './component/user/landing-page/Footer';
 import ResetPassword from './component/user/ResetPassword';
 import ForgotPassword from './component/user/ForgotPassword';
 import ProfilePage from './component/user/Profile';
 import TransactionTest from './component/user/transactionTest'
+import LandingPage from './component/user/landing-page/LandingPage';
+import TopUp from './component/user/TopUp';
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -44,12 +45,14 @@ function App() {
                 <Route path="/Login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/UserLocation" element={<UserLocation />} />
-                <Route path="/features" element={<Features />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/forgot" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path='/transactionTest' element={<TransactionTest />} />
+                <Route path='/landing' element={<LandingPage />} />
+                <Route path='/topup' element={<TopUp />} />
+
             </Routes>
         </>
     );
