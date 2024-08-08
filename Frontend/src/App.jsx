@@ -7,7 +7,7 @@ import AdminAccount from './component/admin/Account/Account';
 import AdminBC from './component/admin/blockchain/adminBC';
 import AdminBCdetails from './component/admin/blockchain/adminBCdetailed';
 import AdminBCtrace from './component/admin/blockchain/adminBCtrace';
-import AdminDMZ from './component/admin/dmz/dmz';
+import AdminDMZ from './component/admin/DMZ/DMZ';
 import AdminReport from './component/admin/Report/Report'
 import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';

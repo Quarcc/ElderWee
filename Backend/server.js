@@ -7,6 +7,7 @@ const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 const http = require('http');
 const { Server } = require('socket.io');
+const bcrypt = require('bcrypt');
 
 // Database
 const elderwee = require('./config/DBConnection');
@@ -581,25 +582,56 @@ app.delete('/api/users/:userID', async (req, res) => {
     }
 });
 
-app.post('/api/accounts/log',async(req,res)=>{
-    const {AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime} = req.body;
-    //res.status(200).json({"message":"message"});
+// app.post('/api/accounts/log',async(req,res)=>{
+//     const {AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime} = req.body;
+//     //res.status(200).json({"message":"message"});
     
+//     try {
+//       const newLog = await AccountLog.create({
+//         AccountNo,
+//         LoginCoords,
+//         LastIPLoginCountry,
+//         Flagged,
+//         LoginTime,
+//       });
+//       console.log("New user created:", newLog.toJSON());
+//       res.json(newLog);
+//     } catch (error) {
+//       console.error("Error creating new user:", error);
+//       return res.status(404).json({error:error});
+//     }
+// })
+
+app.post('/api/accounts/log', async (req, res) => {
+    const { AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime } = req.body;
+
     try {
-      const newLog = await AccountLog.create({
-        AccountNo,
-        LoginCoords,
-        LastIPLoginCountry,
-        Flagged,
-        LoginTime,
-      });
-      console.log("New user created:", newLog.toJSON());
-      res.json(newLog);
+        // Check if the log entry already exists
+        const existingLog = await AccountLog.findOne({ where: { AccountNo } });
+
+        if (existingLog) {
+            // Log already exists; do nothing
+            console.log("Log entry already exists:", existingLog.toJSON());
+            return res.status(200).json({ message: 'Log entry already exists', log: existingLog });
+        }
+
+        // Create new log entry since it does not exist
+        const newLog = await AccountLog.create({
+            AccountNo,
+            LoginCoords,
+            LastIPLoginCountry,
+            Flagged,
+            LoginTime,
+        });
+
+        console.log("New log entry created:", newLog.toJSON());
+        res.status(201).json(newLog);
     } catch (error) {
-      console.error("Error creating new user:", error);
-      return res.status(404).json({error:error});
+        console.error("Error handling log entry:", error);
+        return res.status(500).json({ error: 'Server error' });
     }
-})
+});
+
 
 app.get('/api/accounts', async (req, res) => {
     try {
@@ -741,21 +773,62 @@ app.get('/api/enquiriesCount', async (req, res) => {
     }
 });
 
+async function generateUniqueAccountNumber() {
+    let accountNo;
+    let isUnique = false;
+
+    while (!isUnique) {
+        accountNo = Math.floor(100000000000 + Math.random() * 900000000000).toString();;
+        const existingAccount = await Account.findOne({ where: { AccountNo: accountNo } });
+
+        if (!existingAccount) {
+            isUnique = true;
+        }
+    }
+
+    return accountNo;
+}
+
 app.post('/signup', async (req, res) => {
     try {
         const { fullName, dob, email, phoneNo, password } = req.body;
-        
+
+        // Basic validation
+        if (!fullName || !dob || !email || !phoneNo || !password) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Create user in database using Sequelize model
         const newUser = await User.create({
             FullName: fullName,
             DOB: dob,
             Email: email,
             PhoneNo: phoneNo,
-            Password: password,
+            Password: hashedPassword,
         });
 
-        // Respond with the newly created user object
-        res.status(201).json(newUser);
+        // Generate a unique account number
+        const uniqueAccountNo = await generateUniqueAccountNumber();
+
+        // Create associated account for the new user
+        const newAccount = await Account.create({
+            AccountNo: uniqueAccountNo,
+            DateOpened: new Date(), // Sets the current date and time
+            // other default values or logic for account fields
+            UserID: newUser.UserID // Set the foreign key to associate the account with the user
+        });
+
+        // Respond with the newly created user and account object (excluding passwords)
+        const { Password, ...userWithoutPassword } = newUser.toJSON();
+        res.status(201).json({
+            message: 'Sign-up successful',
+            user: userWithoutPassword,
+            account: newAccount
+        });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });
@@ -768,13 +841,23 @@ app.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ where: { Email: email } });
 
-        if (!user || user.Password !== password) {
+        if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        // Compare the hashed password stored in the database with the plain-text password
+        const isMatch = await bcrypt.compare(password, user.Password);
+
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Set the user ID in the session
         req.session.userId = user.UserID;
-        // You can customize what data to send back to the frontend upon successful login
-        res.status(200).json({ message: 'Login successful', user });
+
+        // Respond with a success message and user data (excluding password)
+        const { Password, ...userWithoutPassword } = user.toJSON();
+        res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
 
     } catch (error) {
         console.error('Login error:', error);

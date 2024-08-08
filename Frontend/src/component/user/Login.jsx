@@ -97,7 +97,6 @@ export default function Login() {
 
       console.log(res);
 
-      return;
       if (response.status === 200) {
         if (formData.email === "DELETED@gmail.com") {
           navigate("/adminDashboard");
