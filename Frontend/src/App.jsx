@@ -23,6 +23,7 @@ import ProfilePage from './component/user/Profile';
 import TransactionTest from './component/user/transactionTest'
 import LandingPage from './component/user/landing-page/LandingPage';
 import TopUp from './component/user/TopUp';
+import Card from './component/user/Card';
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -52,7 +53,7 @@ function App() {
                 <Route path='/transactionTest' element={<TransactionTest />} />
                 <Route path='/landing' element={<LandingPage />} />
                 <Route path='/topup' element={<TopUp />} />
-
+                <Route path='/card' element={<Card />} />
             </Routes>
         </>
     );

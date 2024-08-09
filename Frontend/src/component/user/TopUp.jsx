@@ -1,6 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import {
   MDBBtn,
@@ -14,15 +16,26 @@ import {
 } from "mdb-react-ui-kit";
 
 export default function TopUp() {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cards, setCards] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null); // New state for selected card
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [amount, setAmount] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/user-profile', { withCredentials: true });
-        setUser(response.data);
+        const userProfileResponse = await axios.get('http://localhost:8000/user-profile', { withCredentials: true });
+        setUser(userProfileResponse.data);
+
+        const cardsResponse = await axios.get('http://localhost:8000/cards', { withCredentials: true });
+        setCards(cardsResponse.data);
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -33,101 +46,139 @@ export default function TopUp() {
     fetchUserProfile();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+  const handleDeleteCard = async (cardNumber) => {
+    if (window.confirm(`Confirm deleting card ending with ${cardNumber.slice(-4)}?`)) {
+      try {
+        await axios.delete('http://localhost:8000/delete-card', {
+          data: { cardNumber }
+        }, { withCredentials: true }); // Include credentials to handle session
+
+        // Refresh the card list
+        const updatedCardsResponse = await axios.get('http://localhost:8000/cards', { withCredentials: true });
+        setCards(updatedCardsResponse.data);
+      } catch (error) {
+        console.error('Error deleting card:', error);
+      }
+    }
+  };
+
+  const handleCardSelection = (cardNumber) => {
+    setSelectedCard(cardNumber);
+  };
+
+  const handleProceedToPayment = async () => {
+    if (!selectedCard || !amount) {
+        setSuccessMessage('Please select a card and enter an amount.');
+        return;
+    }
+
+    setIsLoading(true); // Set loading state to true
+
+    try {
+        // Simulate loading time
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // Send payment request to server
+        await axios.post('http://localhost:8000/process-payment', {
+            cardNumber: selectedCard,
+            amount
+        }, { withCredentials: true });
+
+        // Update success message
+        setSuccessMessage('Payment processed successfully');
+    } catch (error) {
+        console.error('Error processing payment:', error);
+        setSuccessMessage('An error occurred while processing the payment');
+    } finally {
+        setIsLoading(false); // Set loading state to false
+    }
+  };
+
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#eee' }}>
+      <MDBContainer>
+        <MDBRow className="d-flex justify-content-center align-items-center">
+          <MDBCol md="12" lg="10" xl="8">
+            <MDBCard>
+              <MDBCardBody className="p-md-5">
+                <div className="text-center">
+                  <h1>Top Up</h1>
+                  <p className="text-muted pb-2">
+                    Choose any card to top up your account
+                  </p>
+                </div>
+                <div className="px-3 py-4 border border-primary border-2 rounded mt-4 d-flex justify-content-between">
+                  <div className="d-flex flex-row align-items-center">
+                    <div className="d-flex flex-column ms-4">
+                      <span className="h4 mb-1">SGD</span>
+                      <span className="small text-muted">
+                        Balance: ${user?.accounts && user.accounts.length > 0 ? user.accounts[0].Balance.toFixed(2) : 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="d-flex flex-row align-items-center">
+                    <sup className="dollar font-weight-bold text-muted">$</sup>
+                    <MDBInput
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      style={{ width: '100px', margin: '0 10px' }}
+                    />
+                  </div>
+                </div>
+                <h4 className="mt-5">Payment details</h4>
+                {cards.map((card, index) => (
+                  <div key={index} className="mt-4 d-flex justify-content-between align-items-center">
+                    <div className="d-flex flex-row align-items-center">
+                      <input
+                        type="radio"
+                        name="cardSelection"
+                        value={card.cardNumber}
+                        checked={selectedCard === card.cardNumber}
+                        onChange={() => handleCardSelection(card.cardNumber)}
+                        style={{ marginRight: '10px' }}
+                      />
+                      <img src="https://i.imgur.com/qHX7vY1.webp" className="rounded" width="70" alt="Card" />
+                      <div className="d-flex flex-column ms-3">
+                        <span className="h5 mb-1">Credit Card</span>
+                        <span className="small text-muted">
+                          {card.cardNumber.replace(/.(?=.{4})/g, 'X')}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteCard(card.cardNumber)}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+                    >
+                      <FontAwesomeIcon icon={faTrash} color="red" />
+                    </button>
+                  </div>
+                ))}
+                <h6 className="mt-4 mb-3 text-primary" onClick={() => navigate('/card')}>
+                  ADD PAYMENT METHOD
+                </h6>
 
-    <MDBContainer >
-      <MDBRow className="d-flex justify-content-center align-items-center">
-        <MDBCol md="12" lg="10" xl="8">
-          <MDBCard>
-            <MDBCardBody className="p-md-5">
-              <div className="text-center" >
-                <h1 >Top Up</h1>
-                <p className="text-muted pb-2">
-                  Choose any card to top up your account
-                </p>
-              </div>
-              <div className="px-3 py-4 border border-primary border-2 rounded mt-4 d-flex justify-content-between">
-                <div className="d-flex flex-row align-items-center">
-                  <div className="d-flex flex-column ms-4">
-                    <span className="h4 mb-1">SGD</span>
-                    <span className="small text-muted">Balance: ${user.accounts && user.accounts.length > 0 ? user.accounts[0].Balance.toFixed(2) : 'N/A'}
-                    </span>
-                  </div>
+                {/* Display success or error message */}
+                <div className="text-center mt-3">
+                  {isLoading && <p>Authenticating...</p>}
+                  {successMessage && (
+                    <p className={successMessage.includes('failed') ? 'text-danger' : 'text-success'}>
+                      {successMessage}
+                    </p>
+                  )}
                 </div>
-                <div className="d-flex flex-row align-items-center">
-                  <sup className="dollar font-weight-bold text-muted">$</sup>
-                  <MDBInput
-                    type="number"
-                    // value={}
-                    // onChange={handleAmountChange}
-                    style={{ width: '100px', margin: '0 10px' }}
-                  />
-                </div>
-              </div>
-              <h4 className="mt-5">Payment details</h4>
-              <div className="mt-4 d-flex justify-content-between align-items-center">
-                <div className="d-flex flex-row align-items-center">
-                  <img
-                    src="https://i.imgur.com/qHX7vY1.webp"
-                    className="rounded"
-                    width="70"
-                  />
-                  <div className="d-flex flex-column ms-3">
-                    <span className="h5 mb-1">Credit Card</span>
-                    <span className="small text-muted">
-                      1234 XXXX XXXX 2570
-                    </span>
-                  </div>
-                </div>
-                <MDBInput
-                  label="CVC"
-                  id="form1"
-                  type="text"
-                  style={{ width: "70px" }}
-                />
-              </div>
-              <div className="mt-4 d-flex justify-content-between align-items-center">
-                <div className="d-flex flex-row align-items-center">
-                  <img
-                    src="https://i.imgur.com/qHX7vY1.webp"
-                    className="rounded"
-                    width="70"
-                  />
-                  <div className="d-flex flex-column ms-3">
-                    <span className="h5 mb-1">Credit Card</span>
-                    <span className="small text-muted">
-                      2344 XXXX XXXX 8880
-                    </span>
-                  </div>
-                </div>
-                <MDBInput
-                  label="CVC"
-                  id="form2"
-                  type="text"
-                  style={{ width: "70px" }}
-                />
-              </div>
-              <h6 className="mt-4 mb-3 text-primary text-uppercase">
-                ADD PAYMENT METHOD
-              </h6>
-              <MDBInput
-                label="Email address"
-                id="form3"
-                size="lg"
-                type="email"
-              />
-              <MDBBtn block size="lg" className="mt-3">
-                {" "}
-                Proceed to payment <MDBIcon fas icon="long-arrow-alt-right" />
-              </MDBBtn>
-            </MDBCardBody>
-          </MDBCard>
-        </MDBCol>
-      </MDBRow>
-    </MDBContainer>
+
+                <button block size="lg" className="mt-3" onClick={() => navigate('/home')}>
+                  Back <MDBIcon fas icon="long-arrow-alt-right" />
+                </button>
+                <button block size="lg" className="mt-3" onClick={handleProceedToPayment} disabled={isLoading}>
+                  Proceed to payment <MDBIcon fas icon="long-arrow-alt-right" />
+                </button>
+              </MDBCardBody>
+            </MDBCard>
+          </MDBCol>
+        </MDBRow>
+      </MDBContainer>
     </div>
   );
 }

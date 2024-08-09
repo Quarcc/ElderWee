@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   MDBCol,
@@ -20,6 +20,7 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -54,10 +55,10 @@ export default function Home() {
                   </MDBCardText>
                   <MDBRow>
                     <MDBCol>
-                      <MDBBtn>Top Up</MDBBtn>
+                      <button onClick={() => navigate('/topup')}>Top Up</button>
                     </MDBCol>
                     <MDBCol>
-                      <MDBBtn>Transfer</MDBBtn>
+                      <button>Transfer</button>
                     </MDBCol>
                   </MDBRow>
                 </MDBCardBody>

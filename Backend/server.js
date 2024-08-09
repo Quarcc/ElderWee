@@ -1066,6 +1066,84 @@ const storage = multer.diskStorage({
 
   app.use('/uploads', express.static('uploads'));
 
+// Initialize cards storage
+const userCards = {}; // Key: UserID, Value: Array of Cards
+
+// Add Card Endpoint
+app.post('/add-card', (req, res) => {
+    const { cardNumber, cvc } = req.body;
+    const userID = req.session.userId; // Get UserID from session
+  
+    if (!cardNumber || !cvc || !userID) {
+        return res.status(400).json({ message: 'Card number, CVC, and UserID are required' });
+    }
+  
+    if (!userCards[userID]) {
+        userCards[userID] = [];
+    }
+
+    const maskedCardNumber = cardNumber.replace(/.(?=.{4})/g, 'X');
+    userCards[userID].push({ cardNumber: maskedCardNumber, cvc });
+    res.status(201).json({ message: 'Card added successfully' });
+});
+
+// Get Cards Endpoint
+app.get('/cards', (req, res) => {
+    const userID = req.session.userId;  
+  
+    if (!userCards[userID]) {
+        // Return an empty array if no cards are found
+        return res.status(200).json([]);
+    }
+  
+    res.status(200).json(userCards[userID]);
+});
+
+// Delete Card Endpoint
+app.delete('/delete-card', (req, res) => {
+    const { cardNumber } = req.body;
+    const userID = req.session.userId;  // Get UserID from session
+    console.log('helppppp', userID, cardNumber)
+  
+    if (!cardNumber || !userID || !userCards[userID]) {
+        return res.status(400).json({ message: 'Card number and UserID are required' });
+    }
+  
+    userCards[userID] = userCards[userID].filter(card => card.cardNumber !== cardNumber);
+    res.sendStatus(204);
+});
+
+// Payment Endpoint
+app.post('/process-payment', async (req, res) => {
+    const { cardNumber, amount } = req.body;
+    const userID = req.session.userId; // Get UserID from session
+
+    if (!cardNumber || !amount || !userID) {
+        return res.status(400).json({ message: 'Card number, amount, and UserID are required' });
+    }
+
+    try {
+        // Simulate a delay for payment processing
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // Assuming you have logic to validate the card and process the payment here
+
+        // Update the user's account balance
+        const account = await Account.findOne({ where: { UserID: userID } });
+
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
+        }
+
+        account.Balance += parseFloat(amount);
+        await account.save();
+
+        res.status(200).json({ message: 'Payment processed successfully' });
+    } catch (error) {
+        console.error('Error processing payment:', error);
+        res.status(500).json({ message: 'An error occurred while processing the payment' });
+    }
+});
 
 
 
