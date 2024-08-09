@@ -5,9 +5,11 @@ const AccountLogs = require('../models/AccountLogs');
 const Announcement = require('../models/Announcement');
 const BlockchainDB = require('../models/Blockchain');
 const Enquiry = require('../models/Enquiry');
-const FrozenTransaction = require('../models/FrozenTransaction')
+const FrozenTransaction = require('../models/FrozenTransaction');
+const BannedCountries = require('../models/BannedCountries');
 const Geolocation = require('../models/Geolocation');
 const Transaction = require('../models/Transaction');
+const Email = require('../models/Email');
 
 const setUpDB = (drop) => {
     mySQLDB.authenticate()

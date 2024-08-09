@@ -22,7 +22,7 @@ import '../../css/adminBC.css';
 
 const APIEndPoint = 'localhost:8000';
 
-const TransactionTable = () => {
+const DMZTable = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [transactions, setTransactions] = useState([]);
@@ -120,7 +120,6 @@ const TransactionTable = () => {
         { id: 'TransactionDate', label: 'Transaction Date', minWidth: 170 },
         { id: 'TransactionAmount', label: 'Amount ($)', minWidth: 100 },
         { id: 'TransactionStatus', label: 'Status', minWidth: 100 },
-        { id: 'TransactionTrace', label: 'Trace', minWidth: 100 },
     ];
 
     const visibleTransactions = React.useMemo(() => {
@@ -180,11 +179,6 @@ const TransactionTable = () => {
                                     <TableCell key={column.id} align="left">
                                         <>
                                             {column.id === 'TransactionDate' ? formatDate(transaction[column.id]) : transaction[column.id]}
-                                            {column.id === 'TransactionTrace' && transaction.TransactionStatus === 'Pending' ? (
-                                                <a href={`http://localhost:3000/admin/transaction/trace/id/${transaction.TransactionID}`}>
-                                                    <SearchIcon fontSize='medium'></SearchIcon>
-                                                </a>
-                                            ) : null}
                                         </>
                                     </TableCell>
                                 ))}
@@ -206,4 +200,4 @@ const TransactionTable = () => {
     );
 }
 
-export default TransactionTable;
+export default DMZTable;

@@ -2,12 +2,19 @@ import React, {useState,useEffect} from 'react';
 import AdminNavBar from "../navbar/adminNavbar";
 import '../css/adminNavbar.css';
 import {GoogleMap,useLoadScript,Circle,Marker } from "@react-google-maps/api"
+import { useLocation } from 'react-router-dom';
+import AccountLogTable from './accountLogTable';
+import '../css/geolocation.css';
 
 function UserLocation(){
   const mapContainerStyle = {
     width: "40vw",
     height: "40vh",
   };
+
+  const location = useLocation()
+
+  const [logs, setLogs] = useState(location.state.AccountLogs);
 
   const [center, setCenter] = useState(null);
 
@@ -48,20 +55,24 @@ function UserLocation(){
       }
 
       let latestRecord = data[0];
-
       data.forEach(record => {
-          if (new Date(record.LoginTime) > new Date(latestRecord.LoginTime)) {
+          if (JSON.parse(record.LoginTime) > JSON.parse(latestRecord.LoginTime)) {
               latestRecord = record;
           }
       });
-
-      let coords = JSON.parse(latestRecord.LoginCoords);
       
+      let coords = JSON.parse(latestRecord.LoginCoords);
+      if(coords.latitude){
+        coords = {
+          lat:coords.latitude,
+          lng:coords.longitude
+        }
+      }
       setCenter(coords);
 
       return latestRecord;
     }
-    getLatestRecord(dummyData);
+    getLatestRecord(logs);
   },[])
 
   const { isLoaded, loadError } = useLoadScript({
@@ -73,27 +84,40 @@ function UserLocation(){
   if (!isLoaded) return <div>Loading Maps...</div>;
 
   return (
-    <div className='flex h-screen'>
-      <div className="w-full"> 
+    <div className='container-fluid'>
+      <div className=""> 
         <AdminNavBar/>
       </div>
-      <div className='container flex justify-center items-cente r w-2/5 ml-auto'>
-        {center && (
-        <GoogleMap mapContainerStyle={mapContainerStyle} zoom={14} center={center}>
-            <Circle
-              key={"circle"}
-              center={center}
-              radius={500}
-              options={{
-              strokeColor: "#ff0000",
-              strokeOpacity: 0.8,
-              strokeWeight: 2,
-              fillColor: "#ff0000",
-              fillOpacity: 0.35,
-              }}
-            />
-          <Marker position={center} title="Current Location" />
-        </GoogleMap>)}
+      <div className='location-bg'>
+        <div className='row mb-5 p-3'>
+            {/* Account Number */}
+        </div>
+        <div className='row mb-5 p-3 d-flex'>
+          <div className='col'>
+            <table></table>
+          </div>
+          <div className='col'>
+            {center && (
+            <GoogleMap mapContainerStyle={mapContainerStyle} zoom={14} center={center}>
+                <Circle
+                  key={"circle"}
+                  center={center}
+                  radius={500}
+                  options={{
+                  strokeColor: "#ff0000",
+                  strokeOpacity: 0.8,
+                  strokeWeight: 2,
+                  fillColor: "#ff0000",
+                  fillOpacity: 0.35,
+                  }}
+                />
+              <Marker position={center} title="Current Location" />
+            </GoogleMap>)}
+          </div>
+          <div>
+            <AccountLogTable logs={logs}/>
+          </div>
+        </div>
       </div>
     </div>
   );

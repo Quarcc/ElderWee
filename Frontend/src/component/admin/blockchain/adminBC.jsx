@@ -38,7 +38,7 @@ const AdminBC = () => {
                 <div className="BC-bot-bg mt-5">
                     <h1 className="BC-transaction-header">Transaction Details</h1>
                     <TransactionTable className="BC-transaction-table" />
-                </div>     
+                </div>   
             </div>
         </div>
     );

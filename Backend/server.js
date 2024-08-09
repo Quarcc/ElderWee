@@ -21,6 +21,8 @@ const BlockchainDB = require('./models/Blockchain')
 const Location = require('./models/Geolocation');
 const AccountLog = require('./models/AccountLogs');
 const Enquiry = require('./models/Enquiry');
+const BannedCountries = require('./models/BannedCountries');
+
 // send mail
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
@@ -70,16 +72,18 @@ const options = {
     port:db.port,
     user:db.username,
     password:db.password,
-        database:db.database
-        }
-    const sessionStore = new MySQLStore(options);
-    app.use(session({
+    database:db.database
+};
+
+const sessionStore = new MySQLStore(options);
+app.use(session({
     key:'session_cookie_name',
     secret: 'session_cookie_secret',
     store: sessionStore,
     resave: false,
     saveUninitialized:false
-}));
+    })
+);
 
 let Bc = new Blockchain();
 
@@ -173,15 +177,44 @@ const initBc = async () => {
 
 initBc();
 
-// API endpoint to get active accounts
-app.get('/api/activeAccounts', async (req, res) => {
+// === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
+
+app.get("/api/activeAccounts", async (req, res) => {
     try {
         const accounts = await Account.findAll({
+            attributes: ["AccountNo"],
             where: { AccountStatus: false },
-            include: [{
-                model: User,
-                attributes: ['FullName', 'PhoneNo']
-            }]
+        });
+
+        const users = await User.findAll({
+            attributes: ["PhoneNo", "FullName"],
+        });
+
+        const userMap = {};
+        users.forEach((user) => {
+            userMap[user.UserID] = {
+                PhoneNo: user.PhoneNo,
+                FullName: user.FullName,
+            };
+        });
+
+        const formattedData = accounts.map((account) => ({
+            AccountNo: account.AccountNo,
+            FullName: userMap[account.UserID]
+                ? userMap[account.UserID].FullName
+                : null,
+            PhoneNo: userMap[account.UserID] ? userMap[account.UserID].PhoneNo : null,
+        }));
+        res.json(formattedData);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get("/api/flaggedAccounts", async (req, res) => {
+    try {
+        const accounts = await Account.findAll({
+            where: { Scammer: true },
         });
         res.json(accounts);
     } catch (error) {
@@ -189,19 +222,63 @@ app.get('/api/activeAccounts', async (req, res) => {
     }
 });
 
-
-// API endpoint to get flagged accounts
-app.get('/api/flaggedAccounts', async (req, res) => {
-    try {
-        const accounts = await Account.findAll({
-            where: { Scammer: true }
-        });
-        res.json(accounts);
-    }   catch (error) {
-        res.status(500).json({ error: error.message });
+app.get("/api/accountlogs", async (req, res) => {
+  try {
+    const logs = await AccountLog.findAll();
+    if (logs) {
+      res.json(logs);
     }
-
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
+
+app.get('/api/accounts', async (req,res) =>{
+    try{
+        const accounts = await Account.findAll();
+        res.status(200).json(accounts);  
+    }catch(error){
+        res.status(500).json({error:message})
+    }
+});
+
+app.put("/api/countries/ban-status/:countryName", async (req, res) => {
+    const { countryName } = req.params;
+    const { isBanned } = req.body;
+
+    try {
+        let country = await BannedCountries.findOne({
+            where: { CountryName: countryName },
+        });
+        if (country) {
+            country.isBanned = isBanned;
+            await country.save();
+            return res.status(200).json({
+                message: `${countryName} ${isBanned ? "banned" : "unbanned"} successfully.`,
+            });
+        } else {
+            const newCountry = await BannedCountries.create({
+                CountryName: countryName,
+                isBanned: isBanned,
+            });
+
+            return res.status(200).json({ message: `${countryName} added to banlist.` });
+        }
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
+app.get('/api/countries/banned', async (req, res) => {
+    try {
+        let banList = await BannedCountries.findAll({ where: { isBanned: 1 } });
+        return res.status(200).json(banList);
+    }
+    catch (err) {
+        return res.status(500).json({ err });
+    }
+});
+
 
 app.get('/api/displayallaccounts',async (req,res)=>{
     try{
@@ -212,17 +289,6 @@ app.get('/api/displayallaccounts',async (req,res)=>{
         res.status(500).json({error:message});
     }
 });
-
-app.get('/api/accounts', async (req,res) =>{
-    try{
-        const accounts = await Account.findAll();
-        res.status(200).json(accounts);  
-    }catch(error){
-        res.status(500).json({error:message})
-    }
-})
-
-// === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
 function padWithZeros(value) {
     let strValue = value.toString();
@@ -582,40 +648,10 @@ app.delete('/api/users/:userID', async (req, res) => {
     }
 });
 
-// app.post('/api/accounts/log',async(req,res)=>{
-//     const {AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime} = req.body;
-//     //res.status(200).json({"message":"message"});
-    
-//     try {
-//       const newLog = await AccountLog.create({
-//         AccountNo,
-//         LoginCoords,
-//         LastIPLoginCountry,
-//         Flagged,
-//         LoginTime,
-//       });
-//       console.log("New user created:", newLog.toJSON());
-//       res.json(newLog);
-//     } catch (error) {
-//       console.error("Error creating new user:", error);
-//       return res.status(404).json({error:error});
-//     }
-// })
-
-app.post('/api/accounts/log', async (req, res) => {
+app.post("/api/accounts/log", async (req, res) => {
     const { AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime } = req.body;
 
     try {
-        // Check if the log entry already exists
-        const existingLog = await AccountLog.findOne({ where: { AccountNo } });
-
-        if (existingLog) {
-            // Log already exists; do nothing
-            console.log("Log entry already exists:", existingLog.toJSON());
-            return res.status(200).json({ message: 'Log entry already exists', log: existingLog });
-        }
-
-        // Create new log entry since it does not exist
         const newLog = await AccountLog.create({
             AccountNo,
             LoginCoords,
@@ -623,15 +659,13 @@ app.post('/api/accounts/log', async (req, res) => {
             Flagged,
             LoginTime,
         });
-
-        console.log("New log entry created:", newLog.toJSON());
-        res.status(201).json(newLog);
+        console.log("New user created:", newLog.toJSON());
+        res.json(newLog);
     } catch (error) {
-        console.error("Error handling log entry:", error);
-        return res.status(500).json({ error: 'Server error' });
+        console.error("Error creating new user:", error);
+        return res.status(404).json({ error: error });
     }
 });
-
 
 app.get('/api/accounts', async (req, res) => {
     try {
@@ -934,8 +968,6 @@ app.post('/reset-password', async (req, res) => {
       res.status(500).json({ error: 'Server error' });
     }
   });
-
-console.log("Hello World");
 
 server.listen(4000, () => {
     console.log(`Server running on http://localhost:4000`);

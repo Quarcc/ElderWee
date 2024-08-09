@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 
+import Button from '@mui/material/Button';
+
 const APIEndPoint = 'localhost:8000';
 const ServerEndPoint = 'localhost:4000';
 const socket = io(`http://${ServerEndPoint}`);
@@ -41,37 +43,38 @@ const DMZZone = () => {
     }, [])
 
     return(
-        <div className="d-flex justify-content-center ms-auto me-auto mt-5">
-            <div className="col ms-5 me-3 mainZoneBox">
-                <h2 className="ps-3 pt-3">Demilitarized Zone</h2>
-                <div className="dmz-container d-flex justify-content-center">
+        <div className="d-flex ms-5 me-5 mt-4">
+            <div className="col me-2 mainZoneBox">
+                <h2 className="mt-2" style={{'font-weight': '600', postion: 'sticky'}}>Demilitarized Zone</h2>
+                <div className="dmz-container flex-wrap d-flex justify-content-start align-items-start">
                     {transactions.map((transaction) => (
-                        <div key={transaction.id} className="dmz-box">
-                            <p>ID : {transaction.id}</p>
-                            <p>Amount : ${transaction.amount}</p>
-                            <p>Status : {transaction.status}</p>
-                        </div>
+                        <Button style={{ padding: 0, margin: 0, textTransform: 'none', color: 'black', textAlign: 'left', textDecoration: 'none'}}>
+                            <div key={transaction.id} className="dmz-box">
+                                <p>ID : {transaction.id}</p>
+                                <p>Amount : ${transaction.amount}</p>
+                                <p>Reason : {transaction.status}</p>
+                            </div>
+                        </Button>
                     ))}
                 </div>
             </div>
-            <div className="col me-5 ms-3 mainZoneBox">
-                <h2 className="ps-3 pt-3">Frozen Funds</h2>
-                <div className="outer-dmz-container">
-                    <div className="dmz-container d-flex justify-content-start">   
+            <div className="col ms-2 mainZoneBox">
+                <h2 className="mt-2" style={{'font-weight': '600', postion: 'sticky'}}>Frozen Funds</h2>
+                <div className="dmz-container-frozen flex-wrap d-flex justify-content-start align-items-start">
                     {funds.map((transaction) => (
                         transaction.TransactionStatus === "Pending" ? (
-                            <div key={transaction.TransactionID} className="dmz-box">
-                            <p>ID : {transaction.TransactionID}</p>
-                            <p>Amount : ${transaction.TransactionAmount}</p>
-                            <p>Status : {transaction.TransactionStatus}</p>
-                            </div>
+                            <Button style={{ padding: 0, margin: 0, textTransform: 'none', color: 'black', textAlign: 'left', textDecoration: 'none'}}>
+                                <div key={transaction.TransactionID} className="dmz-box-frozen">
+                                    <p>ID : {transaction.TransactionID}</p>
+                                    <p>Amount : ${transaction.TransactionAmount}</p>
+                                    <p>Reason : {transaction.TransactionStatus}</p>
+                                </div> 
+                            </Button>
                         ) : null
-                        ))}
-                    </div>
+                    ))}
                 </div>
-            </div> 
+            </div>
         </div>
-        
     )
 }
 
