@@ -2,7 +2,7 @@
 const express = require('express');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 const http = require('http');
@@ -17,26 +17,28 @@ const { Op } = require('sequelize');
 const User = require('./models/User');
 const Account = require('./models/Account');
 const Transaction = require('./models/Transaction');
-const BlockchainDB = require('./models/Blockchain')
+const BlockchainDB = require('./models/Blockchain');
 const Location = require('./models/Geolocation');
 const AccountLog = require('./models/AccountLogs');
 const Enquiry = require('./models/Enquiry');
+const BannedCountries = require('./models/BannedCountries');
+
 // send mail
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 // Blockchain module
-const {Block, Blockchain} = require('./blockchain/blockchain');
+const { Block, Blockchain } = require("./blockchain/blockchain");
 
 const app = express();
 
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000", // Frontend URL
-      methods: ["GET", "POST"]
+        origin: "http://localhost:3000", // Frontend URL
+        methods: ["GET", "POST"]
     }
-  });
+});
 
 const connectedSockets = new Set();
 
@@ -57,7 +59,7 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: "http://localhost:3000",  //specify domains that can call your API
+        origin: "http://localhost:3000", //specify domains that can call your API
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
@@ -67,19 +69,21 @@ elderwee.setUpDB(false); // true will drop all tables and create again, false wi
 
 const options = {
     host: db.host,
-    port:db.port,
-    user:db.username,
-    password:db.password,
-        database:db.database
-        }
-    const sessionStore = new MySQLStore(options);
-    app.use(session({
-    key:'session_cookie_name',
-    secret: 'session_cookie_secret',
-    store: sessionStore,
-    resave: false,
-    saveUninitialized:false
-}));
+    port: db.port,
+    user: db.username,
+    password: db.password,
+    database: db.database,
+};
+const sessionStore = new MySQLStore(options);
+app.use(
+    session({
+        key: "session_cookie_name",
+        secret: "session_cookie_secret",
+        store: sessionStore,
+        resave: false,
+        saveUninitialized: false,
+    })
+);
 
 let Bc = new Blockchain();
 
@@ -106,8 +110,18 @@ const formatDate = (dateString) => {
 
     const day = date.getDate();
     const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
     ];
     const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
@@ -119,15 +133,27 @@ const initBc = async () => {
     try {
         // Fetch data from database
         const BlockchainDBData = await BlockchainDB.findAll({
-            attributes: ['BlockNo', 'TransactionID', 'TransactionDate', 'TransactionAmount', 'TransactionStatus', 'TransactionType', 'TransactionDesc', 'ReceiverID', 'ReceiverAccountNo', 'SenderID', 'SenderAccountNo'],
-            order: [['TransactionID', 'ASC']]
+            attributes: [
+                "BlockNo",
+                "TransactionID",
+                "TransactionDate",
+                "TransactionAmount",
+                "TransactionStatus",
+                "TransactionType",
+                "TransactionDesc",
+                "ReceiverID",
+                "ReceiverAccountNo",
+                "SenderID",
+                "SenderAccountNo",
+            ],
+            order: [["TransactionID", "ASC"]],
         });
 
         // Create a map to store transactions grouped by TransactionID
         const transactionMap = new Map();
 
         // Group transactions by TransactionID
-        BlockchainDBData.forEach(data => {
+        BlockchainDBData.forEach((data) => {
             if (!transactionMap.has(data.TransactionID)) {
                 transactionMap.set(data.TransactionID, []);
             }
@@ -135,11 +161,13 @@ const initBc = async () => {
         });
 
         // Process transactions and add to blockchain
-        transactionMap.forEach(transactions => {
+        transactionMap.forEach((transactions) => {
             // Sort transactions by TransactionStatus order: Pending, Completed, Returned
             transactions.sort((a, b) => {
-                const statusOrder = { 'Pending': 1, 'Completed': 2, 'Returned': 3 };
-                return statusOrder[a.TransactionStatus] - statusOrder[b.TransactionStatus];
+                const statusOrder = { Pending: 1, Completed: 2, Returned: 3 };
+                return (
+                    statusOrder[a.TransactionStatus] - statusOrder[b.TransactionStatus]
+                );
             });
 
             // Add each sorted transaction to blockchain
@@ -157,12 +185,11 @@ const initBc = async () => {
                         ReceiverID: data.ReceiverID,
                         ReceiverAccountNo: data.ReceiverAccountNo,
                         SenderID: data.SenderID,
-                        SenderAccountNo: data.SenderAccountNo
+                        SenderAccountNo: data.SenderAccountNo,
                     })
                 );
             });
         });
-
     } catch (err) {
         console.log(err);
     }
@@ -173,15 +200,46 @@ const initBc = async () => {
 
 initBc();
 
+// === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
+
 // API endpoint to get active accounts
-app.get('/api/activeAccounts', async (req, res) => {
+app.get("/api/activeAccounts", async (req, res) => {
     try {
         const accounts = await Account.findAll({
+            attributes: ["AccountNo"],
             where: { AccountStatus: false },
-            include: [{
-                model: User,
-                attributes: ['FullName', 'PhoneNo']
-            }]
+        });
+
+        const users = await User.findAll({
+            attributes: ["PhoneNo", "FullName"],
+        });
+
+        const userMap = {};
+        users.forEach((user) => {
+            userMap[user.UserID] = {
+                PhoneNo: user.PhoneNo,
+                FullName: user.FullName,
+            };
+        });
+
+        const formattedData = accounts.map((account) => ({
+            AccountNo: account.AccountNo,
+            FullName: userMap[account.UserID]
+                ? userMap[account.UserID].FullName
+                : null,
+            PhoneNo: userMap[account.UserID] ? userMap[account.UserID].PhoneNo : null,
+        }));
+        res.json(formattedData);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// API endpoint to get flagged accounts
+app.get("/api/flaggedAccounts", async (req, res) => {
+    try {
+        const accounts = await Account.findAll({
+            where: { Scammer: true },
         });
         res.json(accounts);
     } catch (error) {
@@ -189,114 +247,33 @@ app.get('/api/activeAccounts', async (req, res) => {
     }
 });
 
-
-// API endpoint to get flagged accounts
-app.get('/api/flaggedAccounts', async (req, res) => {
+app.get('/api/accounts', async (req, res) => {
     try {
-        const accounts = await Account.findAll({
-            where: { Scammer: true }
-        });
-        res.json(accounts);
-    }   catch (error) {
-        res.status(500).json({ error: error.message });
+        const accounts = await Account.findAll();
+        res.status(200).json(accounts);
+    } catch (error) {
+        res.status(500).json({ error: message });
     }
-
 });
 
-app.get('/api/displayallaccounts',async (req,res)=>{
-    try{
+app.get("/api/displayallaccounts", async (req, res) => {
+    try {
         const accounts = await Account.findAll();
         res.json(accounts);
-    }
-    catch(error){
-        res.status(500).json({error:message});
+    } catch (error) {
+        res.status(500).json({ error: message });
     }
 });
 
-app.get('/api/accounts', async (req,res) =>{
-    try{
-        const accounts = await Account.findAll();
-        res.status(200).json(accounts);  
-    }catch(error){
-        res.status(500).json({error:message})
-    }
-})
-
-// === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
-
-function padWithZeros(value) {
-    let strValue = value.toString();
-    let zerosNeeded = 8 - strValue.length;
-    let zeros = '0'.repeat(zerosNeeded);
-    return zeros + strValue;
-}
-
-app.post('/api/transaction/send/:sender/receive/:receiver', async (req, res) => {
-    const { sender, receiver } = req.params;
-    const { amt } = req.body;
-    
+app.get("/api/Blockchain", async (req, res) => {
     try {
-        const senderAccount = await Account.findOne({ where: { AccountNo: sender } });
-        const receiverAccount = await Account.findOne({ where: { AccountNo: receiver } });
-        if (!senderAccount || !receiverAccount) {
-            res.status(404).json({ error: 'Account not found' });
-            return;
-        }
-        if (senderAccount.Balance < amt) {   
-            res.status(400).json({ error: 'Insufficient balance' });
-            return;
-        }
-        const trans = await Transaction.findAll();
-
-        const newTransID = padWithZeros(trans.length + 1);
-
-        const DMZNewTransaction = {
-            id: newTransID,
-            amount: amt,
-            status: 'Checking...'
-        }
-
-        // Emit to all connected sockets
-        for (let socket of connectedSockets) {
-            socket.emit('newTransaction', DMZNewTransaction);
-        }
-
-        const transaction = await Transaction.create({
-            TransactionID: newTransID,
-            TransactionDate: new Date(),
-            TransactionAmount: amt,
-            TransactionStatus: 'Completed',
-            TransactionType: 'Withdrawal',
-            TransactionDesc: null,
-            ReceiverID: receiverAccount.UserID,
-            ReceiverAccountNo: receiverAccount.AccountNo,
-            SenderID: senderAccount.UserID,
-            SenderAccountNo: senderAccount.AccountNo
-        })
-
-        const newSenderBalance = parseInt(senderAccount.Balance) - parseInt(amt);
-        const newReceiverBalance = parseInt(receiverAccount.Balance) + parseInt(amt);
-        await Account.update({ Balance: newSenderBalance }, { where: { AccountNo: sender } });
-        await Account.update({ Balance: newReceiverBalance }, { where: { AccountNo: receiver } });
-        res.status(200).json({ message: 'Transaction completed successfully' });
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-
-app.get('/api/Blockchain', async (req, res) => {
-    try{
         res.status(200).send(JSON.stringify(Bc, null, 2));
-    }
-    catch (err){
+    } catch (err) {
         res.status(500).json(err);
     }
-})
+});
 
-app.get('/api/allTransactions', async (req, res) => {
+app.get("/api/allTransactions", async (req, res) => {
     try {
         const transactions = await Transaction.findAll();
         res.json(transactions);
@@ -305,7 +282,7 @@ app.get('/api/allTransactions', async (req, res) => {
     }
 });
 
-app.get('/api/transactionCount', async (req, res) => {
+app.get("/api/transactionCount", async (req, res) => {
     try {
         const transactionCount = await Transaction.count();
         res.json({ count: transactionCount });
@@ -314,7 +291,7 @@ app.get('/api/transactionCount', async (req, res) => {
     }
 });
 
-app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
+app.put("/api/transaction/rollback/id/:transactionID", async (req, res) => {
     const { transactionID } = req.params;
     let transactionDate;
     let transactionAmt;
@@ -325,7 +302,9 @@ app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
     let senderid;
     let senderaccountnum;
     try {
-        const transaction = await Transaction.findOne({ where: { TransactionID: transactionID } });
+        const transaction = await Transaction.findOne({
+            where: { TransactionID: transactionID },
+        });
         if (transaction) {
             transactionDate = transaction.TransactionDate;
             transactionAmt = transaction.TransactionAmount;
@@ -335,34 +314,97 @@ app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
             receiveraccountnum = transaction.ReceiverAccountNo;
             senderid = transaction.SenderID;
             senderaccountnum = transaction.SenderAccountNo;
-            transaction.TransactionStatus = 'Returned';
+            transaction.TransactionStatus = "Returned";
             await transaction.save();
-            res.status(200).json({ message: 'Transaction updated successfully' });
+            res.status(200).json({ message: "Transaction updated successfully" });
         } else {
-            res.status(404).json({ error: 'Transaction not found' });
+            res.status(404).json({ error: "Transaction not found" });
         }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 
     const newTransactionDB = await BlockchainDB.create({
-        BlockNo: (Math.random()+' ').substring(2,10)+(Math.random()+' ').substring(2,10),
+        BlockNo:
+            (Math.random() + " ").substring(2, 10) +
+            (Math.random() + " ").substring(2, 10),
         TransactionID: transactionID,
         TransactionDate: transactionDate,
         TransactionAmount: transactionAmt,
-        TransactionStatus: 'Returned',
+        TransactionStatus: "Returned",
         TransactionType: transactionType,
         TransactionDesc: transactionDesc,
         ReceiverID: receiverid,
         ReceiverAccountNo: receiveraccountnum,
         SenderID: senderid,
-        SenderAccountNo: senderaccountnum
+        SenderAccountNo: senderaccountnum,
     });
 
     if (newTransactionDB) {
         initBc();
     }
-})
+});
+
+app.get("/api/totalTransactionAmount", async (req, res) => {
+    try {
+        const totalAmount = await Transaction.sum("TransactionAmount");
+        res.json({ totalAmount });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get("/api/transaction/weeklyTransaction", async (req, res) => {
+    try {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 13);
+
+        const transactions = await Transaction.findAll({
+            where: {
+                TransactionDate: {
+                    [Op.between]: [startDate, endDate],
+                },
+            },
+            order: [["TransactionDate", "ASC"]],
+        });
+
+        // Group accounts by date
+        const groupedData = transactions.reduce((acc, transaction) => {
+            const date = transaction.TransactionDate.toISOString().split("T")[0];
+            if (!acc[date]) {
+                acc[date] = 0;
+            }
+            acc[date]++;
+            return acc;
+        }, {});
+
+        // Initialize arrays to hold the account counts for the last 14 days
+        const currentWeekData = Array(7).fill(0);
+        const previousWeekData = Array(7).fill(0);
+
+        const labels = [];
+        for (let i = 0; i < 14; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            const dateString = date.toISOString().split("T")[0];
+
+            if (i < 7) {
+                previousWeekData[i] = groupedData[dateString] || 0;
+            } else {
+                currentWeekData[i - 7] = groupedData[dateString] || 0;
+            }
+
+            if (i >= 7) {
+                labels.push(dateString);
+            }
+        }
+
+        res.json({ labels, currentWeekData, previousWeekData });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 
 app.get('/api/FrozenFunds', async (req, res) => {
     try {
@@ -405,333 +447,10 @@ app.get('/api/FrozenFunds/Yesterday', async (req, res) => {
     }
 });
 
-app.get('/api/totalTransactionAmount', async (req, res) => {
-    try {
-        const totalAmount = await Transaction.sum('TransactionAmount');
-        res.json({ totalAmount });
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-app.get('/api/transaction/weeklyTransaction', async (req, res) => {
-    try {
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - 13);
-
-        const transactions = await Transaction.findAll({
-            where: {
-                TransactionDate: {
-                    [Op.between]: [startDate, endDate]
-                }
-            },
-            order: [['TransactionDate', 'ASC']]
-        });
-
-        // Group accounts by date
-        const groupedData = transactions.reduce((acc, transaction) => {
-            const date = transaction.TransactionDate.toISOString().split('T')[0];
-            if (!acc[date]) {
-                acc[date] = 0;
-            }
-            acc[date]++;
-            return acc;
-        }, {});
-
-        // Initialize arrays to hold the account counts for the last 14 days
-        const currentWeekData = Array(7).fill(0);
-        const previousWeekData = Array(7).fill(0);
-
-        const labels = [];
-        for (let i = 0; i < 14; i++) {
-            const date = new Date(startDate);
-            date.setDate(startDate.getDate() + i);
-            const dateString = date.toISOString().split('T')[0];
-
-            if (i < 7) {
-                previousWeekData[i] = groupedData[dateString] || 0;
-            } else {
-                currentWeekData[i - 7] = groupedData[dateString] || 0;
-            }
-
-            if (i >= 7) {
-                labels.push(dateString);
-            }
-        }
-
-        res.json({ labels, currentWeekData, previousWeekData });
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-app.get('/api/users', async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json(users);
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-app.get('/api/users/email/:email',async (req, res)=>{
-    const {email} = req.params;
-    console.log(req.params);
-    try {
-      const user = await User.findOne({ where: { Email: email } });
-      if (user) {
-        res.json(user);
-      } else {
-        res.status(404).json({ error: "User not found" });
-      }
-    } catch (err) {
-      res.status(500).json(err);
-    }
-})
-
-app.get('/api/users/:userID', async (req, res) => {
-    const { userID } = req.params
-    try {
-        const user = await User.findOne({ where: {UserID: userID }});
-        if (user) {
-            res.json(user);
-        } else {
-            res.status(404).json({ error: 'User not found' } );
-        }
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-app.get('/api/userCount', async (req, res) => {
-    try {
-        const userCount = await User.count() - 1;
-        res.json({ count: userCount })
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-app.put('/api/users/:userID', async (req, res) => {
-    const { userID } = req.params;
-    const { FullName, DOB, Email, PhoneNo } = req.body;
-    try {
-        const user = await User.findOne({ where: { UserID: userID }});
-        if (user) {
-            user.FullName = FullName;
-            user.DOB = DOB;
-            user.Email = Email;
-            user.PhoneNo = PhoneNo;
-            await user.save();
-            res.status(200).json({message: "User Updated Successfully"});
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.delete('/api/users/:userID', async (req, res) => {
-    const { userID } = req.params;
-    const newUserID = 999;
-
-    try {
-        const user = await User.findOne({ where: { UserID: userID }});
-        if (user) {
-
-            console.log(`Updating accounts from userID ${userID} to ${newUserID}`);
-
-            const updatedAccounts = await Account.update(
-                { UserID: newUserID },
-                { where: { UserID : userID } }
-            );
-
-            const updatedSTransactions = await Transaction.update(
-                { SenderID: newUserID },
-                { where: { SenderID : userID } }
-            );
-
-            const updatedRTransactions = await Transaction.update(
-                { ReceiverID: newUserID },
-                { where: { ReceiverID : userID } }
-            );
-
-            const updateSBlockchainDB = await BlockchainDB.update(
-                { SenderID: newUserID },
-                { where: { SenderID : userID } }
-            );
-
-            const updateRBlockchainDB = await BlockchainDB.update(
-                { ReceiverID: newUserID },
-                { where: { ReceiverID : userID } }
-            );
-
-            initBc();
-
-            console.log(`${updatedAccounts[0]} accounts updated.`);
-
-            await user.destroy();
-            res.status(200).json({ message: "User Deleted Successfully" });
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// app.post('/api/accounts/log',async(req,res)=>{
-//     const {AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime} = req.body;
-//     //res.status(200).json({"message":"message"});
-    
-//     try {
-//       const newLog = await AccountLog.create({
-//         AccountNo,
-//         LoginCoords,
-//         LastIPLoginCountry,
-//         Flagged,
-//         LoginTime,
-//       });
-//       console.log("New user created:", newLog.toJSON());
-//       res.json(newLog);
-//     } catch (error) {
-//       console.error("Error creating new user:", error);
-//       return res.status(404).json({error:error});
-//     }
-// })
-
-app.post('/api/accounts/log', async (req, res) => {
-    const { AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime } = req.body;
-
-    try {
-        // Check if the log entry already exists
-        const existingLog = await AccountLog.findOne({ where: { AccountNo } });
-
-        if (existingLog) {
-            // Log already exists; do nothing
-            console.log("Log entry already exists:", existingLog.toJSON());
-            return res.status(200).json({ message: 'Log entry already exists', log: existingLog });
-        }
-
-        // Create new log entry since it does not exist
-        const newLog = await AccountLog.create({
-            AccountNo,
-            LoginCoords,
-            LastIPLoginCountry,
-            Flagged,
-            LoginTime,
-        });
-
-        console.log("New log entry created:", newLog.toJSON());
-        res.status(201).json(newLog);
-    } catch (error) {
-        console.error("Error handling log entry:", error);
-        return res.status(500).json({ error: 'Server error' });
-    }
-});
-
-
-app.get('/api/accounts', async (req, res) => {
-    try {
-        const accounts = await Account.findAll({
-            order: [['UserID', 'ASC']]
-        });
-        res.json(accounts);
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-app.get('/api/accounts/userid/:userid',async (req,res)=>{
-    const {userid} = req.params;
-    try {
-      const acc = await Account.findOne({ where: { UserID: userid } });
-      if (acc) {
-        res.json(acc);
-      } else {
-        res.status(404).json({ error: "Account not found" });
-      }
-    } catch (err) {
-      res.status(500).json(err);
-    }
-})
-
-app.put('/api/accounts/:accountNo', async (req, res) => {
-  const { accountNo } = req.params;
-  const { AccountStatus, Scammer } = req.body;
-  try {
-    const account = await Account.findOne({ where: { AccountNo: accountNo } });
-    if (account) {
-      account.AccountStatus = AccountStatus;
-      account.Scammer = Scammer;
-      await account.save();
-      res.status(200).json({ message: 'Account updated successfully' });
-    } else {
-      res.status(404).json({ error: 'Account not found' });
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get('/api/accounts/weekly', async (req, res) => {
-    try {
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - 13);
-
-        const accounts = await Account.findAll({
-            where: {
-                DateOpened: {
-                    [Op.between]: [startDate, endDate]
-                }
-            },
-            order: [['DateOpened', 'ASC']]
-        });
-
-        // Group accounts by date
-        const groupedData = accounts.reduce((acc, account) => {
-            const date = account.DateOpened.toISOString().split('T')[0];
-            if (!acc[date]) {
-                acc[date] = 0;
-            }
-            acc[date]++;
-            return acc;
-        }, {});
-
-        // Initialize arrays to hold the account counts for the last 14 days
-        const currentWeekData = Array(7).fill(0);
-        const previousWeekData = Array(7).fill(0);
-
-        const labels = [];
-        for (let i = 0; i < 14; i++) {
-            const date = new Date(startDate);
-            date.setDate(startDate.getDate() + i);
-            const dateString = date.toISOString().split('T')[0];
-
-            if (i < 7) {
-                previousWeekData[i] = groupedData[dateString] || 0;
-            } else {
-                currentWeekData[i - 7] = groupedData[dateString] || 0;
-            }
-
-            if (i >= 7) {
-                labels.push(dateString);
-            }
-        }
-
-        res.json({ labels, currentWeekData, previousWeekData });
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
 app.get('/api/enquiries', async (req, res) => {
     try {
         const enquiries = await Enquiry.findAll({
-            attributes: ['EnquiryID', 'EnquiryDate', 'EnquiryType', 'EnquiryStatus','EnquiryDetails', 'UserID', 'AccountNo']
+            attributes: ['EnquiryID', 'EnquiryDate', 'EnquiryType', 'EnquiryStatus', 'EnquiryDetails', 'UserID', 'AccountNo']
         });
 
         const users = await User.findAll({
@@ -778,7 +497,7 @@ async function generateUniqueAccountNumber() {
     let isUnique = false;
 
     while (!isUnique) {
-        accountNo = Math.floor(100000000000 + Math.random() * 900000000000).toString();;
+        accountNo = Math.floor(100000000000 + Math.random() * 900000000000).toString();
         const existingAccount = await Account.findOne({ where: { AccountNo: accountNo } });
 
         if (!existingAccount) {
@@ -835,7 +554,7 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-app.post('/login', async (req, res) => {
+app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -860,30 +579,30 @@ app.post('/login', async (req, res) => {
         res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
 
     } catch (error) {
-        console.error('Login error:', error);
+        console.error("Login error:", error);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
 const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    service: "Gmail",
     auth: {
-        user: 'justprepco@gmail.com',
-        pass: 'uhru lnfq oalh duxz', // Use your app-specific password here
+        user: "justprepco@gmail.com",
+        pass: "uhru lnfq oalh duxz", // Use your app-specific password here
     },
 });
 
-app.post('/forgot-password', async (req, res) => {
+app.post("/forgot-password", async (req, res) => {
     const { email } = req.body;
 
     try {
         const user = await User.findOne({ where: { Email: email } });
 
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: "User not found" });
         }
 
-        const token = crypto.randomBytes(32).toString('hex');
+        const token = crypto.randomBytes(32).toString("hex");
         const resetLink = `http://localhost:3000/reset-password/${token}`;
 
         // Save the token to the user record in the database
@@ -892,56 +611,186 @@ app.post('/forgot-password', async (req, res) => {
         await user.save();
 
         const mailOptions = {
-            from: 'justprepco@gmail.com',
+            from: "justprepco@gmail.com",
             to: user.Email,
-            subject: 'Password Reset',
+            subject: "Password Reset",
             html: `<p>You requested a password reset</p>
                    <p>Click this <a href="${resetLink}">link</a> to set a new password.</p>`,
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.error('Error sending email:', error);
-                return res.status(500).json({ error: 'Error sending email' });
+                console.error("Error sending email:", error);
+                return res.status(500).json({ error: "Error sending email" });
             }
-            res.status(200).json({ message: 'Password reset link sent' });
+            res.status(200).json({ message: "Password reset link sent" });
         });
     } catch (error) {
-        console.error('Error processing request:', error);
-        res.status(500).json({ error: 'Server error' });
+        console.error("Error processing request:", error);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
-app.post('/reset-password', async (req, res) => {
+app.post("/reset-password", async (req, res) => {
     const { token, password } = req.body;
-  
+
     try {
-      const user = await User.findOne({ where: { resetToken: token, resetTokenExpiration: { [Op.gt]: Date.now() } } });
-  
-      if (!user) {
-        return res.status(400).json({ error: 'Invalid or expired token' });
-      }
-  
-      // const hashedPassword = await bcrypt.hash(password, 10); // Comment this line out for now
-      user.Password = password; // Save the plain text password for now
-      user.resetToken = null;
-      user.resetTokenExpiration = null;
-      await user.save();
-  
-      res.status(200).json({ message: 'Password reset successful' });
+        const user = await User.findOne({
+            where: {
+                resetToken: token,
+                resetTokenExpiration: { [Op.gt]: Date.now() },
+            },
+        });
+
+        if (!user) {
+            return res.status(400).json({ error: "Invalid or expired token" });
+        }
+
+        // const hashedPassword = await bcrypt.hash(password, 10); // Comment this line out for now
+        user.Password = password; // Save the plain text password for now
+        user.resetToken = null;
+        user.resetTokenExpiration = null;
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successful" });
     } catch (error) {
-      console.error('Error resetting password:', error);
-      res.status(500).json({ error: 'Server error' });
+        console.error("Error resetting password:", error);
+        res.status(500).json({ error: "Server error" });
     }
-  });
+});
 
-console.log("Hello World");
+app.put("/api/accounts/:accountNo", async (req, res) => {
+    const { accountNo } = req.params;
+    const { AccountStatus, Scammer } = req.body;
+    try {
+        const account = await Account.findOne({ where: { AccountNo: accountNo } });
+        if (account) {
+            account.AccountStatus = AccountStatus;
+            account.Scammer = Scammer;
+            await account.save();
+            res.status(200).json({ message: "Account updated successfully" });
+        } else {
+            res.status(404).json({ error: "Account not found" });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
-server.listen(4000, () => {
-    console.log(`Server running on http://localhost:4000`);
+app.put("/api/countries/ban-status/:countryName", async (req, res) => {
+    const { countryName } = req.params;
+    const { isBanned } = req.body;
+
+    try {
+        let country = await BannedCountries.findOne({
+            where: { CountryName: countryName },
+        });
+        if (country) {
+            country.isBanned = isBanned;
+            await country.save();
+            return res.status(200).json({
+                message: `${countryName} ${isBanned ? "banned" : "unbanned"} successfully.`,
+            });
+        } else {
+            const newCountry = await BannedCountries.create({
+                CountryName: countryName,
+                isBanned: isBanned,
+            });
+
+            return res.status(200).json({ message: `${countryName} added to banlist.` });
+        }
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
+app.get('/api/countries/banned', async (req, res) => {
+    try {
+        let banList = await BannedCountries.findAll({ where: { isBanned: 1 } });
+        return res.status(200).json(banList);
+    }
+    catch (err) {
+        return res.status(500).json({ err });
+    }
+});
+
+app.post('/api/transaction/send/:sender/receive/:receiver', async (req, res) => {
+    const { sender, receiver } = req.params;
+    const { amt } = req.body;
+
+    try {
+        const senderAccount = await Account.findOne({ where: { AccountNo: sender } });
+        const receiverAccount = await Account.findOne({ where: { AccountNo: receiver } });
+        if (!senderAccount || !receiverAccount) {
+            res.status(404).json({ error: 'Account not found' });
+            return;
+        }
+        if (senderAccount.Balance < amt) {
+            res.status(400).json({ error: 'Insufficient balance' });
+            return;
+        }
+        const trans = await Transaction.findAll();
+
+        const newTransID = padWithZeros(trans.length + 1);
+
+        const DMZNewTransaction = {
+            id: newTransID,
+            amount: amt,
+            status: 'Checking...'
+        }
+
+        // Emit to all connected sockets
+        for (let socket of connectedSockets) {
+            socket.emit('newTransaction', DMZNewTransaction);
+        }
+
+        const transaction = await Transaction.create({
+            TransactionID: newTransID,
+            TransactionDate: new Date(),
+            TransactionAmount: amt,
+            TransactionStatus: 'Completed',
+            TransactionType: 'Withdrawal',
+            TransactionDesc: null,
+            ReceiverID: receiverAccount.UserID,
+            ReceiverAccountNo: receiverAccount.AccountNo,
+            SenderID: senderAccount.UserID,
+            SenderAccountNo: senderAccount.AccountNo
+        })
+
+        const newSenderBalance = parseInt(senderAccount.Balance) - parseInt(amt);
+        const newReceiverBalance = parseInt(receiverAccount.Balance) + parseInt(amt);
+        await Account.update({ Balance: newSenderBalance }, { where: { AccountNo: sender } });
+        await Account.update({ Balance: newReceiverBalance }, { where: { AccountNo: receiver } });
+        res.status(200).json({ message: 'Transaction completed successfully' });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post("/api/accounts/log", async (req, res) => {
+    const { AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime } = req.body;
+    //res.status(200).json({"message":"message"});
+
+    try {
+        const newLog = await AccountLog.create({
+            AccountNo,
+            LoginCoords,
+            LastIPLoginCountry,
+            Flagged,
+            LoginTime,
+        });
+        console.log("New user created:", newLog.toJSON());
+        res.json(newLog);
+    } catch (error) {
+        console.error("Error creating new user:", error);
+        return res.status(404).json({ error: error });
+    }
 });
 
 // Last line of code
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log(`App running on http://localhost:${port}`);
 });
+

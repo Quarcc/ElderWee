@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect } from "react";
+import { Autocomplete } from "@mui/material";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -14,7 +15,11 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
 import axios from "axios";
 import Validation from "./LoginValidation";
-import { retrieveAccountDetailsWithEmail } from "../../Api";
+import {
+  getCountry,
+  retrieveAccountDetailsWithEmail,
+  getBannedCountries,
+} from "../../Api";
 
 const defaultTheme = createTheme();
 
@@ -27,23 +32,47 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const [bannedCountries, setBannedCountries] = React.useState([
+    "Cuba",
+    `Iran`,
+    ` North Korea`,
+    ` Russia`,
+    `Syria`,
+    `Ukraine`,
+    `Italy`,
+  ]);
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setCoordinates({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
           });
         },
         (err) => {
-          confirm("Please enable geolocation to use this application."); 
+          confirm("Please enable geolocation to use this application.");
         }
       );
     } else {
-      confirm("Please enable geolocation to use this application."); 
+      confirm("Please enable geolocation to use this application.");
     }
+
+    const getBannedCountries = async () => {
+      try {
+        let banList = await fetch("http://localhost:8000/api/countries/banned");
+        let list = await banList.json();
+        let bannedCountryNames = list.map((c) => c.CountryName);
+        //console.log(bannedCountryNames);
+        setBannedCountries(bannedCountryNames);
+        return list;
+      } catch (err) {
+        console.log(err);
+        return [];
+      }
+    };
+    getBannedCountries();
   }, []);
 
   const handleChange = (event) => {
@@ -57,7 +86,7 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if(!coordinates){
+    if (!coordinates) {
       confirm("Please enable geolocation to use this application.");
       return;
     }
@@ -76,26 +105,46 @@ export default function Login() {
 
       let accountData = await retrieveAccountDetailsWithEmail(formData.email);
       let LoginCoords = JSON.stringify(coordinates);
+      let lastIPLogin = await getCountry(coordinates);
+      // If login from banned country, mark account as scammed;
+      if (bannedCountries.includes(lastIPLogin)) {
+        let result = await fetch(
+          `http://localhost:8000/api/accounts/${accountData.AccountNo}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              AccountStatus: 1,
+              Scammer: 1,
+            }),
+          }
+        );
+        accountData.Scammed = true;
+      }
+      //console.log("LAST IP Login",lastIPLogin);
       let currentDateTime = new Date();
       const accountLogData = {
-        AccountNo:accountData.AccountNo,
-        LoginCoords:LoginCoords,
-        LastIPLoginCountry:"Singapore",
-        Flagged:accountData.Scammed ? true : false,
-        LoginTime:JSON.stringify(currentDateTime),
-      }
+        AccountNo: accountData.AccountNo,
+        LoginCoords: LoginCoords,
+        LastIPLoginCountry: lastIPLogin,
+        Flagged: accountData.Scammed ? true : false,
+        LoginTime: JSON.stringify(currentDateTime),
+      };
 
-      const addAccountLog = await fetch("http://localhost:8000/api/accounts/log",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify(accountLogData),
-      });
+      const addAccountLog = await fetch(
+        "http://localhost:8000/api/accounts/log",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(accountLogData),
+        }
+      );
 
-      let res = await addAccountLog.json()
-
-      console.log(res);
+      let res = await addAccountLog.json();
 
       if (response.status === 200) {
         if (formData.email === "DELETED@gmail.com") {
@@ -143,6 +192,7 @@ export default function Login() {
               </Typography>
             </Box>
           )}
+
           <Box
             component="form"
             onSubmit={handleSubmit}
