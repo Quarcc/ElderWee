@@ -8,6 +8,7 @@ import AdminBC from './component/admin/blockchain/adminBC';
 import AdminBCdetails from './component/admin/blockchain/adminBCdetailed';
 import AdminBCtrace from './component/admin/blockchain/adminBCtrace';
 import AdminDMZ from './component/admin/DMZ/DMZ';
+import AdminReport from './component/admin/Report/Report'
 import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';
 import Login from './component/user/Login';
@@ -20,6 +21,7 @@ import Home from './component/user/landing-page/components/Home';
 import ResetPassword from './component/user/ResetPassword';
 import ForgotPassword from './component/user/ForgotPassword';
 import ProfilePage from './component/user/Profile';
+import TransactionTest from './component/user/transactionTest'
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -37,6 +39,7 @@ function App() {
                 <Route path="/admin/transaction/details/id/:transactionID" element={<AdminBCdetails />} />
                 <Route path="/admin/transaction/trace/id/:transactionID" element={<AdminBCtrace />} />
                 <Route path="/adminDMZ" element={<AdminDMZ />} />
+                <Route path='/adminReport' element={<AdminReport /> } />
                 <Route path="/adminGeo" element={<GeoSummary />} />
                 <Route path="/Login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
@@ -46,9 +49,8 @@ function App() {
                 <Route path="/forgot" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
-
+                <Route path='/transactionTest' element={<TransactionTest />} />
             </Routes>
-
         </>
     );
 }

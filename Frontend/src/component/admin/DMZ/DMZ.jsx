@@ -1,6 +1,11 @@
 import React from "react";
 import '../css/adminDMZ.css';
+import io from 'socket.io-client'
 import AdminNavbar from "../navbar/adminNavbar";
+import DMZCard from "./card/dmzCard";
+import DMZZone from "./zone/dmzZone";
+
+import '../css/adminDMZ.css';
 
 const adminDMZ = () => {
     return (
@@ -9,12 +14,8 @@ const adminDMZ = () => {
                 <AdminNavbar />
             </div>
             <div className="DMZ-bg">
-                <div className="row DMZ-top-bg mb-5">
-                    <h1>DMZ</h1>
-                </div>
-                <div className="row DMZ-bot-bg mt-5">
-                    <h1>DMZ part 2</h1>
-                </div>
+                <DMZCard />
+                <DMZZone />
             </div>
             
         </div>

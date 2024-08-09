@@ -1,11 +1,45 @@
 .DMZ-top-bg, .DMZ-bot-bg {
     background-color: white;
     border-radius: 10px;
-    box-shadow: 10px 10px 10px #AAAAAA;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .DMZ-bg{
     margin: 30px;
     width: 100%;
     padding-left: 250px;
+}
+
+.DMZTopThreeCards{
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.dmz-container {
+    margin: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+  
+.dmz-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    min-width: 150px;
+    margin: auto;
+}
+
+.mainZoneBox{
+    min-height: 600px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.outer-dmz-container{
+    margin-left: 10px;
+    margin-right: 10px;
 }

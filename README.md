@@ -66,3 +66,4 @@ IF YOU ARE GOING TO INSTALL DEPENDENCIES, FIGURE OUT WHERE IT GOES, FRONTEND OR 
 2. https://threejs.org/docs/ - ThreeJS Models
 3. https://hygraph.com/blog/routing-in-react - React Routing
 4. https://mui.com/material-ui/getting-started/installation/ - Material Icons
+5. https://socket.io/docs/v4/ - SocketIO

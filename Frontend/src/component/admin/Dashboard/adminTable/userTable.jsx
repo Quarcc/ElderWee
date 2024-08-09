@@ -58,7 +58,7 @@ export const UserTable = () => {
     <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: '20px' }}>
       <Toolbar sx={{ margin: 2}}>
         <Typography sx={{ flex: '1 1 100%', fontSize: 40 }} variant="h1" id="tableTitle" component="div">
-          New Users
+          Latest Users
         </Typography>
       </Toolbar>
       <TableContainer sx={{ marginBottom: 3 }}>

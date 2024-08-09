@@ -1,0 +1,15 @@
+.Enquiry-top-bg, .Enquiry-bot-bg {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 10px 10px 10px #AAAAAA;
+}
+
+.Enquiry-bg{
+    margin: 30px;
+    width: 100%;
+    padding-left: 250px;
+}
+.wordcloud-container {
+    width: 100%;
+    height: 600px; /* Adjust as needed */
+  }

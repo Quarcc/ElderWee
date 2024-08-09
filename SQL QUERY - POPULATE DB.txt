@@ -1,118 +1,3 @@
-Populate DB Data, copy entire thing, do not change the order.
-
-INSERT INTO elderwee.Users (UserID, FullName, DOB, Email, PhoneNo, Password, FaceID)
-VALUES
-(1, 'test1', '2024-01-01 00:00:00', 'test1@gmail.com', '12345678', 'test1', 1),
-(2, 'test2', '2024-01-02 00:00:00', 'test2@gmail.com', '12345679', 'test2', 1),
-(3, 'test3', '2024-01-03 00:00:00', 'test3@gmail.com', '12345677', 'test3', 1),
-(4, 'test4', '2024-01-04 00:00:00', 'test4@gmail.com', '12345666', 'test4', 1),
-(5, 'Michael Johnson', '1988-05-05 00:00:00', 'michael.johnson@example.com', '567-890-1234', 'password5', 1),
-(6, 'Jessica Lee', '1993-06-06 00:00:00', 'jessica.lee@example.com', '678-901-2345', 'password6', 1),
-(7, 'David Wilson', '1987-07-07 00:00:00', 'david.wilson@example.com', '789-012-3456', 'password7', 1),
-(8, 'Sarah Martinez', '1991-08-08 00:00:00', 'sarah.martinez@example.com', '890-123-4567', 'password8', 1),
-(9, 'James Anderson', '1990-09-09 00:00:00', 'james.anderson@example.com', '901-234-5678', 'password9', 1),
-(10, 'Laura Thomas', '1994-10-10 00:00:00', 'laura.thomas@example.com', '912-345-6789', 'password10', 1),
-(11, 'Daniel Moore', '1986-11-11 00:00:00', 'daniel.moore@example.com', '923-456-7890', 'password11', 1),
-(12, 'Karen Taylor', '1995-12-12 00:00:00', 'karen.taylor@example.com', '934-567-8901', 'password12', 1),
-(13, 'Matthew Jackson', '1989-01-13 00:00:00', 'matthew.jackson@example.com', '945-678-9012', 'password13', 1),
-(14, 'Lisa White', '1993-02-14 00:00:00', 'lisa.white@example.com', '456-789-0193', 'password14', 1),
-(15, 'Anthony Harris', '1988-03-15 00:00:00', 'anthony.harris@example.com', '569-890-1234', 'password15', 1),
-(16, 'Patricia Martin', '1992-04-16 00:00:00', 'patricia.martin@example.com', '978-901-2345', 'password16', 1),
-(17, 'Thomas Thompson', '1990-05-17 00:00:00', 'thomas.thompson@example.com', '989-012-3456', 'password17', 1),
-(18, 'Elizabeth Garcia', '1991-06-18 00:00:00', 'elizabeth.garcia@example.com', '894-123-4567', 'password18', 1),
-(19, 'Joshua Martinez', '1994-07-19 00:00:00', 'joshua.martinez@example.com', '901-334-5678', 'password19', 1),
-(20, 'Barbara Robinson', '1987-08-20 00:00:00', 'barbara.robinson@example.com', '016-345-6789', 'password20', 1),
-(21, 'John Doe', '1990-01-01 00:00:00', 'john.doe@example.com', '123-456-7890', 'password1', 1),
-(22, 'Jane Smith', '1985-02-02 00:00:00', 'jane.smith@example.com', '234-567-8901', 'password2', 1),
-(23, 'Robert Brown', '1992-03-03 00:00:00', 'robert.brown@example.com', '345-678-9012', 'password3', 1),
-(24, 'Emily Davis', '1995-04-04 00:00:00', 'emily.davis@example.com', '456-789-0123', 'password4', 1),
-(25, 'Test 25', '1988-05-06 00:00:00', 'mick.johnson@example.com', '511-890-1234', 'password5', 1),
-(26, 'Test 26', '1995-04-05 00:00:00', 'amy.davis@example.com', '456-112-0123', 'password4', 1),
-(27, 'Test 27', '1992-03-04 00:00:00', 'robet.brown@example.com', '345-174-9012', 'password3', 1),
-(28, 'Test 28', '1985-02-03 00:00:00', 'jan.smith@example.com', '234-567-5601', 'password2', 1),
-(29, 'Test 29', '1990-01-02 00:00:00', 'joh.doe@example.com', '123-456-7835', 'password1', 1);
-
-INSERT INTO elderwee.accounts(AccountNo, Balance, DateOpened, AccountStatus, Scammer, UserID)
-VALUES
-('05399925', 8000, '2024-06-25 00:00:00', 0, 0, 15),
-('07479754', 2500.25, '2024-07-06 00:00:00', 0, 0, 24),
-('07515321', 3500.75, '2024-07-08 00:00:00', 0, 0, 26),
-('08232403', 5500.75, '2024-07-03 00:00:00', 0, 0, 10),
-('16249954', 9500.75, '2024-06-27 00:00:00', 0, 0, 18),
-('19169111', 3500.75, '2024-06-29 00:00:00', 0, 0, 6),
-('19538594', 9000.5, '2024-06-22 00:00:00', 0, 0, 17),
-('22633993', 10000, '2024-06-27 00:00:00', 0, 0, 19),
-('26066670', 1500.75, '2024-07-06 00:00:00', 0, 0, 22),
-('27147673', 8500.25, '2024-07-05 00:00:00', 0, 0, 16),
-('30060010', 2000, '2024-07-06 00:00:00', 0, 0, 1),
-('30212750', 6500.25, '2024-06-26 00:00:00', 0, 0, 12),
-('41919316', 5000.5, '2024-07-02 00:00:00', 0, 0, 9),
-('45990916', 3000.5, '2024-07-07 00:00:00', 0, 0, 25),
-('50981991', 6000, '2024-07-04 00:00:00', 0, 0, 11),
-('51338907', 4000, '2024-06-30 00:00:00', 0, 0, 7),
-('54198557', 10500.2, '2024-07-05 00:00:00', 0, 0, 20),
-('64420107', 5500, '2024-06-25 00:00:00', 0, 0, 2),
-('66355915', 7000, '2024-06-26 00:00:00', 0, 0, 3),
-('75473357', 4500.25, '2024-07-08 00:00:00', 0, 0, 28),
-('77732467', 1000.5, '2024-06-24 00:00:00', 0, 0, 21),
-('78555196', 5000.5, '2024-07-08 00:00:00', 0, 0, 29),
-('81502217', 3000.5, '2024-06-28 00:00:00', 0, 0, 5),
-('96113992', 1020, '2024-06-27 00:00:00', 0, 0, 4),
-('97135952', 2000, '2024-06-26 00:00:00', 0, 0, 23),
-('98117780', 7000.5, '2024-06-26 00:00:00', 0, 0, 13),
-('99187207', 4500.25, '2024-07-01 00:00:00', 0, 0, 8),
-('99603863', 4000, '2024-07-09 00:00:00', 0, 0, 27),
-('99950652', 7500.75, '2024-07-06 00:00:00', 0, 0, 14);
-
-INSERT INTO Transactions (TransactionID, TransactionDate, TransactionAmount, TransactionStatus, TransactionType, TransactionDesc, ReceiverID, ReceiverAccountNo, SenderID, SenderAccountNo)
-VALUES
-('00000001', '2024-07-01 10:00:00', 100.50, 'Completed', 'Withdrawal', 'ATM Withdrawal', 1, '30060010', 2, '64420107'),
-('00000002', '2024-07-01 11:00:00', 200.75, 'Pending', 'Deposit', 'Salary Credit', 3, '66355915', 4, '96113992'),
-('00000003', '2024-07-01 12:00:00', 300.00, 'Returned', 'Withdrawal', 'ATM Withdrawal', 5, '81502217', 6, '19169111'),
-('00000004', '2024-07-01 13:00:00', 150.25, 'Completed', 'Deposit', 'Salary Credit', 7, '51338907', 8, '99187207'),
-('00000005', '2024-07-01 14:00:00', 250.75, 'Pending', 'Withdrawal', 'ATM Withdrawal', 9, '41919316', 10, '08232403'),
-('00000006', '2024-07-01 15:00:00', 350.50, 'Completed', 'Deposit', 'Salary Credit', 11, '50981991', 12, '30212750'),
-('00000007', '2024-07-01 16:00:00', 450.00, 'Returned', 'Withdrawal', 'ATM Withdrawal', 13, '98117780', 14, '99950652'),
-('00000008', '2024-07-01 17:00:00', 550.25, 'Completed', 'Deposit', 'Salary Credit', 15, '05399925', 16, '27147673'),
-('00000009', '2024-07-01 18:00:00', 650.75, 'Pending', 'Withdrawal', 'ATM Withdrawal', 17, '19538594', 18, '16249954'),
-('00000010', '2024-07-01 19:00:00', 750.50, 'Completed', 'Deposit', 'Salary Credit', 19, '22633993', 20, '54198557'),
-('00000011', '2024-07-02 10:00:00', 850.25, 'Completed', 'Withdrawal', 'ATM Withdrawal', 21, '77732467', 22, '26066670'),
-('00000012', '2024-07-02 11:00:00', 950.00, 'Pending', 'Deposit', 'Salary Credit', 23, '97135952', 24, '07479754'),
-('00000013', '2024-07-02 12:00:00', 1050.75, 'Returned', 'Withdrawal', 'ATM Withdrawal', 25, '45990916', 26, '07515321'),
-('00000014', '2024-07-02 13:00:00', 1150.50, 'Completed', 'Deposit', 'Salary Credit', 27, '99603863', 28, '75473357'),
-('00000015', '2024-07-02 14:00:00', 1250.25, 'Pending', 'Withdrawal', 'ATM Withdrawal', 29, '78555196', 1, '30060010'),
-('00000016', '2024-07-02 15:00:00', 1350.75, 'Completed', 'Deposit', 'Salary Credit', 2, '64420107', 3, '66355915'),
-('00000017', '2024-07-02 16:00:00', 1450.50, 'Returned', 'Withdrawal', 'ATM Withdrawal', 4, '96113992', 5, '81502217'),
-('00000018', '2024-07-02 17:00:00', 1550.00, 'Completed', 'Deposit', 'Salary Credit', 6, '19169111', 7, '51338907'),
-('00000019', '2024-07-02 18:00:00', 1650.25, 'Pending', 'Withdrawal', 'ATM Withdrawal', 8, '99187207', 9, '41919316'),
-('00000020', '2024-07-02 19:00:00', 1750.75, 'Completed', 'Deposit', 'Salary Credit', 10, '08232403', 11, '50981991');
-
-INSERT INTO elderwee.Blockchaindbs (BlockNo, TransactionID, TransactionDate, TransactionAmount, TransactionStatus, TransactionType, TransactionDesc, ReceiverID, ReceiverAccountNo, SenderID, SenderAccountNo)
-VALUES
-('123456789012', '00000001', '2024-07-01 10:00:00', 100.50, 'Completed', 'Withdrawal', 'ATM Withdrawal', 1, '30060010', 2, '64420107'),
-('234567890123', '00000002', '2024-07-01 11:00:00', 200.75, 'Pending', 'Deposit', 'Salary Credit', 3, '66355915', 4, '96113992'),
-('345678901234', '00000003', '2024-07-01 12:00:00', 300.00, 'Returned', 'Withdrawal', 'ATM Withdrawal', 5, '81502217', 6, '19169111'),
-('456789012345', '00000004', '2024-07-01 13:00:00', 150.25, 'Completed', 'Deposit', 'Salary Credit', 7, '51338907', 8, '99187207'),
-('567890123456', '00000005', '2024-07-01 14:00:00', 250.75, 'Pending', 'Withdrawal', 'ATM Withdrawal', 9, '41919316', 10, '08232403'),
-('678901234567', '00000006', '2024-07-01 15:00:00', 350.50, 'Completed', 'Deposit', 'Salary Credit', 11, '50981991', 12, '30212750'),
-('789012345678', '00000007', '2024-07-01 16:00:00', 450.00, 'Returned', 'Withdrawal', 'ATM Withdrawal', 13, '98117780', 14, '99950652'),
-('890123456789', '00000008', '2024-07-01 17:00:00', 550.25, 'Completed', 'Deposit', 'Salary Credit', 15, '05399925', 16, '27147673'),
-('901234567890', '00000009', '2024-07-01 18:00:00', 650.75, 'Pending', 'Withdrawal', 'ATM Withdrawal', 17, '19538594', 18, '16249954'),
-('012345678901', '00000010', '2024-07-01 19:00:00', 750.50, 'Completed', 'Deposit', 'Salary Credit', 19, '22633993', 20, '54198557'),
-('123450987654', '00000011', '2024-07-02 10:00:00', 850.25, 'Completed', 'Withdrawal', 'ATM Withdrawal', 21, '77732467', 22, '26066670'),
-('234561098765', '00000012', '2024-07-02 11:00:00', 950.00, 'Pending', 'Deposit', 'Salary Credit', 23, '97135952', 24, '07479754'),
-('345672109876', '00000013', '2024-07-02 12:00:00', 1050.75, 'Returned', 'Withdrawal', 'ATM Withdrawal', 25, '45990916', 26, '07515321'),
-('456783210987', '00000014', '2024-07-02 13:00:00', 1150.50, 'Completed', 'Deposit', 'Salary Credit', 27, '99603863', 28, '75473357'),
-('567894321098', '00000015', '2024-07-02 14:00:00', 1250.25, 'Pending', 'Withdrawal', 'ATM Withdrawal', 29, '78555196', 1, '30060010'),
-('678905432109', '00000016', '2024-07-02 15:00:00', 1350.75, 'Completed', 'Deposit', 'Salary Credit', 2, '64420107', 3, '66355915'),
-('789016543210', '00000017', '2024-07-02 16:00:00', 1450.50, 'Returned', 'Withdrawal', 'ATM Withdrawal', 4, '96113992', 5, '81502217'),
-('890127654321', '00000018', '2024-07-02 17:00:00', 1550.00, 'Completed', 'Deposit', 'Salary Credit', 6, '19169111', 7, '51338907'),
-('901238765432', '00000019', '2024-07-02 18:00:00', 1650.25, 'Pending', 'Withdrawal', 'ATM Withdrawal', 8, '99187207', 9, '41919316'),
-('213947292349', '00000019', '2024-07-02 18:00:00', 1650.25, 'Returned', 'Withdrawal', 'ATM Withdrawal', 8, '99187207', 9, '41919316'),
-('012349876543', '00000020', '2024-07-02 19:00:00', 1750.75, 'Completed', 'Deposit', 'Salary Credit', 10, '08232403', 11, '50981991');
-
-===========================
-
 -- Users Table
 INSERT INTO elderwee.Users (UserID, FullName, DOB, Email, PhoneNo, Password, FaceID, resetToken, resetTokenExpiration)
 VALUES
@@ -127,7 +12,7 @@ VALUES
 (9, 'James Anderson', '1990-09-09 00:00:00', 'james.anderson@example.com', '901-234-5678', 'password9', 1, 'h8ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3152', '2024-09-09 00:00:00'),
 (10, 'Laura Thomas', '1994-10-10 00:00:00', 'laura.thomas@example.com', '912-345-6789', 'password10', 1, 'i7ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3153', '2024-10-10 00:00:00'),
 (11, 'Daniel Moore', '1986-11-11 00:00:00', 'daniel.moore@example.com', '923-456-7890', 'password11', 1, 'j6ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3154', '2024-11-11 00:00:00'),
-(12, 'Karen Taylor', '1995-12-12 00:00:00', 'karen.taylor@example.com', '934-567-8901', 'password12', 1, 'k5ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3155', '2024-12-12 00:00:00'),
+(12, 'Karen Taylor', '1995-12-12 00:00:00', 'karen.taylor@example.com', '934-567-	8901', 'password12', 1, 'k5ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3155', '2024-12-12 00:00:00'),
 (13, 'Matthew Jackson', '1989-01-13 00:00:00', 'matthew.jackson@example.com', '945-678-9012', 'password13', 1, 'l4ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3156', '2024-01-13 00:00:00'),
 (14, 'Lisa White', '1993-02-14 00:00:00', 'lisa.white@example.com', '456-789-0193', 'password14', 1, 'm3ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3157', '2024-02-14 00:00:00'),
 (15, 'Anthony Harris', '1988-03-15 00:00:00', 'anthony.harris@example.com', '569-890-1234', 'password15', 1, 'n2ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3158', '2024-03-15 00:00:00'),
@@ -145,7 +30,9 @@ VALUES
 (27, 'Test 27', '1992-03-04 00:00:00', 'robet.brown@example.com', '345-174-9012', 'password3', 1, 'i35ba1f436c3560ab83dbb7f75624888580633c93dc54592557372cab521e320', '2024-01-06 00:00:00'),
 (28, 'Test 28', '1985-02-03 00:00:00', 'jan.smith@example.com', '234-567-5601', 'password2', 1, 'j25ba2f437c3560ab83dbb7f75624888580633c93dc54592557372cab521e321', '2024-01-07 00:00:00'),
 (29, 'Test 29', '1990-01-02 00:00:00', 'joh.doe@example.com', '123-456-7835', 'password1', 1, 'k15ba3f438c3560ab83dbb7f75624888580633c93dc54592557372cab521e322', '2024-01-08 00:00:00'),
-(0, 'DELETED', '2024-01-01 00:00:00', 'DELETED@gmail.com', '11111111', 'delete', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00');
+(30, 'DELETED', '2024-01-01 00:00:00', 'DELETED@gmail.com', '11111111', 'delete', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00'),
+(100, 'Brandon Wee', '2005-05-13 10:20:00', 'brandonweejc@gmail.com', '90743553', 'P@ssw0rd100', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00'),
+(101, 'Jeren Goh', '2005-05-13 10:20:00', 'jerengoh@gmail.com', '11223344', 'P@ssw0rd101', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00');
 
 -- Accounts Table
 INSERT INTO elderwee.accounts(AccountNo, Balance, BalanceDisplay, DateOpened, AccountStatus, Scammer, UserID)
@@ -178,7 +65,9 @@ VALUES
 ('821826050026', 7000, 6300, '2024-07-04 00:00:00', 0, 0, 23),
 ('899457210027', 8000, 8000, '2024-06-28 00:00:00', 0, 0, 28),
 ('931009810028', 4500, 5300, '2024-07-02 00:00:00', 0, 0, 8),
-('972394680029', 4000, 3100, '2024-07-03 00:00:00', 0, 0, 29);
+('972394680029', 4000, 3100, '2024-07-03 00:00:00', 0, 0, 29),
+('000000000000', '10000', '10000', '2024-07-03 00:00:00', 0, 0, 100),
+('111111111111', '10000', '10000', '2024-07-03 00:00:00', 0, 0, 101);
 
 -- Transactions Table
 INSERT INTO elderwee.Transactions (TransactionID, TransactionDate, TransactionAmount, TransactionStatus, TransactionType, TransactionDesc, ReceiverID, ReceiverAccountNo, SenderID, SenderAccountNo)
@@ -202,11 +91,11 @@ VALUES
 ('00000017', '2024-07-17 13:00:00', 650, 'Pending', 'Deposit', 'Cheque Deposit', 18, '162499540005', 10, '082324030004'),
 ('00000018', '2024-07-18 15:20:00', 800, 'Completed', 'Withdrawal', 'Bill Payment', 6, '191691110006', 17, '195385940007'),
 ('00000019', '2024-07-19 17:40:00', 950, 'Returned', 'Deposit', 'Salary Deposit', 19, '226339930008', 22, '260666700009'),
-('00000020', '2024-07-20 08:55:00', 1200, 'Completed', 'Withdrawal', 'ATM Withdrawal', 16, '271476730010', 1, '300600100011'),
-('00000021', '2024-07-21 10:05:00', 400, 'Pending', 'Deposit', 'Savings Deposit', 12, '302127500012', 9, '419193160013'),
-('00000022', '2024-07-22 12:25:00', 300, 'Completed', 'Withdrawal', 'Online Transfer', 25, '459909160014', 11, '509819910015'),
-('00000023', '2024-07-23 14:45:00', 700, 'Returned', 'Deposit', 'Cheque Deposit', 7, '513389070016', 20, '541985570017'),
-('00000024', '2024-07-24 16:50:00', 800, 'Completed', 'Withdrawal', 'Bill Payment', 2, '644201070018', 27, '672188820019'),
+('00000020', '2024-07-24 08:55:00', 1200, 'Completed', 'Withdrawal', 'ATM Withdrawal', 16, '271476730010', 1, '300600100011'),
+('00000021', '2024-07-24 10:05:00', 400, 'Pending', 'Deposit', 'Savings Deposit', 12, '302127500012', 9, '419193160013'),
+('00000022', '2024-07-24 12:25:00', 300, 'Completed', 'Withdrawal', 'Online Transfer', 25, '459909160014', 11, '509819910015'),
+('00000023', '2024-07-25 14:45:00', 700, 'Returned', 'Deposit', 'Cheque Deposit', 7, '513389070016', 20, '541985570017'),
+('00000024', '2024-07-25 16:50:00', 800, 'Completed', 'Withdrawal', 'Bill Payment', 2, '644201070018', 27, '672188820019'),
 ('00000025', '2024-07-25 09:10:00', 600, 'Pending', 'Deposit', 'Salary Deposit', 21, '681559720020', 14, '681765450021'),
 ('00000026', '2024-07-26 11:30:00', 450, 'Completed', 'Withdrawal', 'ATM Withdrawal', 13, '751408680022', 4, '775070580023'),
 ('00000027', '2024-07-27 13:55:00', 700, 'Returned', 'Deposit', 'Savings Deposit', 3, '775674400024', 5, '797170570025'),
@@ -250,7 +139,7 @@ VALUES
 ('2938571028374638', '00000030', '2024-07-30 08:45:00', 500, 'Completed', 'Withdrawal', 'Bill Payment', 24, '074797540002', 15, '053999250001'),
 ('5283498127652378', '00000031', '2024-07-31 08:45:00', '100', 'Pending', 'Withdrawal', NULL, 15, '053999250001', 8, '931009810028');
 
-
+-- AccountLogs Table
 INSERT INTO elderwee.AccountLogs (AccountNo, LoginCoords, LastIPLoginCountry, Flagged, LoginTime)
 VALUES
 ('053999250001', '1.3521, 103.8198', 'Singapore', FALSE, '2024-07-01 10:15:00'),
