@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-
+import Card from './Card';
 import {
   MDBBtn,
   MDBCard,
@@ -20,10 +20,11 @@ export default function TopUp() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cards, setCards] = useState([]);
-  const [selectedCard, setSelectedCard] = useState(null); // New state for selected card
+  const [selectedCard, setSelectedCard] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [amount, setAmount] = useState('');
+  const [showCard, setShowCard] = useState(false); // State to toggle card form
 
   const navigate = useNavigate();
 
@@ -51,7 +52,7 @@ export default function TopUp() {
       try {
         await axios.delete('http://localhost:8000/delete-card', {
           data: { cardNumber }
-        }, { withCredentials: true }); // Include credentials to handle session
+        }, { withCredentials: true });
 
         // Refresh the card list
         const updatedCardsResponse = await axios.get('http://localhost:8000/cards', { withCredentials: true });
@@ -68,30 +69,34 @@ export default function TopUp() {
 
   const handleProceedToPayment = async () => {
     if (!selectedCard || !amount) {
-        setSuccessMessage('Please select a card and enter an amount.');
-        return;
+      setSuccessMessage('Please select a card and enter an amount.');
+      return;
     }
 
-    setIsLoading(true); // Set loading state to true
+    setIsLoading(true);
 
     try {
-        // Simulate loading time
-        await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 5000));
 
-        // Send payment request to server
-        await axios.post('http://localhost:8000/process-payment', {
-            cardNumber: selectedCard,
-            amount
-        }, { withCredentials: true });
+      await axios.post('http://localhost:8000/process-payment', {
+        cardNumber: selectedCard,
+        amount
+      }, { withCredentials: true });
 
-        // Update success message
-        setSuccessMessage('Payment processed successfully');
+      setSuccessMessage('Payment processed successfully');
     } catch (error) {
-        console.error('Error processing payment:', error);
-        setSuccessMessage('An error occurred while processing the payment');
+      console.error('Error processing payment:', error);
+      setSuccessMessage('An error occurred while processing the payment');
     } finally {
-        setIsLoading(false); // Set loading state to false
+      setIsLoading(false);
     }
+  };
+
+  // Function to handle when a card is added
+  const handleCardAdded = () => {
+    setShowCard(false); 
+    window.location.reload();
+    navigate('/topup'); 
   };
 
   return (
@@ -154,11 +159,16 @@ export default function TopUp() {
                     </button>
                   </div>
                 ))}
-                <h6 className="mt-4 mb-3 text-primary" onClick={() => navigate('/card')}>
+                <h6 
+                  className="mt-4 mb-3 text-primary" 
+                  onClick={() => setShowCard(!showCard)} 
+                  style={{ cursor: 'pointer' }} 
+                >
                   ADD PAYMENT METHOD
                 </h6>
 
-                {/* Display success or error message */}
+                {showCard && <Card onCardAdded={handleCardAdded} />} {/* Pass the callback */}
+
                 <div className="text-center mt-3">
                   {isLoading && <p>Authenticating...</p>}
                   {successMessage && (
@@ -168,12 +178,12 @@ export default function TopUp() {
                   )}
                 </div>
 
-                <button block size="lg" className="mt-3" onClick={() => navigate('/home')}>
+                <MDBBtn block size="lg" className="mt-3" onClick={() => navigate('/home')}>
                   Back <MDBIcon fas icon="long-arrow-alt-right" />
-                </button>
-                <button block size="lg" className="mt-3" onClick={handleProceedToPayment} disabled={isLoading}>
+                </MDBBtn>
+                <MDBBtn block size="lg" className="mt-3" onClick={handleProceedToPayment} disabled={isLoading}>
                   Proceed to payment <MDBIcon fas icon="long-arrow-alt-right" />
-                </button>
+                </MDBBtn>
               </MDBCardBody>
             </MDBCard>
           </MDBCol>

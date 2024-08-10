@@ -1101,8 +1101,9 @@ app.get('/cards', (req, res) => {
 
 // Delete Card Endpoint
 app.delete('/delete-card', (req, res) => {
+    console.log('Session Data:', req.session);
     const { cardNumber } = req.body;
-    const userID = req.session.userId;  // Get UserID from session
+    const userID = req.session.userId; 
     console.log('helppppp', userID, cardNumber)
   
     if (!cardNumber || !userID || !userCards[userID]) {
@@ -1344,39 +1345,34 @@ app.get('/transaction-history', async (req, res) => {
  
 
 app.get('/transaction-summary', async (req, res) => {
-    const userID = req.session.userId; 
-
-    if (!userID) {
-        return res.status(401).json({ message: 'User not authenticated' });
-    }
-
     try {
-        const transactions = await Transaction.findAll({
-            where: {
-                [Sequelize.Op.or]: [
-                    { SenderID: userID },
-                    { ReceiverID: userID }
-                ]
-            }
-        });
-
-        let moneyIn = 0;
-        let moneyOut = 0;
-
-        transactions.forEach(transaction => {
-            if (transaction.SenderID === userID) {
-                moneyOut += transaction.TransactionAmount;
-            } else if (transaction.ReceiverID === userID) {
-                moneyIn += transaction.TransactionAmount;
-            }
-        });
-
-        res.status(200).json({ moneyIn, moneyOut });
+      const { month } = req.query; // Expect month in format 'YYYY-MM'
+  
+      // Assuming you have a Sequelize model named `Transaction`
+      const transactions = await Transaction.findAll({
+        where: {
+          TransactionDate: {
+            [Op.between]: [new Date(`${month}-01`), new Date(`${month}-01`).setMonth(new Date(`${month}-01`).getMonth() + 1)]
+          }
+        }
+      });
+  
+      const moneyIn = transactions
+        .filter(tx => tx.TransactionType === 'Deposit')
+        .reduce((acc, tx) => acc + parseFloat(tx.TransactionAmount), 0);
+  
+      const moneyOut = transactions
+        .filter(tx => tx.TransactionType === 'Withdrawal')
+        .reduce((acc, tx) => acc + parseFloat(tx.TransactionAmount), 0);
+  
+      res.json({ moneyIn, moneyOut });
     } catch (error) {
-        console.error('Error fetching transaction summary:', error);
-        res.status(500).json({ message: 'An error occurred while fetching the transaction summary' });
+      console.error('Error fetching transaction summary:', error);
+      res.status(500).json({ error: 'Failed to fetch data' });
     }
-});
+  });
+  
+  
 
 
 
