@@ -27,9 +27,6 @@ const AccountLog = require('./models/AccountLogs');
 const Enquiry = require('./models/Enquiry');
 const BannedCountries = require('./models/BannedCountries');
 
-// AI
-const AI = require('./openai/ai');
-
 // send mail
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
