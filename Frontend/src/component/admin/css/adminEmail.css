@@ -1,0 +1,31 @@
+.email-bg{
+    margin: 30px;
+    width: 100%;
+    padding-left: 250px;
+}
+
+.EmailTopThreeCards{
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.Email-table-bg{
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border: 1px solid;
+}
+
+.emailmessage-input{
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #adad9d;
+}
+
+.emailmessage-input:focus{
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #adad9d;
+    outline-width: 0px;
+}

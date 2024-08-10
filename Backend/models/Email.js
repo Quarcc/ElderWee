@@ -20,6 +20,10 @@ const Email = db.define('email', {
         type: Sequelize.STRING,
         allowNull: false,
     },
+    EmailAttachment: {
+        type: Sequelize.STRING,
+        allowNull: true,
+    },
     EmailSent: {
         type: Sequelize.INTEGER,
         allowNull: false,

@@ -171,3 +171,20 @@ VALUES
 ('899457210027', '40.7128, -74.0060', 'United States', FALSE, '2024-07-27 13:30:00'),
 ('931009810028', '1.3521, 103.8198', 'Singapore', TRUE, '2024-07-28 15:15:00'),
 ('972394680029', '48.8566, 2.3522', 'France', FALSE, '2024-07-29 17:00:00');
+
+-- Email Table
+INSERT INTO elderwee.emails (EmailDate, EmailSubject, EmailBody, EmailAttachment, EmailSent, EmailOpened) VALUES
+(CURRENT_DATE, 'Exciting New Promotions Just for You!', 'Check out our latest promotions and special offers available now!', NULL, 100, 60),
+(CURRENT_DATE - INTERVAL 1 DAY, 'Reminder: Exclusive Offer Ends Soon!', 'Don\'t miss out on our exclusive offer ending soon. Act fast!', NULL, 120, 70),
+(CURRENT_DATE - INTERVAL 2 DAY, 'New Features Released!', 'We have released new features that you will love. Explore them now!', NULL, 110, 65),
+(CURRENT_DATE - INTERVAL 3 DAY, 'Website Maintenance Alert', 'Our website will be undergoing maintenance from midnight. Please plan accordingly.', NULL, 130, 75),
+(CURRENT_DATE - INTERVAL 4 DAY, 'Thank You for Your Purchase!', 'Thank you for your recent purchase. We hope you enjoy your new items!', NULL, 90, 50),
+(CURRENT_DATE - INTERVAL 5 DAY, 'Special Offer for Valued Customers!', 'As a valued customer, enjoy a special discount on your next purchase!', NULL, 140, 80),
+(CURRENT_DATE - INTERVAL 6 DAY, 'Website Update Notification', 'We have updated our website for a better experience. Check out the new features!', NULL, 125, 70),
+(CURRENT_DATE - INTERVAL 7 DAY, 'Last Chance: Sale Ends Tonight!', 'Our sale ends tonight. Make sure to take advantage of the discounts before it\'s too late!', NULL, 105, 55),
+(CURRENT_DATE - INTERVAL 8 DAY, 'Exclusive Early Access for You!', 'Get early access to our new products before anyone else!', NULL, 115, 60),
+(CURRENT_DATE - INTERVAL 9 DAY, 'Reminder: Complete Your Registration!', 'Complete your registration to start enjoying our premium features!', NULL, 95, 45),
+(CURRENT_DATE - INTERVAL 10 DAY, 'Upcoming Webinar on Industry Trends', 'Join our upcoming webinar to learn about the latest trends in the industry.', NULL, 135, 85),
+(CURRENT_DATE - INTERVAL 11 DAY, 'Monthly Newsletter', 'Read our monthly newsletter to stay updated with company news and updates.', NULL, 145, 90),
+(CURRENT_DATE - INTERVAL 12 DAY, 'New Blog Post: Tips & Tricks', 'Check out our new blog post for useful tips and tricks on getting the most out of our service.', NULL, 100, 55),
+(CURRENT_DATE - INTERVAL 13 DAY, 'Service Downtime Notification', 'We are performing essential maintenance that may affect our service. We appreciate your patience.', NULL, 130, 65);

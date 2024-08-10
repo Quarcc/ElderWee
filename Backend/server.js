@@ -8,6 +8,9 @@ const { Sequelize, DataTypes } = require('sequelize');
 const http = require('http');
 const { Server } = require('socket.io');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 // Database
 const elderwee = require('./config/DBConnection');
@@ -18,10 +21,14 @@ const User = require('./models/User');
 const Account = require('./models/Account');
 const Transaction = require('./models/Transaction');
 const BlockchainDB = require('./models/Blockchain')
+const Email = require('./models/Email');
 const Location = require('./models/Geolocation');
 const AccountLog = require('./models/AccountLogs');
 const Enquiry = require('./models/Enquiry');
 const BannedCountries = require('./models/BannedCountries');
+
+// AI
+const AI = require('./openai/ai');
 
 // send mail
 const nodemailer = require('nodemailer');
@@ -176,6 +183,21 @@ const initBc = async () => {
 };
 
 initBc();
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/'); // Directory to save uploaded files
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
+    }
+});
+
+const upload = multer({ storage: storage });
+
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
 
 // === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
@@ -470,6 +492,57 @@ app.get('/api/FrozenFunds/Yesterday', async (req, res) => {
         res.status(500).json(err);
     }
 });
+
+app.get('/api/allEmails', async (req, res) => {
+    try {
+        const emails = await Email.findAll();
+        res.json(emails);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
+app.get('/api/emailSent', async (req, res) => {
+    try {
+        const emailSent = await Email.findAll({
+            attributes: ['EmailSent']
+        })
+        res.status(200).send(emailSent);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.get('/api/emailOpened', async (req, res) => {
+    try {
+        const emailOpened = await Email.findAll({
+            attributes: ['EmailOpened']
+        })
+        res.status(200).send(emailOpened);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+app.post('/api/massEmail', upload.single('EmailAttachment'), async (req, res) => {
+    const { targetEmail, EmailSubject, EmailBody } = req.body;
+    const EmailDate = '2024-08-10 00:00:00';
+    const EmailSent = 0;
+    const EmailOpened = 0;
+    const EmailAttachment = req.file ? req.file.filename : null; // Get the uploaded file name
+    try {
+        const emails = await Email.create({ EmailDate, EmailSubject, EmailBody, EmailAttachment, EmailSent, EmailOpened });
+        res.status(200).send(emails);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
+app.get('/api/download/emailattachment/:filename', async (req, res) => {
+    const { filename } = req.params;
+    const filePath = path.join(__dirname, 'uploads', filename);
+    res.download(filePath);
+})
 
 app.get('/api/totalTransactionAmount', async (req, res) => {
     try {
