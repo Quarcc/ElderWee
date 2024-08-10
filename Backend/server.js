@@ -11,6 +11,8 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const ngrok = require('ngrok');
+require('dotenv').config();
 
 // Database
 const elderwee = require('./config/DBConnection');
@@ -28,24 +30,32 @@ const Enquiry = require('./models/Enquiry');
 const BannedCountries = require('./models/BannedCountries');
 
 // AI
-const AI = require('./openai/ai');
+const { filterEmails } = require('./openai/ai');
 
 // send mail
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 // Blockchain module
-const {Block, Blockchain} = require('./blockchain/blockchain');
+const { Block, Blockchain } = require('./blockchain/blockchain');
+
+//otp
+const otpDictionary = {}; 
+const otpExpirationTime = 5 * 60 * 1000; 
+const userCards = {}
+
 
 const app = express();
 
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000", // Frontend URL
-      methods: ["GET", "POST"]
+        origin: "http://localhost:3000", // Frontend URL
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true
     }
-  });
+});
 
 const connectedSockets = new Set();
 
@@ -66,9 +76,10 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: "http://localhost:3000",  //specify domains that can call your API
+        origin: ["http://localhost:3000", "https://mail.google.com"],  //specify domains that can call your API
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true
     })
 );
 
@@ -76,21 +87,21 @@ elderwee.setUpDB(false); // true will drop all tables and create again, false wi
 
 const options = {
     host: db.host,
-    port:db.port,
-    user:db.username,
-    password:db.password,
-    database:db.database
+    port: db.port,
+    user: db.username,
+    password: db.password,
+    database: db.database
 };
 
 const sessionStore = new MySQLStore(options);
 app.use(session({
-    key:'session_cookie_name',
+    key: 'session_cookie_name',
     secret: 'session_cookie_secret',
     store: sessionStore,
     resave: false,
-    saveUninitialized:false
-    })
-);
+    saveUninitialized: false,
+    cookie: { secure: false }
+}));
 
 let Bc = new Blockchain();
 
@@ -186,10 +197,10 @@ initBc();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'uploads/'); // Directory to save uploaded files
+        cb(null, 'uploads/'); // Directory to save uploaded files
     },
     filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
+        cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
     }
 });
 
@@ -198,6 +209,14 @@ const upload = multer({ storage: storage });
 if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
 }
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_KEY, // Use your app-specific password here
+    },
+});
 
 // === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
@@ -245,23 +264,25 @@ app.get("/api/flaggedAccounts", async (req, res) => {
 });
 
 app.get("/api/accountlogs", async (req, res) => {
-  try {
-    const logs = await AccountLog.findAll();
-    if (logs) {
-      res.json(logs);
+    try {
+        const logs = await AccountLog.findAll();
+        if (logs) {
+            res.json(logs);
+        }
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json(err);
     }
-  } catch (err) {
-    res.status(500).json(err);
-  }
 });
 
-app.get('/api/accounts', async (req,res) =>{
-    try{
+app.get('/api/accounts', async (req, res) => {
+    try {
         const accounts = await Account.findAll();
-        res.status(200).json(accounts);  
-    }catch(error){
-        res.status(500).json({error:message})
+        res.status(200).json(accounts);
+    } catch (error) {
+        res.status(500).json({ error: message })
     }
+     
 });
 
 app.put("/api/countries/ban-status/:countryName", async (req, res) => {
@@ -302,13 +323,13 @@ app.get('/api/countries/banned', async (req, res) => {
 });
 
 
-app.get('/api/displayallaccounts',async (req,res)=>{
-    try{
+app.get('/api/displayallaccounts', async (req, res) => {
+    try {
         const accounts = await Account.findAll();
         res.json(accounts);
     }
-    catch(error){
-        res.status(500).json({error:message});
+    catch (error) {
+        res.status(500).json({ error: message });
     }
 });
 
@@ -322,7 +343,7 @@ function padWithZeros(value) {
 app.post('/api/transaction/send/:sender/receive/:receiver', async (req, res) => {
     const { sender, receiver } = req.params;
     const { amt } = req.body;
-    
+
     try {
         const senderAccount = await Account.findOne({ where: { AccountNo: sender } });
         const receiverAccount = await Account.findOne({ where: { AccountNo: receiver } });
@@ -330,7 +351,7 @@ app.post('/api/transaction/send/:sender/receive/:receiver', async (req, res) => 
             res.status(404).json({ error: 'Account not found' });
             return;
         }
-        if (senderAccount.Balance < amt) {   
+        if (senderAccount.Balance < amt) {
             res.status(400).json({ error: 'Insufficient balance' });
             return;
         }
@@ -376,10 +397,10 @@ app.post('/api/transaction/send/:sender/receive/:receiver', async (req, res) => 
 
 
 app.get('/api/Blockchain', async (req, res) => {
-    try{
+    try {
         res.status(200).send(JSON.stringify(Bc, null, 2));
     }
-    catch (err){
+    catch (err) {
         res.status(500).json(err);
     }
 })
@@ -434,7 +455,7 @@ app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
     }
 
     const newTransactionDB = await BlockchainDB.create({
-        BlockNo: (Math.random()+' ').substring(2,10)+(Math.random()+' ').substring(2,10),
+        BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
         TransactionID: transactionID,
         TransactionDate: transactionDate,
         TransactionAmount: transactionAmt,
@@ -527,12 +548,130 @@ app.get('/api/emailOpened', async (req, res) => {
 app.post('/api/massEmail', upload.single('EmailAttachment'), async (req, res) => {
     const { targetEmail, EmailSubject, EmailBody } = req.body;
     const EmailDate = '2024-08-10 00:00:00';
-    const EmailSent = 0;
     const EmailOpened = 0;
     const EmailAttachment = req.file ? req.file.filename : null; // Get the uploaded file name
+
+    const dataLength = await Email.findAll();
+    const EmailID = dataLength.length + 1;
+
+    const emailData = await User.findAll({
+        attributes: ['Email']
+    })
+
+    const emailDataJson = JSON.stringify(emailData.map(email => ({ Email: email.Email })));
+    const aiResponse = await filterEmails(emailDataJson, targetEmail);
+
+    const EmailSent = aiResponse.length;
+
+    if (EmailAttachment === null) {
+        aiResponse.forEach(emailaddresses => {
+            const mailContent = {
+                from: '"ElderWee" <contacteventnow@gmail.com',
+                to: emailaddresses.Email,
+                subject: 'REQ: Password Reset',
+                html: `
+                    <html>
+                        <head>
+                            <style>
+                                body { font-family: Arial, sans-serif; }
+                                h1 { color: #333; }
+                                p { color: #666; }
+                                .highlight { color: #007BFF; }
+                            </style>
+                        </head>
+                        <img src="cid:logo" alt="ElderWee Logo" style="max-width: 100px;"/>
+                        <body>
+                            <h1>Reset Password Link</h1>
+                            <p>You have requested a password reset. Please click the link below to reset your password.</p>
+                            <p>Reset password here: </a></p>
+                            <p>This link will expire in 1 hour.</p>
+                            <p>If you did not request a password reset, please ignore this email.</p>
+                            <p>Best regards,<br>Your EventNow Team</p>
+                        </body>
+                        <img src="https://d9f9-49-245-43-147.ngrok-free.app/api/imagebugger/track/${EmailID}" alt="" style="display:none;"/>
+                    </html>
+                `,
+                attachments: [{
+                    filename: 'logo-email.png',
+                    path: './uploads/logo-email.png',
+                    cid: 'logo'
+                }]
+            }
+
+            transporter.sendMail(mailContent, function (err, val) {
+                if (err) {
+                    console.log(err)
+                }
+                else {
+                    console.log(val.response, 'sending...')
+                }
+            })
+        })
+    } else {
+        aiResponse.forEach(emailaddresses => {
+            const mailContent = {
+                from: '"ElderWee" <contacteventnow@gmail.com',
+                to: emailaddresses.Email,
+                subject: EmailSubject,
+                html: `
+                    <html>
+                        <head>
+                            <style>
+                                body { font-family: Arial, sans-serif; }
+                                h1 { color: #333; }
+                                p { color: #666; }
+                                .highlight { color: #007BFF; }
+                            </style>
+                        </head>
+                        <img src="cid:logo" alt="ElderWee Logo" style="max-width: 100px;"/>
+                        <body>
+                            <h1>${EmailSubject}</h1>
+                            <p>${EmailBody}</p>
+                            <p>Best regards,<br>Your ElderWee Team</p>
+                        </body>
+                        <img src="https://d9f9-49-245-43-147.ngrok-free.app/api/imagebugger/track/${EmailID}" alt="" style="display:none;"/>
+                    </html>
+                `,
+                attachments: [
+                    {
+                        filename: 'logo-email.png',
+                        path: './uploads/logo-email.png',
+                        cid: 'logo'
+                    },
+                    {
+                        filename: `${EmailSubject}.` + EmailAttachment.split('.').pop(),
+                        path: './uploads/' + EmailAttachment,
+                    }
+                ]
+            }
+
+            transporter.sendMail(mailContent, function (err, val) {
+                if (err) {
+                    console.log(err)
+                }
+                else {
+                    console.log(val.response, 'sending...')
+                }
+            })
+        })
+    }
+
     try {
         const emails = await Email.create({ EmailDate, EmailSubject, EmailBody, EmailAttachment, EmailSent, EmailOpened });
         res.status(200).send(emails);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
+app.get('/api/imagebugger/track/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const emails = await Email.findOne({ where: { EmailID: id } });
+        emails.EmailOpened += 1;
+        await emails.save();
+        res.send('');
     } catch (err) {
         res.status(500).json(err);
     }
@@ -614,29 +753,29 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-app.get('/api/users/email/:email',async (req, res)=>{
-    const {email} = req.params;
+app.get('/api/users/email/:email', async (req, res) => {
+    const { email } = req.params;
     console.log(req.params);
     try {
-      const user = await User.findOne({ where: { Email: email } });
-      if (user) {
-        res.json(user);
-      } else {
-        res.status(404).json({ error: "User not found" });
-      }
+        const user = await User.findOne({ where: { Email: email } });
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ error: "User not found" });
+        }
     } catch (err) {
-      res.status(500).json(err);
+        res.status(500).json(err);
     }
 })
 
 app.get('/api/users/:userID', async (req, res) => {
     const { userID } = req.params
     try {
-        const user = await User.findOne({ where: {UserID: userID }});
+        const user = await User.findOne({ where: { UserID: userID } });
         if (user) {
             res.json(user);
         } else {
-            res.status(404).json({ error: 'User not found' } );
+            res.status(404).json({ error: 'User not found' });
         }
     } catch (err) {
         res.status(500).json(err);
@@ -656,14 +795,14 @@ app.put('/api/users/:userID', async (req, res) => {
     const { userID } = req.params;
     const { FullName, DOB, Email, PhoneNo } = req.body;
     try {
-        const user = await User.findOne({ where: { UserID: userID }});
+        const user = await User.findOne({ where: { UserID: userID } });
         if (user) {
             user.FullName = FullName;
             user.DOB = DOB;
             user.Email = Email;
             user.PhoneNo = PhoneNo;
             await user.save();
-            res.status(200).json({message: "User Updated Successfully"});
+            res.status(200).json({ message: "User Updated Successfully" });
         } else {
             res.status(404).json({ error: 'User not found' });
         }
@@ -677,34 +816,34 @@ app.delete('/api/users/:userID', async (req, res) => {
     const newUserID = 999;
 
     try {
-        const user = await User.findOne({ where: { UserID: userID }});
+        const user = await User.findOne({ where: { UserID: userID } });
         if (user) {
 
             console.log(`Updating accounts from userID ${userID} to ${newUserID}`);
 
             const updatedAccounts = await Account.update(
                 { UserID: newUserID },
-                { where: { UserID : userID } }
+                { where: { UserID: userID } }
             );
 
             const updatedSTransactions = await Transaction.update(
                 { SenderID: newUserID },
-                { where: { SenderID : userID } }
+                { where: { SenderID: userID } }
             );
 
             const updatedRTransactions = await Transaction.update(
                 { ReceiverID: newUserID },
-                { where: { ReceiverID : userID } }
+                { where: { ReceiverID: userID } }
             );
 
             const updateSBlockchainDB = await BlockchainDB.update(
                 { SenderID: newUserID },
-                { where: { SenderID : userID } }
+                { where: { SenderID: userID } }
             );
 
             const updateRBlockchainDB = await BlockchainDB.update(
                 { ReceiverID: newUserID },
-                { where: { ReceiverID : userID } }
+                { where: { ReceiverID: userID } }
             );
 
             initBc();
@@ -751,36 +890,36 @@ app.get('/api/accounts', async (req, res) => {
     }
 });
 
-app.get('/api/accounts/userid/:userid',async (req,res)=>{
-    const {userid} = req.params;
+app.get('/api/accounts/userid/:userid', async (req, res) => {
+    const { userid } = req.params;
     try {
-      const acc = await Account.findOne({ where: { UserID: userid } });
-      if (acc) {
-        res.json(acc);
-      } else {
-        res.status(404).json({ error: "Account not found" });
-      }
+        const acc = await Account.findOne({ where: { UserID: userid } });
+        if (acc) {
+            res.json(acc);
+        } else {
+            res.status(404).json({ error: "Account not found" });
+        }
     } catch (err) {
-      res.status(500).json(err);
+        res.status(500).json(err);
     }
 })
 
 app.put('/api/accounts/:accountNo', async (req, res) => {
-  const { accountNo } = req.params;
-  const { AccountStatus, Scammer } = req.body;
-  try {
-    const account = await Account.findOne({ where: { AccountNo: accountNo } });
-    if (account) {
-      account.AccountStatus = AccountStatus;
-      account.Scammer = Scammer;
-      await account.save();
-      res.status(200).json({ message: 'Account updated successfully' });
-    } else {
-      res.status(404).json({ error: 'Account not found' });
+    const { accountNo } = req.params;
+    const { AccountStatus, Scammer } = req.body;
+    try {
+        const account = await Account.findOne({ where: { AccountNo: accountNo } });
+        if (account) {
+            account.AccountStatus = AccountStatus;
+            account.Scammer = Scammer;
+            await account.save();
+            res.status(200).json({ message: 'Account updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Account not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
 app.get('/api/accounts/weekly', async (req, res) => {
@@ -838,7 +977,7 @@ app.get('/api/accounts/weekly', async (req, res) => {
 app.get('/api/enquiries', async (req, res) => {
     try {
         const enquiries = await Enquiry.findAll({
-            attributes: ['EnquiryID', 'EnquiryDate', 'EnquiryType', 'EnquiryStatus','EnquiryDetails', 'UserID', 'AccountNo']
+            attributes: ['EnquiryID', 'EnquiryDate', 'EnquiryType', 'EnquiryStatus', 'EnquiryDetails', 'UserID', 'AccountNo']
         });
 
         const users = await User.findAll({
@@ -972,13 +1111,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-        user: 'justprepco@gmail.com',
-        pass: 'uhru lnfq oalh duxz', // Use your app-specific password here
-    },
-});
+
 
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
@@ -999,7 +1132,7 @@ app.post('/forgot-password', async (req, res) => {
         await user.save();
 
         const mailOptions = {
-            from: 'justprepco@gmail.com',
+            from: '"ElderWee" <contacteventnow@gmail.com',
             to: user.Email,
             subject: 'Password Reset',
             html: `<p>You requested a password reset</p>
@@ -1021,32 +1154,507 @@ app.post('/forgot-password', async (req, res) => {
 
 app.post('/reset-password', async (req, res) => {
     const { token, password } = req.body;
+
+    try {
+        // Find the user with the matching reset token and valid expiration
+        const user = await User.findOne({
+            where: {
+                resetToken: token,
+                resetTokenExpiration: { [Op.gt]: Date.now() }
+            }
+        });
+
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid or expired token' });
+        }
+
+        // Hash the new password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Update the user's password and clear the reset token and expiration
+        user.Password = hashedPassword;
+        user.resetToken = null;
+        user.resetTokenExpiration = null;
+        await user.save();
+
+        res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Check session route
+app.get('/check-session', (req, res) => {
+    console.log('Session:', req.session);
+    console.log('UserID:', req.session.userId);
+    if (req.session.userId) {
+        User.findByPk(req.session.userId)
+            .then(user => {
+                if (user) {
+                    res.status(200).json({ loggedIn: true, user });
+                } else {
+                    console.log('No user found for UserID:', req.session.userId);
+                    res.status(401).json({ loggedIn: false });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user:', error);
+                res.status(500).json({ error: 'Server error' });
+            });
+    } else {
+        console.log('No UserID in session');
+        res.status(401).json({ loggedIn: false });
+    }
+});
+
+app.get('/user-profile', async (req, res) => {
+    const userId = req.session.userId;
   
     try {
-      const user = await User.findOne({ where: { resetToken: token, resetTokenExpiration: { [Op.gt]: Date.now() } } });
-  
+      const user = await User.findByPk(userId, {
+        include: [{
+          model: Account,
+          attributes: ['AccountNo', 'Balance']
+        }]
+      });
+      
       if (!user) {
-        return res.status(400).json({ error: 'Invalid or expired token' });
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching user profile' });
+    }
+  });
+  
+  
+
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ error: 'Logout failed' });
+        }
+        res.status(200).json({ message: 'Logged out successfully' });
+    });
+});
+
+
+function generateOtp() {
+    return Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+}
+
+async function sendOtpEmail(toEmail, otp) {
+    try {
+        const mailOptions = {
+            from: '"ElderWee" <contacteventnow@gmail.com',
+            to: toEmail,
+            subject: 'Your OTP Code',
+            text: `Your OTP code is ${otp}. It will expire in 5 minutes.`,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('OTP sent successfully');
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+    }
+}
+
+app.post('/send-otp', async (req, res) => {
+    const { newEmail } = req.body;
+    const userId = req.session.userId;
+    console.log({newEmail})
+
+    // Generate OTP
+    const otp = generateOtp();
+    const expirationTime = Date.now() + otpExpirationTime;
+
+    // Store OTP and expiration time
+    otpDictionary[userId] = { otp, expirationTime };
+
+    // Send OTP to new email
+    await sendOtpEmail(newEmail, otp);
+
+    res.status(200).send('OTP sent to new email');
+});
+
+app.post('/verify-otp', async (req, res) => {
+    const { otp, newEmail } = req.body;
+    const userId = req.session.userId; 
+    console.log('Email to update:', newEmail);
+    console.log('UserID:', userId);
+
+    if (!otpDictionary[userId]) {
+        return res.status(400).send('OTP not found');
+    }
+
+    const { otp: storedOtp, expirationTime } = otpDictionary[userId];
+
+    if (Date.now() > expirationTime) {
+        delete otpDictionary[userId];
+        return res.status(400).json({ error: 'OTP expired' });
+    }
+
+    if (parseInt(otp) !== storedOtp) {
+        return res.status(400).json({ error: 'OTP does not match' });
+    }
+
+    try {
+        const result = await User.update({ Email: newEmail }, { where: { UserID: userId } });
+        console.log('Update result:', result);
+        delete otpDictionary[userId];
+        res.status(200).send('Email updated successfully');
+    } catch (error) {
+        console.error('Update error:', error);
+        res.status(500).send('Server error');
+    }
+});
+
+app.post('/check-email', async (req, res) => {
+    const { newEmail } = req.body;
+
+    try {
+        const user = await User.findOne({ where: { Email: newEmail } });
+        if (user) {
+            res.status(200).json({ exists: true });
+        } else {
+            res.status(200).json({ exists: false });
+        }
+    } catch (error) {
+        res.status(500).send('Server error');
+    }
+});
+
+app.post('/upload-profile-image', upload.single('profileImage'), async (req, res) => {
+    const userId = req.session.userId;
+    const profileImage = req.file.filename;
+  
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
       }
   
-      // const hashedPassword = await bcrypt.hash(password, 10); // Comment this line out for now
-      user.Password = password; // Save the plain text password for now
-      user.resetToken = null;
-      user.resetTokenExpiration = null;
+      user.profilePic = profileImage;
       await user.save();
   
-      res.status(200).json({ message: 'Password reset successful' });
+      res.status(200).json({ profilePic: profileImage });
     } catch (error) {
-      console.error('Error resetting password:', error);
-      res.status(500).json({ error: 'Server error' });
+      res.status(500).json({ error: 'Error updating profile image' });
+    }
+  });
+
+  app.use('/uploads', express.static('uploads'));
+
+  app.post('/add-card', (req, res) => {
+    const { cardNumber, cvc } = req.body;
+    const userID = req.session.userId; // Get UserID from session
+  
+    if (!cardNumber || !cvc || !userID) {
+        return res.status(400).json({ message: 'Card number, CVC, and UserID are required' });
+    }
+  
+    if (!userCards[userID]) {
+        userCards[userID] = [];
+    }
+
+    const maskedCardNumber = cardNumber.replace(/.(?=.{4})/g, 'X');
+    userCards[userID].push({ cardNumber: maskedCardNumber, cvc });
+    res.status(201).json({ message: 'Card added successfully' });
+});
+
+// Get Cards Endpoint
+app.get('/cards', (req, res) => {
+    const userID = req.session.userId;  
+  
+    if (!userCards[userID]) {
+        // Return an empty array if no cards are found
+        return res.status(200).json([]);
+    }
+  
+    res.status(200).json(userCards[userID]);
+});
+
+// Delete Card Endpoint
+app.delete('/delete-card', (req, res) => {
+    console.log('Session Data:', req.session);
+    const { cardNumber } = req.body;
+    const userID = req.session.userId; 
+    console.log('helppppp', userID, cardNumber)
+  
+    if (!cardNumber || !userID || !userCards[userID]) {
+        return res.status(400).json({ message: 'Card number and UserID are required' });
+    }
+  
+    userCards[userID] = userCards[userID].filter(card => card.cardNumber !== cardNumber);
+    res.sendStatus(204);
+});
+
+// Payment Endpoint
+app.post('/process-payment', async (req, res) => {
+    const { cardNumber, amount } = req.body;
+    const userID = req.session.userId; // Get UserID from session
+
+    if (!cardNumber || !amount || !userID) {
+        return res.status(400).json({ message: 'Card number, amount, and UserID are required' });
+    }
+
+    try {
+        // Simulate a delay for payment processing
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // Assuming you have logic to validate the card and process the payment here
+
+        // Update the user's account balance
+        const account = await Account.findOne({ where: { UserID: userID } });
+
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
+        }
+
+        await Transaction.create({
+            TransactionID: crypto.randomBytes(16).toString('hex'),
+            TransactionDate: new Date(),
+            TransactionAmount: parseFloat(amount),
+            TransactionStatus: 'Success',
+            TransactionType: 'Top Up', // You can use 'Top Up' or another type you prefer
+            TransactionDesc: `Top-up from card ending in ${cardNumber.slice(-4)}`,
+            ReceiverID: userID,
+            ReceiverAccountNo: account.AccountNo,
+            SenderID: userID,
+            SenderAccountNo: account.AccountNo 
+        });
+
+        // Update the account balance
+        account.Balance += parseFloat(amount);
+        await account.save();
+
+        res.status(200).json({ message: 'Payment processed successfully' });
+    } catch (error) {
+        console.error('Error processing payment:', error);
+        res.status(500).json({ message: 'An error occurred while processing the payment' });
+    }
+});
+
+app.post('/transfer', async (req, res) => {
+    const { receiverIdentifier, amount, description } = req.body;
+    const senderUserId = req.session.userId;
+    console.log('sender',senderUserId)
+
+    if (!senderUserId) {
+        return res.status(401).json({ success: false, message: 'userID is undefined' });
+    }
+
+    try {
+        
+        // Find the receiver by phone number, account number, or email
+        let receiverUser = await User.findOne({
+            where: {
+                [Sequelize.Op.or]: [
+                    { PhoneNo: receiverIdentifier },
+                    { Email: receiverIdentifier }
+                ]
+            }
+        });
+
+        if (!receiverUser) {
+            return res.status(404).json({ success: false, message: 'Receiver not found' });
+        }
+
+        // Find sender's account
+        const senderAccount = await Account.findOne({ where: { UserID: senderUserId } });
+        if (!senderAccount) {
+            return res.status(404).json({ success: false, message: 'Sender account not found' });
+        }
+
+        if (senderAccount.Balance < amount) {
+            return res.status(400).json({ success: false, message: 'Insufficient funds' });
+        }
+
+        // Find receiver's account
+        const receiverAccount = await Account.findOne({ where: { UserID: receiverUser.UserID } });
+        if (!receiverAccount) {
+            return res.status(404).json({ success: false, message: 'Receiver account not found' });
+        }
+
+        // Update balances
+        senderAccount.Balance -= amount;
+        receiverAccount.Balance += amount;
+
+        await senderAccount.save();
+        await receiverAccount.save();
+
+        // Record the transaction
+        await Transaction.create({
+            TransactionID: crypto.randomBytes(16).toString('hex'),
+            TransactionDate: new Date(),
+            TransactionAmount: amount,
+            TransactionStatus: 'Success',
+            TransactionType: 'Transfer',
+            TransactionDesc: description || 'Fund Transfer',
+            ReceiverID: receiverUser.UserID,
+            ReceiverAccountNo: receiverAccount.AccountNo,
+            SenderID: senderUserId,
+            SenderAccountNo: senderAccount.AccountNo
+        });
+
+
+        res.status(200).json({ success: true, message: 'Transfer successful' });
+    } catch (error) {
+        console.error('Error processing transfer:', error);
+        res.status(500).json({ success: false, message: 'Error processing transfer' });
+    }
+});
+
+app.get('/user-balance', async (req, res) => {
+    try {
+        const userId = req.session.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        // Fetch account details associated with the user
+        const account = await Account.findOne({
+            where: { UserID: userId },
+            attributes: ['AccountNo', 'Balance']
+        });
+
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
+        }
+
+        return res.json({
+            accountNumber: account.AccountNo,
+            balance: account.Balance
+        });
+    } catch (error) {
+        console.error('Error fetching user balance:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.get('/check-receiver', async (req, res) => {
+    try {
+        const { identifier } = req.query;
+        console.log('Received identifier:', identifier);
+
+        if (!identifier) {
+            return res.status(400).json({ message: 'Identifier is required' });
+        }
+
+        // Check if the identifier matches a user by email or phone number
+        const user = await User.findOne({
+            where: {
+                [Sequelize.Op.or]: [
+                    { Email: identifier },
+                    { PhoneNo: identifier }
+                ]
+            }
+        });
+
+        console.log('User found:', user);
+
+        if (!user) {
+            return res.status(404).json({ exists: false, message: 'Receiver not registered' });
+        }
+
+        // If user exists, check account status
+        const account = await Account.findOne({ where: { UserID: user.UserID } });
+
+        if (!account) {
+            return res.status(404).json({ exists: true, message: 'Account not found' });
+        }
+
+        if (account.AccountStatus) {
+            return res.status(403).json({ message: 'Receiver\'s account is locked' });
+        }
+
+        if (account.Scammer) {
+            return res.status(403).json({ message: 'Receiver is flagged as a scammer' });
+        }
+
+        res.json({ exists: true, message: 'Receiver is valid', accountNo: account.AccountNo });
+    } catch (error) {
+        console.error('Error checking receiver:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.get('/transaction-history', async (req, res) => {
+    const userID = req.session.userId; 
+
+    if (!userID) {
+        return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    try {
+        
+        const transactions = await Transaction.findAll({
+            where: {
+                [Sequelize.Op.or]: [
+                    { SenderID: userID },
+                    { ReceiverID: userID }
+                ]
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'Sender', // Alias for sender
+                    attributes: ['FullName']
+                },
+                {
+                    model: User,
+                    as: 'Receiver', // Alias for receiver
+                    attributes: ['FullName']
+                }
+            ],
+            order: [['TransactionDate', 'DESC']] // Order by transaction date, newest first
+        });
+
+        res.status(200).json({ transactions });
+    } catch (error) {
+        console.error('Error fetching transaction history:', error);
+        res.status(500).json({ message: 'An error occurred while fetching the transaction history' });
+    }
+});
+ 
+
+app.get('/transaction-summary', async (req, res) => {
+    try {
+      const { month } = req.query; // Expect month in format 'YYYY-MM'
+  
+      // Assuming you have a Sequelize model named `Transaction`
+      const transactions = await Transaction.findAll({
+        where: {
+          TransactionDate: {
+            [Op.between]: [new Date(`${month}-01`), new Date(`${month}-01`).setMonth(new Date(`${month}-01`).getMonth() + 1)]
+          }
+        }
+      });
+  
+      const moneyIn = transactions
+        .filter(tx => tx.TransactionType === 'Deposit')
+        .reduce((acc, tx) => acc + parseFloat(tx.TransactionAmount), 0);
+  
+      const moneyOut = transactions
+        .filter(tx => tx.TransactionType === 'Withdrawal')
+        .reduce((acc, tx) => acc + parseFloat(tx.TransactionAmount), 0);
+  
+      res.json({ moneyIn, moneyOut });
+    } catch (error) {
+      console.error('Error fetching transaction summary:', error);
+      res.status(500).json({ error: 'Failed to fetch data' });
     }
   });
 
 server.listen(4000, () => {
     console.log(`Server running on http://localhost:4000`);
 });
-
 // Last line of code
-app.listen(port, ()=>{
+app.listen(port, async () => {
     console.log(`App running on http://localhost:${port}`);
 });

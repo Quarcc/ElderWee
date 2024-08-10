@@ -63,7 +63,8 @@ const AdminEmail = () => {
             await axios.post(`http://localhost:8000/api/massEmail`, form, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-    
+            
+            window.location.reload();
             setError('');
         } catch (err) {
             setError('Error Sending Email');
@@ -124,7 +125,8 @@ const AdminEmail = () => {
                             className="emailmessage-input mt-3"
                             style={{ width: '100%' }}
                         />
-                        <br />
+                        *Target your emails using quotation marks: ""<br />
+                        eg: "name" / "gmail.com"
                         <input
                             type="text"
                             name="emailSubject"
@@ -134,7 +136,6 @@ const AdminEmail = () => {
                             className="emailmessage-input mt-4"
                             style={{ width: '100%' }}
                         />
-                        <br />
                         <textarea
                             type="text"
                             name="emailBody"
@@ -144,7 +145,6 @@ const AdminEmail = () => {
                             className="emailmessage-input mt-4"
                             style={{ width: '100%' }}
                         />
-                        <br />
                         <input
                             type="file"
                             name="attachment"

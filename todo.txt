@@ -1,0 +1,3 @@
+- fix dmz (rollback, release)
+- transaction check and freeze
+--> Blockchain must update also ah

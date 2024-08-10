@@ -1,7 +1,8 @@
 .Account-top-bg, .Account-bot-bg {
     background-color: white;
-    border-radius: 20px;
-    box-shadow: 10px 10px 10px #AAAAAA;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border: 1px solid;
 }
 
 .Account-bg{

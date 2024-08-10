@@ -31,6 +31,14 @@ const Account = db.define('account', {
         defaultValue: false, // False = Not a scammer, True = Scammer
         allowNull: false
     }
+    // UserID: {
+    //     type: Sequelize.INTEGER,
+    //     references: {
+    //         model: 'users',
+    //         key: 'UserID'
+    //     },
+    //     allowNull: false
+    // }
 });
 
 module.exports = Account;

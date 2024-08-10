@@ -32,7 +32,6 @@ function AccountLogTable({logs}) {
   const [orderBy, setOrderBy] = useState("LoginTime");
 
   useEffect(() => {
-    console.log(logs);
     setFilteredAccounts(
       logs.filter((account) =>
         Object.values(account).some((value) =>
@@ -99,9 +98,8 @@ function AccountLogTable({logs}) {
       <div>Last IP Login</div>
     <div>
       {logs.map((log,idx)=>{
-          console.log(log);
           return (<div key = {idx}>
-              <div>{JSON.parse(log.LoginTime)}</div>
+              <div>{log.LoginTime}</div>
               <div>{log.LastIPLoginCountry}</div>
           </div>)
       })}

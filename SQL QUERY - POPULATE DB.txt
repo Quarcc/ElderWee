@@ -188,3 +188,16 @@ INSERT INTO elderwee.emails (EmailDate, EmailSubject, EmailBody, EmailAttachment
 (CURRENT_DATE - INTERVAL 11 DAY, 'Monthly Newsletter', 'Read our monthly newsletter to stay updated with company news and updates.', NULL, 145, 90),
 (CURRENT_DATE - INTERVAL 12 DAY, 'New Blog Post: Tips & Tricks', 'Check out our new blog post for useful tips and tricks on getting the most out of our service.', NULL, 100, 55),
 (CURRENT_DATE - INTERVAL 13 DAY, 'Service Downtime Notification', 'We are performing essential maintenance that may affect our service. We appreciate your patience.', NULL, 130, 65);
+
+-- Enquiries Table
+INSERT INTO elderwee.enquiries (EnquiryID, EnquiryDate, EnquiryType, EnquiryDetails, EnquiryStatus, UserID, AccountNo) VALUES
+(1, '2024-07-01 00:00:00', 'Support', 'I cannot access my account. Please help!', 1, 11, '509819910015'),
+(2, '2024-07-02 00:00:00', 'Sales', 'Interested in Password Managing System.', 1, 2, '644201070018'),
+(3, '2024-07-03 00:00:00', 'Technical', 'The mobile app crashes when I type my Password', 1, 3, '775674400024'),
+(4, '2024-07-04 00:00:00', 'Feedback', 'The new feature is very useful. Good job !', 1, 4, '775070580023'),
+(5, '2024-07-05 00:00:00', 'Complaint', 'I received the wrong item in my order.', 1, 5, '797170570025'),
+(6, '2024-07-06 00:00:00', 'Support', 'I think I got Hacked yesterday', 0, 6, '191691110006'),
+(7, '2024-07-07 00:00:00', 'Technical', 'The payment gateway and Password is not working.', 0, 7, '513389070016'),
+(8, '2024-07-08 00:00:00', 'Sales', 'Will I get hacked?', 0, 8, '931009810028'),
+(9, '2024-07-09 00:00:00', 'Feedback', 'My Account Got Hacked.', 0, 9, '419193160013'),
+(10, '2024-07-10 00:00:00', 'Complaint', 'I was charged incorrectly on my last transaction.', 0, 10, '082324030004');

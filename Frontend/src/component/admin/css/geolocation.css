@@ -33,7 +33,6 @@
   width: 900px;
 }
 
-
 .geo-summaryContainer {
   display: flex;
   justify-content: space-around;
@@ -43,10 +42,11 @@
 .geo-card {
   background-color: white;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   flex: 1;
+  border: 1px solid;
   margin: 0 10px;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 /* FlaggedAccountsTable styles */
@@ -55,15 +55,34 @@
   width: 100%;
   padding-left: 250px;
 }
+.geo-acc-table{
+  margin-top: 10px;
+  margin-left: 10px;
+  border: 1px solid;
+  border-radius: 10px;
+  background-color: white !important;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.geo-flagacc-table{
+  border: 1px solid;
+  border-radius: 10px;
+  background-color: white !important;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.geo-flagacc-table .css-1r8ihza-MuiPaper-root{
+  background-color: transparent;
+}
+
+.geo-acc-table .css-1r8ihza-MuiPaper-root{
+  background-color: transparent;
+}
 
 .toprow-container{
   display: flex;
   flex-direction: row; 
-}
-
-.geo-acc-table {
-  padding: 10px;
-  border: 1px solid #ccc; /* Optional: for visual separation */
 }
 
 .geo-container-activeAcc{
@@ -85,9 +104,6 @@
 
 }
 
-.geo-th {
-}
-
 .accountTables {
   margin-top: 20px;
 }
@@ -96,4 +112,13 @@
   margin: 30px;
   width: 100%;
   padding-left: 250px;
+}
+
+.country-ban{
+  margin-top: 10px;
+  background-color: white !important;
+  border: 1px solid;
+  border-radius: 10px;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }

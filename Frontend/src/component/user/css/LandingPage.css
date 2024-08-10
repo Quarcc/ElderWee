@@ -1,0 +1,116 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page-wrapper {
+    min-height: 100vh;
+    background-image: linear-gradient(180deg, #CEE5FD, #FFF);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  
+  .landing-container {
+    width: 100%;
+    min-height: calc(100vh - 64px); /* Adjust 64px to match your AppAppBar height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    max-width: 1200px; /* Adjust this value based on your design preferences */
+    width: 100%;
+  }
+  
+  .text-stack {
+    width: 100%;
+    max-width: 800px; /* Adjust this value based on your design preferences */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .main-title {
+    font-size: clamp(3.5rem, 10vw, 4rem);
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    text-align: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .highlight {
+    color: #1976d2;  /* Adjust this color to match your primary color */
+  }
+  
+  .description {
+  color: #666;
+  width: 100%;
+  max-width: 600px; /* Adjust this value based on your design preferences */
+  margin: 1rem 0;
+}
+  
+.input-group1 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px; /* Adjust this value based on your design preferences */
+    margin-top: 2rem;
+  }
+  
+  input[type="email"] {
+    padding: 0.5rem;
+    padding-right: 0.5rem;
+    margin-right: 0.5rem;
+    width: 100%;
+    max-width: 500px; /* Adjust this value based on your design preferences */
+  }
+  
+  .start-button1 {
+    background-color: #1976d2;  /* Adjust this color to match your primary color */
+    color: white;
+    border: none;
+    padding: 0.5rem ;
+    cursor: pointer;
+    width: 300px;
+  }
+  
+  .terms {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 1rem;
+  }
+  
+  .terms-link {
+    color: #1976d2;  /* Adjust this color to match your primary color */
+    text-decoration: none;
+  }
+  
+  @media (max-width: 600px) {
+    .text-stack {
+      width: 100%;
+    }
+  
+    .main-title {
+      flex-direction: column;
+    }
+  
+    .input-group {
+      flex-direction: column;
+    }
+  
+    input[type="email"] {
+      margin-right: 0;
+      margin-bottom: 0.5rem;
+    }
+  }

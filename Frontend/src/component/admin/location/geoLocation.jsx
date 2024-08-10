@@ -236,7 +236,6 @@ function geoSummary() {
   useEffect(() => {
     const getLatestLog = (accNo, logs) => {
       let accLog = getAccountLogsWithAccountNo(accNo, logs);
-
       if (accLog.length < 1) {
         return [];
       }
@@ -244,7 +243,8 @@ function geoSummary() {
       let latestLog = accLog[0];
 
       accLog.forEach((log) => {
-        if (JSON.parse(log.LoginTime) > JSON.parse(latestLog.LoginTime)) {
+        // console.log(log.LoginTime, latestLog.LoginTime);
+        if (log.LoginTime > latestLog.LoginTime) {
           latestLog = log;
         }
       });
@@ -318,6 +318,37 @@ function geoSummary() {
       e.target.parentNode.parentNode.parentNode.querySelector("span").innerHTML;
     await updateCountryStatus(countryName, 1);
     setBannedCountries((prevItems) => [...prevItems, countryName]);
+    let newAccounts = JSON.parse(JSON.stringify(accounts));
+    for (let i = 0; i < accounts.active.length; i++) {
+      let acc = accounts.active[i];
+      if (acc.LastIPLogin == countryName) {
+        let result = await fetch(
+          `http://localhost:8000/api/accounts/${acc.AccountNo}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              AccountStatus: 1,
+              Scammer: 1,
+            }),
+          }
+        );
+        if (!result.ok) {
+          alert(
+            "Failed to update account ban status. Please unban and ban the country again."
+          );
+          break;
+        }
+        acc.Reason = "Sanctioned Country"
+        newAccounts.flagged.push(acc);
+        newAccounts.active = newAccounts.active.filter(
+          (active) => active.AccountNo != acc.AccountNo
+        );
+      }
+    }
+    setAccounts(newAccounts);
 
     alert(`${countryName} added to banlist.`);
   };
@@ -340,7 +371,7 @@ function geoSummary() {
         <AdminNavBar />
       </div>
       <div className="admingeo-container">
-        <h1 className="title">Account</h1>
+        <h1 className="title">Geotracking</h1>
         <div className="toprow-container">
           <div className="col-3 geo-row2">
             <div className="row rowacc">
@@ -351,56 +382,60 @@ function geoSummary() {
                 flaggedAccounts={accounts.flagged.length}
               />
             </div>
-            <Autocomplete
-              options={countries}
-              renderOption={(props, option) => {
-                return (
-                  <div
-                    {...props}
-                    className="flex flex-row justify-between items-center w-full"
-                    style={{ padding: "8px 16px" }} // Added padding for better spacing
-                  >
+            <div className="country-ban-btn">
+              <Autocomplete
+                className="mt-4"
+                options={countries}
+                renderOption={(props, option) => {
+                  return (
                     <div
-                      style={{ flexGrow: 1 }}
-                      className={
-                        bannedCountries.includes(option) ? "text-red-500" : ""
-                      }
+                      {...props}
+                      className="flex flex-row justify-between items-center w-full"
+                      style={{ padding: "8px 16px" }} // Added padding for better spacing
                     >
-                      <span>{option}</span>
+                      <div
+                        style={{ flexGrow: 1 }}
+                        className={
+                          bannedCountries.includes(option) ? "text-red-500" : ""
+                        }
+                      >
+                        <span>{option}</span>
+                      </div>
+                      <div className="flex flex-row space-x-2">
+                        <ButtonGroup>
+                          {!bannedCountries.includes(option) && (
+                            <Button
+                              className="country-b"
+                              size="small"
+                              onClick={(e) => {
+                                handleBanCountry(e);
+                              }}
+                            >
+                              Ban
+                            </Button>
+                          )}
+                          {bannedCountries.includes(option) && (
+                            <Button
+                              size="small"
+                              onClick={(e) => {
+                                handleUnbanCountry(e);
+                              }}
+                            >
+                              Unban
+                            </Button>
+                          )}
+                        </ButtonGroup>
+                      </div>
                     </div>
-                    <div className="flex flex-row space-x-2">
-                      <ButtonGroup>
-                        {!bannedCountries.includes(option) && (
-                          <Button
-                            size="small"
-                            onClick={(e) => {
-                              handleBanCountry(e);
-                            }}
-                          >
-                            Ban
-                          </Button>
-                        )}
-                        {bannedCountries.includes(option) && (
-                          <Button
-                            size="small"
-                            onClick={(e) => {
-                              handleUnbanCountry(e);
-                            }}
-                          >
-                            Unban
-                          </Button>
-                        )}
-                      </ButtonGroup>
-                    </div>
-                  </div>
-                );
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Countries" />
-              )}
-            />
-          </div>
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Countries" />
+                )}
+              />
+            </div>
 
+          </div>
           <div className="col-9 geo-acc-table">
             <ActiveAccountsTable
               activeAccountData={accounts.active}
@@ -409,13 +444,14 @@ function geoSummary() {
           </div>
         </div>
         <br />
-        <div className="">
+        <div className="geo-flagacc-table">
           <FlaggedAccountsTable
             flaggedAccountData={accounts.flagged}
             handleClickedFlaggedAccount={handleClickedFlaggedAccount}
           />
         </div>
       </div>
+      <br />
     </div>
   );
 }

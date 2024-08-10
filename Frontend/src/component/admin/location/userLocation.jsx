@@ -56,18 +56,19 @@ function UserLocation(){
 
       let latestRecord = data[0];
       data.forEach(record => {
-          if (JSON.parse(record.LoginTime) > JSON.parse(latestRecord.LoginTime)) {
+          if (record.LoginTime > latestRecord.LoginTime) {
               latestRecord = record;
           }
       });
-      
-      let coords = JSON.parse(latestRecord.LoginCoords);
-      if(coords.latitude){
-        coords = {
-          lat:coords.latitude,
-          lng:coords.longitude
-        }
+
+      let coords = latestRecord.LoginCoords.split(", ");
+      console.log(parseFloat(coords[0]));
+
+      coords = {
+        lat:parseFloat(coords[0]),
+        lng:parseFloat(coords[1]),
       }
+      
       setCenter(coords);
 
       return latestRecord;

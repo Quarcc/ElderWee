@@ -99,7 +99,7 @@ const FlaggedAccountsTable = ({
         paddingX: 2,
       }}
     >
-      <Toolbar sx={{ marginBottom: 2 }}>
+      <Toolbar sx={{ marginBottom: 2, paddingTop: 5 }}>
         <Typography
           sx={{ flex: "1 1 100%", fontSize: 40 }}
           variant="h1"
@@ -116,7 +116,7 @@ const FlaggedAccountsTable = ({
           onChange={(e) => setFilter(e.target.value)}
         />
       </Toolbar>
-      <TableContainer sx={{ maxHeight: 600 }}>
+      <TableContainer sx={{ maxHeight: 600, paddingLeft: 2, paddingRight: 2, paddingBottom: 2 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>

@@ -48,11 +48,6 @@ export const NavbarData = [
         link: "/adminGeo"
     },
     {
-        title: "Flagged Accounts",
-        icon: <FlagIcon />,
-        link: "/adminFlag"
-    },
-    {
         title: "Logout",
         icon: <LogoutIcon />,
         link: "/login"

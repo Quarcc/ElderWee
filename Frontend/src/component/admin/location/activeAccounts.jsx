@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,26 +8,29 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import TextField from '@mui/material/TextField';
+import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 
-import '../css/adminAccount.css';
+import "../css/adminAccount.css";
 
-const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount }) => {
+const ActiveAccountsTable = ({
+  activeAccountData,
+  handleClickedFlaggedAccount,
+}) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState("");
   const [filteredAccounts, setFilteredAccounts] = useState([]);
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('AccountNo');
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("AccountNo");
 
   useEffect(() => {
     setFilteredAccounts(
-      activeAccountData.filter(account =>
-        Object.values(account).some(value =>
+      activeAccountData.filter((account) =>
+        Object.values(account).some((value) =>
           value.toString().toLowerCase().includes(filter.toLowerCase())
         )
       )
@@ -38,14 +41,14 @@ const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount })
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = event => {
+  const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
   const handleRequestSort = (property) => (event) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
@@ -56,11 +59,11 @@ const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount })
       if (order !== 0) return order;
       return a[1] - b[1];
     });
-    return stabilizedThis.map(el => el[0]);
+    return stabilizedThis.map((el) => el[0]);
   };
 
   const getComparator = (order, orderBy) => {
-    return order === 'desc'
+    return order === "desc"
       ? (a, b) => descendingComparator(a, b, orderBy)
       : (a, b) => -descendingComparator(a, b, orderBy);
   };
@@ -72,16 +75,18 @@ const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount })
   };
 
   const columns = [
-    { id: 'AccountNo', label: 'Account No', minWidth: 100 },
-    { id: 'Name', label: 'Name', minWidth: 170 },
-    { id: 'ContactNumber', label: 'Contact Number', minWidth: 150 },
-    { id: 'LastIPLogin', label: 'Last IP Login', minWidth: 150 }
+    { id: "AccountNo", label: "Account No", minWidth: 100 },
+    { id: "Name", label: "Name", minWidth: 170 },
+    { id: "ContactNumber", label: "Contact Number", minWidth: 150 },
+    { id: "LastIPLogin", label: "Last IP Login", minWidth: 150 },
   ];
 
   const visibleAccounts = React.useMemo(() => {
     const comparator = getComparator(order, orderBy);
-    return stableSort(filteredAccounts, comparator)
-      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    return stableSort(filteredAccounts, comparator).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
   }, [filteredAccounts, order, orderBy, page, rowsPerPage]);
 
   return (
@@ -93,7 +98,7 @@ const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount })
         paddingX: 2,
       }}
     >
-      <Toolbar sx={{ marginBottom: 2 }}>
+      <Toolbar sx={{ marginBottom: 2, paddingTop: 5 }}>
         <Typography
           sx={{ flex: "1 1 100%", fontSize: 40 }}
           variant="h1"
@@ -110,7 +115,7 @@ const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount })
           onChange={(e) => setFilter(e.target.value)}
         />
       </Toolbar>
-      <TableContainer sx={{ maxHeight: 600 }}>
+      <TableContainer sx={{ maxHeight: 600, paddingLeft: 2, paddingRight: 2 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -148,7 +153,11 @@ const ActiveAccountsTable = ({ activeAccountData, handleClickedFlaggedAccount })
                 tabIndex={-1}
                 key={account.AccountNo}
                 onClick={(e) => {
-                  handleClickedFlaggedAccount(e);
+                  if (account.LastIPLogin != "NIL") {
+                    handleClickedFlaggedAccount(e);
+                  } else {
+                    alert("No login records from this account.");
+                  }
                 }}
               >
                 {columns.map((column) => {
