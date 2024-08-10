@@ -1145,6 +1145,168 @@ app.post('/process-payment', async (req, res) => {
     }
 });
 
+app.post('/transfer', async (req, res) => {
+    const { receiverIdentifier, amount, description } = req.body;
+    const senderUserId = req.session.userId;
+
+    if (!senderUserId) {
+        return res.status(401).json({ success: false, message: 'userID is undefined' });
+    }
+
+    try {
+        
+        // Find the receiver by phone number, account number, or email
+        let receiverUser = await User.findOne({
+            where: {
+                [Sequelize.Op.or]: [
+                    { PhoneNo: receiverIdentifier },
+                    { Email: receiverIdentifier }
+                ]
+            }
+        });
+
+        if (!receiverUser) {
+            return res.status(404).json({ success: false, message: 'Receiver not found' });
+        }
+
+        // Find sender's account
+        const senderAccount = await Account.findOne({ where: { UserID: senderUserId } });
+        if (!senderAccount) {
+            return res.status(404).json({ success: false, message: 'Sender account not found' });
+        }
+
+        if (senderAccount.Balance < amount) {
+            return res.status(400).json({ success: false, message: 'Insufficient funds' });
+        }
+
+        // Find receiver's account
+        const receiverAccount = await Account.findOne({ where: { UserID: receiverUser.UserID } });
+        if (!receiverAccount) {
+            return res.status(404).json({ success: false, message: 'Receiver account not found' });
+        }
+
+        // Update balances
+        senderAccount.Balance -= amount;
+        receiverAccount.Balance += amount;
+
+        await senderAccount.save();
+        await receiverAccount.save();
+
+        // Record the transaction
+        await Transaction.create({
+            TransactionID: crypto.randomBytes(16).toString('hex'),
+            TransactionDate: new Date(),
+            TransactionAmount: amount,
+            TransactionStatus: 'Success',
+            TransactionType: 'Transfer',
+            TransactionDesc: description || 'Fund Transfer',
+            ReceiverID: receiverUser.UserID,
+            ReceiverAccountNo: receiverAccount.AccountNo
+        });
+
+        res.status(200).json({ success: true, message: 'Transfer successful' });
+    } catch (error) {
+        console.error('Error processing transfer:', error);
+        res.status(500).json({ success: false, message: 'Error processing transfer' });
+    }
+});
+
+app.get('/user-balance', async (req, res) => {
+    try {
+        const userId = req.session.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        // Fetch account details associated with the user
+        const account = await Account.findOne({
+            where: { UserID: userId },
+            attributes: ['AccountNo', 'Balance']
+        });
+
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
+        }
+
+        return res.json({
+            accountNumber: account.AccountNo,
+            balance: account.Balance
+        });
+    } catch (error) {
+        console.error('Error fetching user balance:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.get('/check-receiver', async (req, res) => {
+    try {
+        const { identifier } = req.query;
+        console.log('Received identifier:', identifier);
+
+        if (!identifier) {
+            return res.status(400).json({ message: 'Identifier is required' });
+        }
+
+        // Check if the identifier matches a user by email or phone number
+        const user = await User.findOne({
+            where: {
+                [Sequelize.Op.or]: [
+                    { Email: identifier },
+                    { PhoneNo: identifier }
+                ]
+            }
+        });
+
+        console.log('User found:', user);
+
+        if (!user) {
+            return res.status(404).json({ exists: false, message: 'Receiver not registered' });
+        }
+
+        // If user exists, check account status
+        const account = await Account.findOne({ where: { UserID: user.UserID } });
+
+        if (!account) {
+            return res.status(404).json({ exists: true, message: 'Account not found' });
+        }
+
+        if (account.AccountStatus) {
+            return res.status(403).json({ message: 'Receiver\'s account is locked' });
+        }
+
+        if (account.Scammer) {
+            return res.status(403).json({ message: 'Receiver is flagged as a scammer' });
+        }
+
+        res.json({ exists: true, message: 'Receiver is valid', accountNo: account.AccountNo });
+    } catch (error) {
+        console.error('Error checking receiver:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.get('/transactions', async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      console.log('PLS WORK', userId)
+  
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+  
+      const transactions = await Transaction.findAll({
+        where: { ReceiverID: userId },
+        order: [['TransactionDate', 'DESC']],
+      });
+  
+      res.json({ transactions });
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+
 
 
 console.log("Hello World");

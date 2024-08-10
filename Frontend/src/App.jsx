@@ -14,9 +14,7 @@ import PlaceHolder from './Placeholder';
 import Login from './component/user/Login';
 import SignUp from './component/user/Signup';
 import UserLocation from './component/admin/location/userLocation';
-import AppAppBar from './component/user/landing-page/AppAppBar';
 import Home from './component/user/landing-page/Home';
-import Footer from './component/user/landing-page/Footer';
 import ResetPassword from './component/user/ResetPassword';
 import ForgotPassword from './component/user/ForgotPassword';
 import ProfilePage from './component/user/Profile';
@@ -24,6 +22,8 @@ import TransactionTest from './component/user/transactionTest'
 import LandingPage from './component/user/landing-page/LandingPage';
 import TopUp from './component/user/TopUp';
 import Card from './component/user/Card';
+import TransferFund from './component/user/TransferFund';
+import TransactionHistory from './component/user/TransactionHistory';
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -54,6 +54,9 @@ function App() {
                 <Route path='/landing' element={<LandingPage />} />
                 <Route path='/topup' element={<TopUp />} />
                 <Route path='/card' element={<Card />} />
+                <Route path='/transfer' element={<TransferFund />} />
+                <Route path='/history' element={<TransactionHistory />} />
+
             </Routes>
         </>
     );

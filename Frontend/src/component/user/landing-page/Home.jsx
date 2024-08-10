@@ -1,20 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {
-  MDBCol,
-  MDBContainer,
-  MDBRow,
-  MDBCard,
-  MDBCardText,
-  MDBCardBody,
-  MDBCardImage,
-  MDBBtn,
-  MDBListGroup,
-  MDBListGroupItem,
-  MDBInput
-} from 'mdb-react-ui-kit';
 import AppAppBar from './AppAppBar';
+import '../css/Home.css';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -38,71 +26,58 @@ export default function Home() {
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+  if (error) return <p className="error">Error: {error}</p>;
 
   return (
-    <div>
+    <div className='page-wrap'>
       <AppAppBar />
-      <section style={{ backgroundColor: '#eee', marginTop: '80px' }}>
-        <MDBContainer className="py-5">
-          <MDBRow>
-            <MDBCol lg="4">
-              <MDBCard className="mb-4">
-                <MDBCardBody >
-                  <MDBCardText>Balance</MDBCardText>
-                  <MDBCardText className="text-muted" style={{ fontSize: '35px', fontWeight: 'bold' }}>
+      <section className="home-section">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-5">
+              <div className="card mb-4">
+                <div className="card-body">
+                  <h4 className="card-text">Balance</h4>
+                  <span className='span'>SGD</span>
+                  <p className="balance">
                     ${user.accounts && user.accounts.length > 0 ? user.accounts[0].Balance.toFixed(2) : 'N/A'}
-                  </MDBCardText>
-                  <MDBRow>
-                    <MDBCol>
+                  </p>
+                  <div className="row">
+                    <div className="col">
                       <button onClick={() => navigate('/topup')}>Top Up</button>
-                    </MDBCol>
-                    <MDBCol>
-                      <button>Transfer</button>
-                    </MDBCol>
-                  </MDBRow>
-                </MDBCardBody>
-              </MDBCard>
-
-            </MDBCol>
-            <MDBCol lg="7">
-              <MDBCard className="mb-4">
-                <MDBCardBody>
-                  <MDBRow>
-                    <MDBCol sm="3">
-                      <MDBCardText>Full Name</MDBCardText>
-                    </MDBCol>
-                    <MDBCol sm="9">
-                    </MDBCol>
-                  </MDBRow>
-                  <hr />
-                  <MDBRow>
-                    <MDBCol sm="3">
-                      <MDBCardText>Email</MDBCardText>
-                    </MDBCol>
-                    <MDBCol sm="9" className="d-flex align-items-center">
-
-                    </MDBCol>
-                    <div>
-
                     </div>
-                  </MDBRow>
-                  <hr />
-                  <MDBRow>
-                    <MDBCol sm="3">
-                      <MDBCardText>Phone</MDBCardText>
-                    </MDBCol>
-                    <MDBCol sm="9">
-                    </MDBCol>
-                  </MDBRow>
-                </MDBCardBody>
-              </MDBCard>
+                    <div className="col">
+                      <button onClick={() => navigate('/transfer')}>Transfer</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="card mb-4">
+                <div className="card-body">
+                  <h4 className="card-text">Transaction History</h4>
+                  <p className="card-text">See when funds come in and go out. You can find your recent transaction activities here.</p>
+                  
+                  <div className="row">
+                    <div className="col">
+                      <button onClick={() => navigate('/history')}>History</button>
+                    </div>
+                  </div>
+                </div>
 
-              <MDBRow>
-              </MDBRow>
-            </MDBCol>
-          </MDBRow>
-        </MDBContainer>
+              </div>
+            </div>
+            <div className="col-lg-7">
+              <div className="card mb-4">
+                <div className="card-body">
+                  {/* Content for this card */}
+                </div>
+              </div>
+              <div className="row">
+                {/* Additional row content */}
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

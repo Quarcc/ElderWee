@@ -1,0 +1,68 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.page-wrap {
+    min-height: 100vh;
+    background-color: #eee;
+}
+
+.home-section {
+    padding-top: 80px;
+}
+
+.container {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-text {
+    margin-bottom: 0.5rem;
+}
+
+.span {
+    color: black;
+    font-weight: 500;
+    font-size: 15px;
+    margin-right: 1rem;
+    display: inline-block;
+    justify-content: center;
+}
+
+.balance {
+    font-size: 40px;
+    font-weight: bold;
+    color: #0849c1;
+    display: inline-block;
+    /* Ensure it stays on the same line */
+}
+
+.error {
+    color: red;
+}
+
+button {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 992px) {
+
+    .col-lg-4,
+    .col-lg-7 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
