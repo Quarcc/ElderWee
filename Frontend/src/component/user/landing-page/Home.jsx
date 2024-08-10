@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AppAppBar from './AppAppBar';
 import '../css/Home.css';
+import MoneyFlowChart from '../MoneyFlowChart';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -69,7 +70,7 @@ export default function Home() {
             <div className="col-lg-7">
               <div className="card mb-4">
                 <div className="card-body">
-                  {/* Content for this card */}
+                  <MoneyFlowChart/>
                 </div>
               </div>
               <div className="row">

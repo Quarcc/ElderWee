@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import './css/TransactionHistory.css';
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
   const [statusMessage, setStatusMessage] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/transactions', { withCredentials: true });
+        const response = await axios.get('http://localhost:8000/transaction-history', { withCredentials: true });
         setTransactions(response.data.transactions);
       } catch (error) {
         setStatusMessage('Failed to fetch transactions');
@@ -18,37 +21,46 @@ const TransactionHistory = () => {
     fetchTransactions();
   }, []);
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>Transaction History</h1>
-      {statusMessage && <p style={{ color: 'red' }}>{statusMessage}</p>}
+    <div className="transaction-history">
+      <div className="header">
+        <h1 className="title">Transaction History</h1>
+      </div>
+      {statusMessage && <p className="error-message">{statusMessage}</p>}
       {transactions.length === 0 ? (
-        <p>No transactions found.</p>
+        <p className="no-transactions">No transactions found.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table className="transaction-table">
           <thead>
             <tr>
-              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Transaction ID</th>
-              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Date</th>
-              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Amount</th>
-              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Status</th>
-              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Type</th>
-              <th style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>Description</th>
+              <th>Date</th>
+              <th>Sender</th>
+              <th>Receiver</th>
+              <th>Amount</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
             {transactions.map(transaction => (
               <tr key={transaction.TransactionID}>
-                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{transaction.TransactionID}</td>
-                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{new Date(transaction.TransactionDate).toLocaleDateString()}</td>
-                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>${transaction.TransactionAmount.toFixed(2)}</td>
-                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{transaction.TransactionStatus}</td>
-                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{transaction.TransactionType}</td>
-                <td style={{ borderBottom: '1px solid #ddd', padding: '8px' }}>{transaction.TransactionDesc || '-'}</td>
+                <td>{new Date(transaction.TransactionDate).toLocaleDateString()}</td>
+                <td>{transaction.Sender ? transaction.Sender.FullName : '-'}</td>
+                <td>{transaction.Receiver ? transaction.Receiver.FullName : '-'}</td>
+                <td className={`amount ${transaction.TransactionType === 'Top Up' ? 'deposit' : 'withdrawal'}`}>
+                  {transaction.TransactionType === 'Top Up' ? '+' : '-'}${transaction.TransactionAmount.toFixed(2)}
+                </td>
+                <td>{transaction.TransactionDesc || '-'}</td>
               </tr>
             ))}
           </tbody>
+          
+        <button className="back-button" onClick={handleBack}>← Back</button>
         </table>
+        
       )}
     </div>
   );

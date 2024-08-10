@@ -17,6 +17,8 @@ const setUpDB = (drop) => {
         .then(() => {
             User.hasMany(Account, { foreignKey: 'UserID' });
             User.hasMany(Transaction, { foreignKey: 'SenderID' });
+            Transaction.belongsTo(User, { foreignKey: 'SenderID', as: 'Sender' });
+            Transaction.belongsTo(User, { foreignKey: 'ReceiverID', as: 'Receiver' });
             Account.hasMany(Transaction, { foreignKey: 'SenderAccountNo' });
             User.hasMany(BlockchainDB, { foreignKey: 'SenderID' });
             Account.hasMany(BlockchainDB, { foreignKey: 'SenderAccountNo' });

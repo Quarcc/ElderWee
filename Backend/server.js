@@ -1135,6 +1135,20 @@ app.post('/process-payment', async (req, res) => {
             return res.status(404).json({ message: 'Account not found' });
         }
 
+        await Transaction.create({
+            TransactionID: crypto.randomBytes(16).toString('hex'),
+            TransactionDate: new Date(),
+            TransactionAmount: parseFloat(amount),
+            TransactionStatus: 'Success',
+            TransactionType: 'Top Up', // You can use 'Top Up' or another type you prefer
+            TransactionDesc: `Top-up from card ending in ${cardNumber.slice(-4)}`,
+            ReceiverID: userID,
+            ReceiverAccountNo: account.AccountNo,
+            SenderID: userID,
+            SenderAccountNo: account.AccountNo 
+        });
+
+        // Update the account balance
         account.Balance += parseFloat(amount);
         await account.save();
 
@@ -1148,6 +1162,7 @@ app.post('/process-payment', async (req, res) => {
 app.post('/transfer', async (req, res) => {
     const { receiverIdentifier, amount, description } = req.body;
     const senderUserId = req.session.userId;
+    console.log('sender',senderUserId)
 
     if (!senderUserId) {
         return res.status(401).json({ success: false, message: 'userID is undefined' });
@@ -1201,8 +1216,11 @@ app.post('/transfer', async (req, res) => {
             TransactionType: 'Transfer',
             TransactionDesc: description || 'Fund Transfer',
             ReceiverID: receiverUser.UserID,
-            ReceiverAccountNo: receiverAccount.AccountNo
+            ReceiverAccountNo: receiverAccount.AccountNo,
+            SenderID: senderUserId,
+            SenderAccountNo: senderAccount.AccountNo
         });
+
 
         res.status(200).json({ success: true, message: 'Transfer successful' });
     } catch (error) {
@@ -1286,26 +1304,80 @@ app.get('/check-receiver', async (req, res) => {
     }
 });
 
-app.get('/transactions', async (req, res) => {
-    try {
-      const userId = req.session.userId;
-      console.log('PLS WORK', userId)
-  
-      if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
-      }
-  
-      const transactions = await Transaction.findAll({
-        where: { ReceiverID: userId },
-        order: [['TransactionDate', 'DESC']],
-      });
-  
-      res.json({ transactions });
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-      res.status(500).json({ message: 'Internal Server Error' });
+app.get('/transaction-history', async (req, res) => {
+    const userID = req.session.userId; 
+
+    if (!userID) {
+        return res.status(401).json({ message: 'User not authenticated' });
     }
-  });
+
+    try {
+        
+        const transactions = await Transaction.findAll({
+            where: {
+                [Sequelize.Op.or]: [
+                    { SenderID: userID },
+                    { ReceiverID: userID }
+                ]
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'Sender', // Alias for sender
+                    attributes: ['FullName']
+                },
+                {
+                    model: User,
+                    as: 'Receiver', // Alias for receiver
+                    attributes: ['FullName']
+                }
+            ],
+            order: [['TransactionDate', 'DESC']] // Order by transaction date, newest first
+        });
+
+        res.status(200).json({ transactions });
+    } catch (error) {
+        console.error('Error fetching transaction history:', error);
+        res.status(500).json({ message: 'An error occurred while fetching the transaction history' });
+    }
+});
+ 
+
+app.get('/transaction-summary', async (req, res) => {
+    const userID = req.session.userId; 
+
+    if (!userID) {
+        return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    try {
+        const transactions = await Transaction.findAll({
+            where: {
+                [Sequelize.Op.or]: [
+                    { SenderID: userID },
+                    { ReceiverID: userID }
+                ]
+            }
+        });
+
+        let moneyIn = 0;
+        let moneyOut = 0;
+
+        transactions.forEach(transaction => {
+            if (transaction.SenderID === userID) {
+                moneyOut += transaction.TransactionAmount;
+            } else if (transaction.ReceiverID === userID) {
+                moneyIn += transaction.TransactionAmount;
+            }
+        });
+
+        res.status(200).json({ moneyIn, moneyOut });
+    } catch (error) {
+        console.error('Error fetching transaction summary:', error);
+        res.status(500).json({ message: 'An error occurred while fetching the transaction summary' });
+    }
+});
+
 
 
 

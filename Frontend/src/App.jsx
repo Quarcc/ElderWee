@@ -24,6 +24,7 @@ import TopUp from './component/user/TopUp';
 import Card from './component/user/Card';
 import TransferFund from './component/user/TransferFund';
 import TransactionHistory from './component/user/TransactionHistory';
+import MoneyFlowChart from './component/user/MoneyFlowChart';
 
 import './component/admin/css/donttouchme.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -56,6 +57,7 @@ function App() {
                 <Route path='/card' element={<Card />} />
                 <Route path='/transfer' element={<TransferFund />} />
                 <Route path='/history' element={<TransactionHistory />} />
+                <Route path='/flowchart' element={<MoneyFlowChart />} />
 
             </Routes>
         </>
