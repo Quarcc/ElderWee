@@ -43,6 +43,12 @@ const User = db.define('user', {
         type: Sequelize.DATE,
         allowNull: true,
     },
+    profilePic: {
+        type: Sequelize.STRING,
+        allowNull: true,
+    },
+
+
 });
 
 module.exports = User;

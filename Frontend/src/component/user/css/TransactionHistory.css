@@ -1,0 +1,55 @@
+.transaction-history {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  .title {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    color: #d32f2f;
+    font-weight: bold;
+  }
+  
+  .no-transactions {
+    color: #666;
+    font-style: italic;
+  }
+  
+  .transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .transaction-table th {
+    background-color: #2196f3;
+    color: white;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .transaction-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .transaction-table tr:nth-child(even) {
+    background-color: #f8f8f8;
+  }
+  
+  .amount {
+    font-weight: bold;
+  }
+  
+  .amount.deposit {
+    color: #4caf50;
+  }
+  
+  .amount.withdrawal {
+    color: #f44336;
+  }

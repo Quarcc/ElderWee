@@ -7,7 +7,7 @@ const PlaceHolder = () => {
             <Button variant='dark' href='/adminBC'>Blockchain</Button>
             <Button variant='dark' href='/adminDMZ'>DMZ</Button>
             <Button variant='dark' href='/adminDashboard'>Dashboard</Button>
-            <Button variant='dark' href='/Login'>User</Button>
+            <Button variant='dark' href='/landing'>User</Button>
         </>
     )
 }
