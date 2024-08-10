@@ -38,11 +38,11 @@ export default function Login() {
           });
         },
         (err) => {
-          confirm("Please enable geolocation to use this application."); 
+          confirm("Please enable geolocation to use this application.");
         }
       );
     } else {
-      confirm("Please enable geolocation to use this application."); 
+      confirm("Please enable geolocation to use this application.");
     }
   }, []);
 
@@ -56,31 +56,35 @@ export default function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     if (!coordinates) {
       confirm("Please enable geolocation to use this application.");
       return;
     }
-  
+
     const validationErrors = Validation(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-  
+
     try {
       // Perform login request
-      const response = await axios.post("http://localhost:8000/login", {
-        email: formData.email,
-        password: formData.password,
-      }, { withCredentials: true });
-  
+      const response = await axios.post(
+        "http://localhost:8000/login",
+        {
+          email: formData.email,
+          password: formData.password,
+        },
+        { withCredentials: true }
+      );
+
       // Retrieve account details
       let accountData = await retrieveAccountDetailsWithEmail(formData.email);
-  
+
       // Create account log
       //let LoginCoords = JSON.stringify(coordinates);
-      let coordsString = `${coordinates.longitude}, ${coordinates.latitude}`
+      let coordsString = `${coordinates.latitude}, ${coordinates.longitude}`;
       let currentDateTime = new Date();
       const accountLogData = {
         AccountNo: accountData.AccountNo,
@@ -89,17 +93,20 @@ export default function Login() {
         Flagged: accountData.Scammed ? true : false,
         LoginTime: JSON.stringify(currentDateTime),
       };
-      
-      const addAccountLog = await fetch("http://localhost:8000/api/accounts/log", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(accountLogData),
-      });
-  
+
+      const addAccountLog = await fetch(
+        "http://localhost:8000/api/accounts/log",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(accountLogData),
+        }
+      );
+
       let logRes = await addAccountLog.json();
-  
+
       // Proceed with login if the account log creation is successful
       if (response.status === 200) {
         if (formData.email === "DELETED@gmail.com") {
@@ -117,7 +124,6 @@ export default function Login() {
       }
     }
   };
-  
 
   return (
     <ThemeProvider theme={defaultTheme}>
