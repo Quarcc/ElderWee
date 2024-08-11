@@ -4,7 +4,7 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const bodyParser = require('body-parser')
 const cors = require('cors');
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes, where } = require('sequelize');
 const http = require('http');
 const { Server } = require('socket.io');
 const bcrypt = require('bcrypt');
@@ -38,6 +38,7 @@ const crypto = require('crypto');
 
 // Blockchain module
 const { Block, Blockchain } = require('./blockchain/blockchain');
+const FrozenTransaction = require('./models/FrozenTransaction');
 
 //otp
 const otpDictionary = {}; 
@@ -1442,7 +1443,10 @@ app.post('/process-payment', async (req, res) => {
 app.post('/transfer', async (req, res) => {
     const { receiverIdentifier, amount, description } = req.body;
     const senderUserId = req.session.userId;
-    console.log('sender',senderUserId)
+    
+    const trans = await Transaction.findAll();
+
+    const transID = padWithZeros(trans.length + 1);
 
     if (!senderUserId) {
         return res.status(401).json({ success: false, message: 'userID is undefined' });
@@ -1480,27 +1484,175 @@ app.post('/transfer', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Receiver account not found' });
         }
 
-        // Update balances
-        senderAccount.Balance -= amount;
-        receiverAccount.Balance += amount;
+        const accountNo1 = await Account.findOne({
+            where: {
+                UserID: receiverUser.UserID,
+            }
+        })
 
-        await senderAccount.save();
-        await receiverAccount.save();
+        const accountNo2 = await Account.findOne({
+            where: {
+                UserID: senderUserId,
+            }
+        })
 
-        // Record the transaction
-        await Transaction.create({
-            TransactionID: crypto.randomBytes(16).toString('hex'),
-            TransactionDate: new Date(),
-            TransactionAmount: amount,
-            TransactionStatus: 'Success',
-            TransactionType: 'Transfer',
-            TransactionDesc: description || 'Fund Transfer',
-            ReceiverID: receiverUser.UserID,
-            ReceiverAccountNo: receiverAccount.AccountNo,
-            SenderID: senderUserId,
-            SenderAccountNo: senderAccount.AccountNo
-        });
+        const loginCountry1 = await AccountLog.findOne({
+            where: {
+                AccountNo: accountNo1.AccountNo,
+            }
+        })
 
+        const loginCountry2 = await AccountLog.findOne({
+            where: {
+                AccountNo: accountNo2.AccountNo,
+            }
+        })
+
+        const bannedCountry = await BannedCountries.findAll(
+            {
+                where: {
+                    isBanned: true
+                }
+            },
+            {
+                attributes: ['CountryName']
+            }
+        )
+
+        const bannedCountryNames = bannedCountry.map(country => country.CountryName);
+
+        if (accountNo1.Scammer == true || accountNo2.Scammer == true) {
+            await FrozenTransaction.create({
+                TransactionID: transID,
+                SenderAccountNo: accountNo2.AccountNo,
+                ReceiverAccountNo: accountNo1.AccountNo,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                Reason: 'Identified Scammer'
+            })
+
+            senderAccount.BalanceDisplay -= amount;
+            receiverAccount.BalanceDisplay += amount;
+            await senderAccount.save();
+            await receiverAccount.save();
+            
+            await Transaction.create({
+                TransactionID: transID,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                TransactionStatus: 'Pending',
+                TransactionType: 'Transfer',
+                TransactionDesc: description || 'Fund Transfer',
+                ReceiverID: receiverUser.UserID,
+                ReceiverAccountNo: receiverAccount.AccountNo,
+                SenderID: senderUserId,
+                SenderAccountNo: senderAccount.AccountNo
+            });
+
+            const newTransactionDB = await BlockchainDB.create({
+                BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
+                TransactionID: transID,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                TransactionStatus: 'Pending',
+                TransactionType: 'Transfer',
+                TransactionDesc: description || 'Fund Transfer',
+                ReceiverID: receiverUser.UserID,
+                ReceiverAccountNo: receiverAccount.AccountNo,
+                SenderID: senderUserId,
+                SenderAccountNo: senderAccount.AccountNo
+            });
+
+            if (newTransactionDB) {
+                initBc();
+            }
+        }
+        else if (bannedCountryNames.includes(loginCountry1.LastIPLoginCountry) || bannedCountryNames.includes(loginCountry2.LastIPLoginCountry)) {
+            await FrozenTransaction.create({
+                TransactionID: transID,
+                SenderAccountNo: accountNo2.AccountNo,
+                ReceiverAccountNo: accountNo1.AccountNo,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                Reason: 'Sanctioned Country Present'
+            })
+
+            senderAccount.BalanceDisplay -= amount;
+            receiverAccount.BalanceDisplay += amount;
+            await senderAccount.save();
+            await receiverAccount.save();
+            
+            await Transaction.create({
+                TransactionID: transID,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                TransactionStatus: 'Pending',
+                TransactionType: 'Transfer',
+                TransactionDesc: description || 'Fund Transfer',
+                ReceiverID: receiverUser.UserID,
+                ReceiverAccountNo: receiverAccount.AccountNo,
+                SenderID: senderUserId,
+                SenderAccountNo: senderAccount.AccountNo
+            });
+
+            const newTransactionDB = await BlockchainDB.create({
+                BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
+                TransactionID: transID,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                TransactionStatus: 'Pending',
+                TransactionType: 'Transfer',
+                TransactionDesc: description || 'Fund Transfer',
+                ReceiverID: receiverUser.UserID,
+                ReceiverAccountNo: receiverAccount.AccountNo,
+                SenderID: senderUserId,
+                SenderAccountNo: senderAccount.AccountNo
+            });
+
+            if (newTransactionDB) {
+                initBc();
+            }
+        }
+        else {
+            // Update balances
+            senderAccount.Balance -= amount;
+            receiverAccount.Balance += amount;
+
+            await senderAccount.save();
+            await receiverAccount.save();
+
+            // Record the transaction
+            await Transaction.create({
+                TransactionID: transID,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                TransactionStatus: 'Success',
+                TransactionType: 'Transfer',
+                TransactionDesc: description || 'Fund Transfer',
+                ReceiverID: receiverUser.UserID,
+                ReceiverAccountNo: receiverAccount.AccountNo,
+                SenderID: senderUserId,
+                SenderAccountNo: senderAccount.AccountNo
+            });
+
+            const newTransactionDB = await BlockchainDB.create({
+                BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
+                TransactionID: transID,
+                TransactionDate: new Date(),
+                TransactionAmount: amount,
+                TransactionStatus: 'Success',
+                TransactionType: 'Transfer',
+                TransactionDesc: description || 'Fund Transfer',
+                ReceiverID: receiverUser.UserID,
+                ReceiverAccountNo: receiverAccount.AccountNo,
+                SenderID: senderUserId,
+                SenderAccountNo: senderAccount.AccountNo
+            });
+
+            if (newTransactionDB) {
+                initBc();
+            }
+        }
 
         res.status(200).json({ success: true, message: 'Transfer successful' });
     } catch (error) {
