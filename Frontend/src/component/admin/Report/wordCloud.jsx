@@ -7,7 +7,7 @@ Chart.register(WordCloudChart, WordCloudController, WordElement);
 
 // List of common stop words
 const STOP_WORDS = new Set([
-  'the', 'and', 'is', 'in', 'of', 'to', 'a', 'with', 'for', 'on', 'as', 'by', 'an', 'that', 'at', 'it', 'are', 'from', 'or', 'which', 'this', 'be', 'has', 'was', 'were', 'but', 'not', 'can', 'will', 'its', 'they', 'we', 'you', 'he', 'she', 'they', 'i', 'my'
+  'the', 'and', 'is', 'in', 'of', 'to', 'a', 'with', 'for', 'on', 'as', 'got', 'by', 'an', 'that', 'at', 'it', 'are', 'from', 'or', 'which', 'this', 'be', 'has', 'was', 'were', 'but', 'not', 'can', 'will', 'its', 'they', 'we', 'you', 'he', 'she', 'they', 'i', 'my'
 ]);
 
 const fetchWordCloudData = async () => {

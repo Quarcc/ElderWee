@@ -983,6 +983,62 @@ app.get('/api/enquiriesCount', async (req, res) => {
     }
 });
 
+app.put('/api/enquiries/:enquiryID', async (req, res) => {
+    const { enquiryID } = req.params;
+    const { EnquiryStatus } = req.body; // Ensure EnquiryStatus is treated as an integer or string based on your setup
+
+    try {
+        const enquiry = await Enquiry.findOne({ where: { EnquiryID: enquiryID } });
+        if (enquiry) {
+            enquiry.EnquiryStatus = EnquiryStatus; // Ensure the status value is correctly assigned
+            await enquiry.save();
+            res.status(200).json({ message: 'Enquiry Status updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Enquiry not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/enquiries', async (req, res) => {
+    const userId = req.session.userId;
+    const { EnquiryType, EnquiryDetails, EnquiryDate } = req.body;
+
+    if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized: User not logged in' });
+    }
+
+    try {
+        console.log('Request Body:', req.body); // Log the incoming request payload
+
+        const user = await User.findOne({ where: { UserID: userId } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const account = await Account.findOne({ where: { UserID: userId }})
+        if (!account) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+
+        
+
+        const newEnquiry = await Enquiry.create({
+            EnquiryType,
+            EnquiryDetails,
+            EnquiryDate,
+            UserID: userId,
+            AccountNo: account.AccountNo
+        });
+
+        res.status(201).json(newEnquiry);
+    } catch (error) {
+        console.error('Error Creating Enquiry:', error); // Log any server-side errors
+        res.status(400).json({ error: 'Failed to create enquiry' });
+    }
+});
+
 async function generateUniqueAccountNumber() {
     let accountNo;
     let isUnique = false;
@@ -1775,10 +1831,10 @@ server.listen(4000, () => {
 app.listen(port, async () => {
     console.log(`App running on http://localhost:${port}`);
 
-    ngrok.connect(port).then((ngrokUrl) => {
-        console.log(`NGROK URL: ${ngrokUrl}`);
-        ngrokopenurl = ngrokUrl
-    }).catch(err => {
-        console.error('Error connecting to NGROK:', err);
-    })
+    // ngrok.connect(port).then((ngrokUrl) => {
+    //     console.log(`NGROK URL: ${ngrokUrl}`);
+    //     ngrokopenurl = ngrokUrl
+    // }).catch(err => {
+    //     console.error('Error connecting to NGROK:', err);
+    // })
 });

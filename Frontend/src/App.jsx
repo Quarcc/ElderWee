@@ -20,6 +20,7 @@ import Home from './component/user/landing-page/Home';
 import ResetPassword from './component/user/ResetPassword';
 import ForgotPassword from './component/user/ForgotPassword';
 import ProfilePage from './component/user/Profile';
+import ContactUs from './component/user/ContactUs';
 import TransactionTest from './component/user/transactionTest'
 import LandingPage from './component/user/landing-page/LandingPage';
 import TopUp from './component/user/TopUp';
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/forgot" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/contactus" element={<ContactUs />} />
                 <Route path='/transactionTest' element={<TransactionTest />} />
                 <Route path='/landing' element={<LandingPage />} />
                 <Route path='/topup' element={<TopUp />} />

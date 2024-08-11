@@ -66,3 +66,21 @@ body {
         max-width: 100%;
     }
 }
+.contactus-page{
+    height: 100vh;
+    overflow: hidden;
+}
+
+.contactus-navbar{
+    padding-bottom: 50px;
+}
+
+.contactus-box{
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding-top: 80px;
+    min-height: 500px;
+    margin-left: 80px;
+    margin-right: 80px;
+    background-color: white;
+}
