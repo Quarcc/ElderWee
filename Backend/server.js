@@ -1615,6 +1615,8 @@ app.post('/transfer', async (req, res) => {
         }
         else {
             // Update balances
+            senderAccount.BalanceDisplay -= amount;
+            receiverAccount.BalanceDisplay += amount;
             senderAccount.Balance -= amount;
             receiverAccount.Balance += amount;
 
