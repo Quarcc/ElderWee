@@ -219,6 +219,8 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+let ngrokopenurl
+
 // === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE === ALL OFFICIAL CODES HERE ===
 
 app.get("/api/activeAccounts", async (req, res) => {
@@ -548,7 +550,7 @@ app.get('/api/emailOpened', async (req, res) => {
 
 app.post('/api/massEmail', upload.single('EmailAttachment'), async (req, res) => {
     const { targetEmail, EmailSubject, EmailBody } = req.body;
-    const EmailDate = '2024-08-10 00:00:00';
+    const EmailDate = new Date();
     const EmailOpened = 0;
     const EmailAttachment = req.file ? req.file.filename : null; // Get the uploaded file name
 
@@ -557,61 +559,23 @@ app.post('/api/massEmail', upload.single('EmailAttachment'), async (req, res) =>
 
     const emailData = await User.findAll({
         attributes: ['Email']
-    })
+    });
 
     const emailDataJson = JSON.stringify(emailData.map(email => ({ Email: email.Email })));
     const aiResponse = await filterEmails(emailDataJson, targetEmail);
 
+    if (aiResponse.length === 0) {
+        return res.status(400).json({ message: "No emails found to send." });
+    }
+
     const EmailSent = aiResponse.length;
 
-    if (EmailAttachment === null) {
-        aiResponse.forEach(emailaddresses => {
-            const mailContent = {
-                from: '"ElderWee" <contacteventnow@gmail.com',
-                to: emailaddresses.Email,
-                subject: 'REQ: Password Reset',
-                html: `
-                    <html>
-                        <head>
-                            <style>
-                                body { font-family: Arial, sans-serif; }
-                                h1 { color: #333; }
-                                p { color: #666; }
-                                .highlight { color: #007BFF; }
-                            </style>
-                        </head>
-                        <img src="cid:logo" alt="ElderWee Logo" style="max-width: 100px;"/>
-                        <body>
-                            <h1>Reset Password Link</h1>
-                            <p>You have requested a password reset. Please click the link below to reset your password.</p>
-                            <p>Reset password here: </a></p>
-                            <p>This link will expire in 1 hour.</p>
-                            <p>If you did not request a password reset, please ignore this email.</p>
-                            <p>Best regards,<br>Your EventNow Team</p>
-                        </body>
-                        <img src="https://d9f9-49-245-43-147.ngrok-free.app/api/imagebugger/track/${EmailID}" alt="" style="display:none;"/>
-                    </html>
-                `,
-                attachments: [{
-                    filename: 'logo-email.png',
-                    path: './uploads/logo-email.png',
-                    cid: 'logo'
-                }]
-            }
+    try {
+        for (const emailaddresses of aiResponse) {
+            console.log('Sending to:', emailaddresses.Email);
 
-            transporter.sendMail(mailContent, function (err, val) {
-                if (err) {
-                    console.log(err)
-                }
-                else {
-                    console.log(val.response, 'sending...')
-                }
-            })
-        })
-    } else {
-        aiResponse.forEach(emailaddresses => {
             const mailContent = {
-                from: '"ElderWee" <contacteventnow@gmail.com',
+                from: '"ElderWee" <contacteventnow@gmail.com>',
                 to: emailaddresses.Email,
                 subject: EmailSubject,
                 html: `
@@ -624,46 +588,44 @@ app.post('/api/massEmail', upload.single('EmailAttachment'), async (req, res) =>
                                 .highlight { color: #007BFF; }
                             </style>
                         </head>
-                        <img src="cid:logo" alt="ElderWee Logo" style="max-width: 100px;"/>
                         <body>
+                            <img src="${ngrokopenurl}/api/imagebugger/track/${EmailID}" alt="" style="display:block; max-width: 150px;"/>
                             <h1>${EmailSubject}</h1>
                             <p>${EmailBody}</p>
                             <p>Best regards,<br>Your ElderWee Team</p>
                         </body>
-                        <img src="https://d9f9-49-245-43-147.ngrok-free.app/api/imagebugger/track/${EmailID}" alt="" style="display:none;"/>
                     </html>
                 `,
-                attachments: [
-                    {
-                        filename: 'logo-email.png',
-                        path: './uploads/logo-email.png',
-                        cid: 'logo'
-                    },
-                    {
-                        filename: `${EmailSubject}.` + EmailAttachment.split('.').pop(),
-                        path: './uploads/' + EmailAttachment,
-                    }
-                ]
+                attachments: []
+            };
+
+            if (EmailAttachment !== null) {
+                const attachmentPath = './uploads/' + EmailAttachment;
+                console.log('Attachment:', attachmentPath);
+
+                if (fs.existsSync(attachmentPath)) {
+                    mailContent.attachments.push({
+                        filename: `${EmailSubject}.${EmailAttachment.split('.').pop()}`,
+                        path: attachmentPath,
+                    });
+                } else {
+                    console.error('Attachment file does not exist:', attachmentPath);
+                    return res.status(400).json({ error: 'Attachment file not found.' });
+                }
             }
 
-            transporter.sendMail(mailContent, function (err, val) {
-                if (err) {
-                    console.log(err)
-                }
-                else {
-                    console.log(val.response, 'sending...')
-                }
-            })
-        })
-    }
+            await transporter.sendMail(mailContent); // Use await here
+            console.log('Email sent to:', emailaddresses.Email);
+        }
 
-    try {
         const emails = await Email.create({ EmailDate, EmailSubject, EmailBody, EmailAttachment, EmailSent, EmailOpened });
         res.status(200).send(emails);
+
     } catch (err) {
-        res.status(500).json(err);
+        console.error('Error while sending emails:', err);
+        res.status(500).json({ error: 'Failed to send emails.' });
     }
-})
+});
 
 app.get('/api/imagebugger/track/:id', async (req, res) => {
     const { id } = req.params;
@@ -672,7 +634,8 @@ app.get('/api/imagebugger/track/:id', async (req, res) => {
         const emails = await Email.findOne({ where: { EmailID: id } });
         emails.EmailOpened += 1;
         await emails.save();
-        res.send('');
+        const filePath = "C:/ElderWee/Backend/uploads/logo-email.png";
+        res.sendFile(filePath);
     } catch (err) {
         res.status(500).json(err);
     }
@@ -1811,4 +1774,11 @@ server.listen(4000, () => {
 // Last line of code
 app.listen(port, async () => {
     console.log(`App running on http://localhost:${port}`);
+
+    ngrok.connect(port).then((ngrokUrl) => {
+        console.log(`NGROK URL: ${ngrokUrl}`);
+        ngrokopenurl = ngrokUrl
+    }).catch(err => {
+        console.error('Error connecting to NGROK:', err);
+    })
 });

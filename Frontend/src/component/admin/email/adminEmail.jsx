@@ -64,7 +64,6 @@ const AdminEmail = () => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
-            window.location.reload();
             setError('');
         } catch (err) {
             setError('Error Sending Email');
