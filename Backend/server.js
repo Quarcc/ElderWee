@@ -1003,41 +1003,42 @@ app.put('/api/enquiries/:enquiryID', async (req, res) => {
 
 app.post('/api/enquiries', async (req, res) => {
     const userId = req.session.userId;
-    const { EnquiryType, EnquiryDetails, EnquiryDate } = req.body;
+    const { EnquiryType, EnquiryDetails } = req.body;
 
     if (!userId) {
         return res.status(401).json({ error: 'Unauthorized: User not logged in' });
     }
 
     try {
-        console.log('Request Body:', req.body); // Log the incoming request payload
-
         const user = await User.findOne({ where: { UserID: userId } });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const account = await Account.findOne({ where: { UserID: userId }})
+        const account = await Account.findOne({ where: { UserID: userId } });
         if (!account) {
             return res.status(404).json({ error: 'Account not found' });
         }
 
-        
+        // Adjust to Singapore Time
+        const localDate = new Date();
+        const sgDate = localDate.getTime() - (localDate.getTimezoneOffset() * 60000); // Get UTC time
 
         const newEnquiry = await Enquiry.create({
             EnquiryType,
             EnquiryDetails,
-            EnquiryDate,
+            EnquiryDate: sgDate, // Store date in Singapore Time
             UserID: userId,
-            AccountNo: account.AccountNo
+            AccountNo: account.AccountNo,
         });
 
         res.status(201).json(newEnquiry);
     } catch (error) {
-        console.error('Error Creating Enquiry:', error); // Log any server-side errors
+        console.error('Error Creating Enquiry:', error.message);
         res.status(400).json({ error: 'Failed to create enquiry' });
     }
 });
+
 
 async function generateUniqueAccountNumber() {
     let accountNo;

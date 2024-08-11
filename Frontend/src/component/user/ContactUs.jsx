@@ -15,7 +15,6 @@ const ContactUs = () => {
 			const enquiryData = {
 					EnquiryType: enquiryType,
 					EnquiryDetails: enquiryDetails,
-					EnquiryDate: new Date().toISOString(),
 			};
 	
 			console.log('Enquiry Data:', enquiryData); // Log the request payload
