@@ -106,6 +106,10 @@ app.use(session({
 
 let Bc = new Blockchain();
 
+// Adjust to Singapore Time
+const localDate = new Date();
+const sgDate = localDate.getTime() - (localDate.getTimezoneOffset() * 60000);
+
 function getTodayDate() {
     // Create a date object for the current date and time
     const now = new Date();
@@ -1019,10 +1023,6 @@ app.post('/api/enquiries', async (req, res) => {
         if (!account) {
             return res.status(404).json({ error: 'Account not found' });
         }
-
-        // Adjust to Singapore Time
-        const localDate = new Date();
-        const sgDate = localDate.getTime() - (localDate.getTimezoneOffset() * 60000); // Get UTC time
 
         const newEnquiry = await Enquiry.create({
             EnquiryType,

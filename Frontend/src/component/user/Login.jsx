@@ -85,12 +85,15 @@ export default function Login() {
       // Create account log
       //let LoginCoords = JSON.stringify(coordinates);
       let coordsString = `${coordinates.latitude}, ${coordinates.longitude}`;
-      let currentDateTime = new Date();
+      let localDate = new Date()
+      let currentDateTime = new Date( localDate.getTime() - (localDate.getTimezoneOffset() * 60000)).toISOString();
+      
       const accountLogData = {
         AccountNo: accountData.AccountNo,
         LoginCoords: coordsString,
         LastIPLoginCountry: "Singapore",
         Flagged: accountData.Scammed ? true : false,
+        // LoginTime: currentDateTime,
         LoginTime: JSON.stringify(currentDateTime),
       };
 
