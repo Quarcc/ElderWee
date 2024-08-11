@@ -23,7 +23,7 @@ const { Op } = require('sequelize');
 const User = require('./models/User');
 const Account = require('./models/Account');
 const Transaction = require('./models/Transaction');
-const BlockchainDB = require('./models/Blockchain')
+const BlockchainDB = require('./models/Blockchain');
 const Email = require('./models/Email');
 const Location = require('./models/Geolocation');
 const AccountLog = require('./models/AccountLogs');
@@ -476,12 +476,94 @@ app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 
+    const receiver = await Account.findOne({ where: { UserID: receiverid } });
+    receiver.BalanceDisplay -= transactionAmt;
+
+    const sender = await Account.findOne({ where: { UserID: senderid } });
+    sender.BalanceDisplay += transactionAmt;
+
+    receiver.save();
+    sender.save();
+
+    const frozenDestroyer = await FrozenTransaction.findOne({
+        where: {
+            TransactionID: transactionID
+        }
+    })
+    frozenDestroyer.destroy();
+
     const newTransactionDB = await BlockchainDB.create({
         BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
         TransactionID: transactionID,
         TransactionDate: transactionDate,
         TransactionAmount: transactionAmt,
         TransactionStatus: 'Returned',
+        TransactionType: transactionType,
+        TransactionDesc: transactionDesc,
+        ReceiverID: receiverid,
+        ReceiverAccountNo: receiveraccountnum,
+        SenderID: senderid,
+        SenderAccountNo: senderaccountnum
+    });
+
+    if (newTransactionDB) {
+        initBc();
+    }
+})
+
+app.put('/api/transaction/release/id/:transactionID', async (req, res) => {
+    const { transactionID } = req.params;
+    let transactionDate;
+    let transactionAmt;
+    let transactionType;
+    let transactionDesc;
+    let receiverid;
+    let receiveraccountnum;
+    let senderid;
+    let senderaccountnum;
+    try {
+        const transaction = await Transaction.findOne({ where: { TransactionID: transactionID } });
+        if (transaction) {
+            transactionDate = transaction.TransactionDate;
+            transactionAmt = transaction.TransactionAmount;
+            transactionType = transaction.TransactionType;
+            transactionDesc = transaction.TransactionDesc;
+            receiverid = transaction.ReceiverID;
+            receiveraccountnum = transaction.ReceiverAccountNo;
+            senderid = transaction.SenderID;
+            senderaccountnum = transaction.SenderAccountNo;
+            transaction.TransactionStatus = 'Success';
+            await transaction.save();
+            res.status(200).json({ message: 'Transaction updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Transaction not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+
+    const receiver = await Account.findOne({ where: { UserID: receiverid } });
+    receiver.Balance += transactionAmt;
+
+    const sender = await Account.findOne({ where: { UserID: senderid } });
+    sender.Balance -= transactionAmt;
+
+    receiver.save();
+    sender.save();
+
+    const frozenDestroyer = await FrozenTransaction.findOne({
+        where: {
+            TransactionID: transactionID
+        }
+    })
+    frozenDestroyer.destroy();
+
+    const newTransactionDB = await BlockchainDB.create({
+        BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
+        TransactionID: transactionID,
+        TransactionDate: transactionDate,
+        TransactionAmount: transactionAmt,
+        TransactionStatus: 'Success',
         TransactionType: transactionType,
         TransactionDesc: transactionDesc,
         ReceiverID: receiverid,
@@ -503,6 +585,28 @@ app.get('/api/FrozenFunds', async (req, res) => {
         res.status(500).json(err);
     }
 });
+
+app.get('/api/FrozenTransactions', async (req, res) => {
+    try {
+        const frozenFunds = await FrozenTransaction.findAll();
+        res.json(frozenFunds);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
+app.get('/api/FrozenTransactions/:id', async (req, res) => {
+    try {
+        const frozenFunds = await FrozenTransaction.findAll({
+            where: {
+                transactionID : req.params.id
+            }
+        });
+        res.json(frozenFunds);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 app.get('/api/FrozenFunds/Today', async (req, res) => {
     const { startOfToday, endOfToday } = getTodayDate();
@@ -1573,6 +1677,17 @@ app.post('/transfer', async (req, res) => {
         const bannedCountryNames = bannedCountry.map(country => country.CountryName);
 
         if (accountNo1.Scammer == true || accountNo2.Scammer == true) {
+            const DMZNewTransaction = {
+                id: transID,
+                amount: amount,
+                status: 'Checking...'
+            }
+    
+            // Emit to all connected sockets
+            for (let socket of connectedSockets) {
+                socket.emit('newTransaction', DMZNewTransaction);
+            }
+
             await FrozenTransaction.create({
                 TransactionID: transID,
                 SenderAccountNo: accountNo2.AccountNo,
@@ -1619,6 +1734,18 @@ app.post('/transfer', async (req, res) => {
             }
         }
         else if (bannedCountryNames.includes(loginCountry1.LastIPLoginCountry) || bannedCountryNames.includes(loginCountry2.LastIPLoginCountry)) {
+
+            const DMZNewTransaction = {
+                id: transID,
+                amount: amount,
+                status: 'Checking...'
+            }
+    
+            // Emit to all connected sockets
+            for (let socket of connectedSockets) {
+                socket.emit('newTransaction', DMZNewTransaction);
+            }
+
             await FrozenTransaction.create({
                 TransactionID: transID,
                 SenderAccountNo: accountNo2.AccountNo,
@@ -1665,6 +1792,18 @@ app.post('/transfer', async (req, res) => {
             }
         }
         else {
+
+            const DMZNewTransaction = {
+                id: transID,
+                amount: amount,
+                status: 'Checking...'
+            }
+    
+            // Emit to all connected sockets
+            for (let socket of connectedSockets) {
+                socket.emit('newTransaction', DMZNewTransaction);
+            }
+
             // Update balances
             senderAccount.BalanceDisplay -= amount;
             receiverAccount.BalanceDisplay += amount;
@@ -2003,10 +2142,10 @@ server.listen(4000, () => {
 app.listen(port, async () => {
     console.log(`App running on http://localhost:${port}`);
 
-    // ngrok.connect(port).then((ngrokUrl) => {
-    //     console.log(`NGROK URL: ${ngrokUrl}`);
-    //     ngrokopenurl = ngrokUrl
-    // }).catch(err => {
-    //     console.error('Error connecting to NGROK:', err);
-    // })
+    ngrok.connect(port).then((ngrokUrl) => {
+        console.log(`NGROK URL: ${ngrokUrl}`);
+        ngrokopenurl = ngrokUrl
+    }).catch(err => {
+        console.error('Error connecting to NGROK:', err);
+    })
 });

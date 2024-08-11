@@ -34,6 +34,15 @@
     justify-content: flex-start; /* Ensures items start from the left */
 }
 
+.dmz-container-frozen-detailed{
+    margin: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-start;
+    justify-content: flex-start; /* Ensures items start from the left */
+}
+
 .dmz-box {
     border: 1px solid;
     padding: 10px;
@@ -48,6 +57,7 @@
     border-radius: 5px;
     background-color: #FAF9F6;
     min-width: 150px;
+    max-width: 160px;
 }
 
 .mainZoneBox {
@@ -67,6 +77,14 @@
     border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     border: 1px solid;
+}
+
+.detailed-frozen-transaction{
+    display: none;
+}
+
+.frozen-transaction-dmz{
+    display: block;
 }
 
 ::-webkit-scrollbar {
