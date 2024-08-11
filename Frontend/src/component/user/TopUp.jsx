@@ -178,12 +178,12 @@ export default function TopUp() {
                   )}
                 </div>
 
-                <MDBBtn block size="lg" className="mt-3" onClick={() => navigate('/home')}>
+                <button block size="lg" className="mt-3" onClick={() => navigate('/home')}>
                   Back <MDBIcon fas icon="long-arrow-alt-right" />
-                </MDBBtn>
-                <MDBBtn block size="lg" className="mt-3" onClick={handleProceedToPayment} disabled={isLoading}>
+                </button>
+                <button block size="lg" className="mt-3" onClick={handleProceedToPayment} disabled={isLoading}>
                   Proceed to payment <MDBIcon fas icon="long-arrow-alt-right" />
-                </MDBBtn>
+                </button>
               </MDBCardBody>
             </MDBCard>
           </MDBCol>

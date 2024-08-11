@@ -111,31 +111,26 @@ function AppAppBar() {
                 />
               </Link>
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                <MenuItem
-                  onClick={() => navigate('/home')}
-                  sx={{ py: '6px', px: '12px' }}
-                >
-                  <Typography variant="body2" color="text.primary">
-                    Home
-                  </Typography>
-                </MenuItem>
-
-                <MenuItem
-                  onClick={() => navigate('/profile')}
-                  sx={{ py: '6px', px: '12px' }}
-                >
-                  <Typography variant="body2" color="text.primary">
-                    Profile
-                  </Typography>
-                </MenuItem>
-                <MenuItem
-                  onClick={() => navigate('/pricing')}
-                  sx={{ py: '6px', px: '12px' }}
-                >
-                  <Typography variant="body2" color="text.primary">
-                    Pricing
-                  </Typography>
-                </MenuItem>
+                {loggedIn && (
+                  <>
+                    <MenuItem
+                      onClick={() => navigate('/home')}
+                      sx={{ py: '6px', px: '12px' }}
+                    >
+                      <Typography variant="body2" color="text.primary">
+                        Home
+                      </Typography>
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => navigate('/profile')}
+                      sx={{ py: '6px', px: '12px' }}
+                    >
+                      <Typography variant="body2" color="text.primary">
+                        Profile
+                      </Typography>
+                    </MenuItem>
+                  </>
+                )}
                 <MenuItem
                   onClick={() => navigate('/faq')}
                   sx={{ py: '6px', px: '12px' }}
@@ -153,7 +148,7 @@ function AppAppBar() {
                     Log in
                   </Button>
                   <Button color="primary" variant="contained" size="small" onClick={() => navigate('/signup')}>
-                    Sign up
+                    SignUp
                   </Button>
                 </>
               ) : (
@@ -168,9 +163,13 @@ function AppAppBar() {
               </Button>
               <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
                 <Box sx={{ minWidth: '60dvw', p: 2, backgroundColor: 'background.paper', flexGrow: 1 }}>
-                  <MenuItem onClick={() => navigate('/home')}>Home</MenuItem>
-                  <MenuItem onClick={() => navigate('/profile')}>Profile</MenuItem>
-                  <MenuItem onClick={() => navigate('/pricing')}>Pricing</MenuItem>
+                  {loggedIn && (
+                    <>
+                      <MenuItem onClick={() => navigate('/home')}>Home</MenuItem>
+                      <MenuItem onClick={() => navigate('/profile')}>Profile</MenuItem>
+                      <Divider />
+                    </>
+                  )}
                   <MenuItem onClick={() => navigate('/faq')}>FAQ</MenuItem>
                   <Divider />
                   {!loggedIn ? (

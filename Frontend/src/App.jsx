@@ -11,6 +11,7 @@ import AdminDMZ from './component/admin/DMZ/DMZ';
 import AdminReport from './component/admin/Report/Report'
 import GeoSummary from './component/admin/location/geoLocation';
 import PlaceHolder from './Placeholder';
+
 import Login from './component/user/Login';
 import SignUp from './component/user/Signup';
 import UserLocation from './component/admin/location/userLocation';

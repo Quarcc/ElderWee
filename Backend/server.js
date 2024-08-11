@@ -754,6 +754,10 @@ app.get('/api/enquiriesCount', async (req, res) => {
     }
 });
 
+
+
+// SARAH'S CODES ONWARDS //SARAH'S CODES ONWARDS //SARAH'S CODES ONWARDS//SARAH'S CODES ONWARDS//SARAH'S CODES ONWARDS//SARAH'S CODES ONWARDS//SARAH'S CODES ONWARDS//SARAH'S CODES ONWARDS
+
 const generateRandomAccountNo = () => {
     return Math.floor(1000000000 + Math.random() * 9000000000).toString();
   };
@@ -850,8 +854,8 @@ app.post('/reset-password', async (req, res) => {
             return res.status(400).json({ error: 'Invalid or expired token' });
         }
 
-        // const hashedPassword = await bcrypt.hash(password, 10); // Comment this line out for now
-        user.Password = password; // Save the plain text password for now
+      
+        user.Password = password; 
         user.resetToken = null;
         user.resetTokenExpiration = null;
         await user.save();

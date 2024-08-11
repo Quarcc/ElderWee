@@ -20,7 +20,7 @@ function LandingPage() {
               Designed with seniors in mind, ElderWee offers a simple, secure, and user-friendly experience.
               Embrace the convenience and reliability of ElderWee Banking App – banking made easy, just for you!
             </p>
-            <div className="input-group">
+            <div className="input-group1">
               <input
                 type="email"
                 id="email"
@@ -28,7 +28,7 @@ function LandingPage() {
                 placeholder="Your email address"
                 autoComplete="off"
               />
-              <button className="start-button" onClick={() => navigate('/signup')}>
+              <button className="start-button1" onClick={() => navigate('/signup')}>
                 Start now
               </button>
             </div>
