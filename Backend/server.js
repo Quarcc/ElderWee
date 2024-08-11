@@ -7,6 +7,7 @@ const cors = require('cors');
 const { Sequelize, DataTypes, where } = require('sequelize');
 const http = require('http');
 const { Server } = require('socket.io');
+const aws = require("aws-sdk");
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
@@ -48,6 +49,20 @@ const userCards = {}
 
 const app = express();
 
+const s3 = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+aws.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+const rekognition = new aws.Rekognition();
+
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -79,7 +94,7 @@ app.use(
     cors({
         origin: ["http://localhost:3000", "https://mail.google.com"],  //specify domains that can call your API
         methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        allowedHeaders: ["Content-Type", "Authorization, email, "],
         credentials: true
     })
 );
@@ -1132,7 +1147,23 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.post('/authenticate-face-login',async(req,res)=>{
+    const {email} = req.body;
+    try{
+        const user = await User.findOne({where: {Email:email}});
+        
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
 
+        req.session.userId = user.UserID;
+        const { Password, ...userWithoutPassword } = user.toJSON();
+        res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
+    }catch(error){
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+})
 
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
@@ -1824,6 +1855,146 @@ app.get('/transaction-summary', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch data' });
     }
   });
+
+app.post("/user/upload-photo", async (req, res) => {
+  const email = req.headers["email"];
+  const contentType = req.headers["content-type"];
+
+  console.log(email, contentType);
+
+  let rawBody = Buffer.from([]);
+
+  req.on("data", (chunk) => {
+    rawBody = Buffer.concat([rawBody, chunk]);
+  });
+
+  if (!email) {
+    return res.status(400).json({ message: "Missing email" });
+  } else if (!contentType) {
+    return res.status(400).json({ message: "Missing content-type" });
+  }
+
+  req.on("end", async () => {
+    console.log("AWSSSSSSSSSSSSSSSSSSSSSSS",process.env.AWS_S3_BUCKET_NAME);
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: `${email}.jpeg`,
+      Body: rawBody, // Use the collected raw body data
+      ContentType: contentType,
+    };
+
+    try {
+      const data = await s3.upload(params).promise();
+      res.status(200).json({ message: "Image saved successfully" });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+});
+
+const listS3Objects = async (bucketName) => {
+  const params = {
+    Bucket: bucketName,
+  };
+  try {
+    const data = await s3.listObjectsV2(params).promise();
+    return data.Contents.map((item) => item.Key);
+  } catch (err) {
+    console.error("Error listing S3 objects:", err);
+    throw err;
+  }
+};
+
+const compareImageWithS3 = async (
+  sourceImageBucket,
+  sourceImageKey,
+  targetImageBucket,
+  targetImageKey
+) => {
+  console.log(
+    `COMPARING ${sourceImageKey} in ${sourceImageBucket} to ${targetImageKey} in ${targetImageBucket}`
+  );
+  const params = {
+    SourceImage: {
+      S3Object: {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Name: sourceImageKey,
+      },
+    },
+    TargetImage: {
+      S3Object: {
+        Bucket: process.env.AWS_S3_COMPARE_BUCKET_NAME,
+        Name: targetImageKey,
+      },
+    },
+    SimilarityThreshold: 90, // Adjust threshold as needed
+  };
+
+  try {
+    const data = await rekognition.compareFaces(params).promise();
+    return data.FaceMatches;
+  } catch (err) {
+    console.error("Error comparing images:", err);
+    return "No face detected";
+  }
+};
+
+
+app.post(
+  "/user/compare-faces",
+  async (req, res, next) => {
+    const contentType = req.headers["content-type"];
+
+    let rawBody = Buffer.from([]);
+    req.on("data", (chunk) => {
+      rawBody = Buffer.concat([rawBody, chunk]);
+    });
+
+    req.on("end", async () => {
+      let imageKey = await bcrypt.genSalt(10);
+      imageKey = imageKey.replace(/\//g, "@");
+      imageKey = imageKey.replace(".", "a");
+      req.imageKey = `${imageKey}.jpeg`;
+
+      const params = {
+        Bucket: process.env.AWS_S3_COMPARE_BUCKET_NAME,
+        Key: `${imageKey}.jpeg`,
+        Body: rawBody, // Use the collected raw body data
+        ContentType: contentType,
+      };
+
+      try {
+        const data = await s3.upload(params).promise();
+        next();
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
+    });
+  },
+  async (req, res) => {
+    console.log("NEXT");
+    let images = await listS3Objects(process.env.AWS_S3_BUCKET_NAME);
+    for (let i = 0; i < images.length; i++) {
+      let img = images[i];
+
+      let faceMatches = await compareImageWithS3(
+        process.env.AWS_S3_BUCKET_NAME,
+        img,
+        process.env.AWS_S3_COMPARE_BUCKET_NAME,
+        req.imageKey
+      );
+      if (faceMatches === "No face detected") {
+        return res.status(403).json({ message: faceMatches });
+      }
+      console.log(faceMatches);
+      if (faceMatches[0]?.Similarity >= 95) {
+        return res.status(200).json({ email: img });
+      }
+    }
+
+    return res.status(403).json({ message: "No matching faces." });
+  }
+);
 
 server.listen(4000, () => {
     console.log(`Server running on http://localhost:4000`);

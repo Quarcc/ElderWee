@@ -17,6 +17,11 @@ const defaultTheme = createTheme();
 export default function SignUp() {
   const navigate = useNavigate();
   const [errors, setErrors] = React.useState({});
+  const [capturedImage, setCapturedImage] = React.useState(null);
+  const [capturedImageFile, setCapturedImageFile] = React.useState(null);
+  const [webcam, setWebcam] = React.useState(false);
+  const videoRef = React.useRef();
+  const canvasRef = React.useRef();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -37,12 +42,59 @@ export default function SignUp() {
     }
 
     try {
+      if (capturedImageFile) {
+        const facialImageUpload = await fetch(
+          `http://localhost:8000/user/upload-photo`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "image/jpeg",
+              Email: data.get("email"),
+            },
+            body: capturedImageFile,
+          }
+        );
+        const facialUploadRes = await facialImageUpload.json();
+        console.log(facialUploadRes);
+      }
+
       const response = await axios.post('http://localhost:8000/signup', userData);
       console.log('User signed up successfully:', response.data);
       navigate('/Login', { state: { message: 'Your account has been signed up, please log in with the credentials.' } });
     } catch (error) {
       console.error('There was an error signing up:', error);
     }
+  };
+
+    const startVideo = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      videoRef.current.srcObject = stream;
+      setWebcam(true);
+    } catch (err) {
+      console.error("Error accessing webcam: ", err);
+      alert("No webcam detected.");
+    }
+  };
+
+  const handleCapture = async () => {
+    console.log("CAPTURE");
+    const context = canvasRef.current.getContext("2d");
+    context.drawImage(
+      videoRef.current,
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+    canvasRef.current.toBlob((blob) => {
+      setCapturedImageFile(blob);
+    }, "image/jpeg");
+
+    // const capturedImageURL = canvasRef.current.toDataURL("image/jpeg");
+    // setCapturedImage(capturedImageURL);
   };
 
   return (
@@ -164,6 +216,34 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
+                <div className="hover:cursor-pointer">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            className="w-64 h-auto rounded-lg border-2 border-gray-300"
+          />
+          <button onClick={startVideo}>Start Camera</button>
+          {webcam && (
+            <button
+              className="text-center hover:pointer"
+              onClick={handleCapture}
+            >
+              Capture
+            </button>
+          )}
+
+          <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+        </div>
+        {capturedImage && (
+          <div className="mt-4">
+            <img
+              src={capturedImage}
+              alt="Captured"
+              className="w-64 h-auto rounded-lg border-2 border-gray-300"
+            />
+          </div>
+        )}
       </Container>
     </ThemeProvider>
   );

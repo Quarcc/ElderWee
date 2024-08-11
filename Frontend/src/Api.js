@@ -87,7 +87,7 @@ export async function retrieveAccountDetailsWithEmail(email) {
     (error) => {
       // anything outside the status code 2xx range
       if (error.response) {
-        console.log("Error Response: " + error.repsonse);
+        console.log("Error Response: " + error.response);
       }
       // Request made with no response
       else if (error.request) {
