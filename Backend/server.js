@@ -696,7 +696,8 @@ app.get('/api/totalTransactionAmount', async (req, res) => {
 app.get('/api/transaction/weeklyTransaction', async (req, res) => {
     try {
         const endDate = new Date();
-        const startDate = new Date();
+        endDate.setHours(0, 0, 0, 0);
+        const startDate = new Date(endDate);
         startDate.setDate(endDate.getDate() - 13);
 
         const transactions = await Transaction.findAll({
@@ -718,7 +719,7 @@ app.get('/api/transaction/weeklyTransaction', async (req, res) => {
             return acc;
         }, {});
 
-        // Initialize arrays to hold the account counts for the last 14 days
+        // Initialize arrays to hold the transaction counts for the last 14 days
         const currentWeekData = Array(7).fill(0);
         const previousWeekData = Array(7).fill(0);
 
@@ -741,10 +742,9 @@ app.get('/api/transaction/weeklyTransaction', async (req, res) => {
 
         res.json({ labels, currentWeekData, previousWeekData });
     } catch (err) {
-        res.status(500).json(err);
+        res.status(500).json({ error: err.message });
     }
 });
-
 app.get('/api/users', async (req, res) => {
     try {
         const users = await User.findAll();

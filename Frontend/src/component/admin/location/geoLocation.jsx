@@ -309,7 +309,7 @@ function geoSummary() {
     let accountNo = data[0].innerHTML;
     let logs = getAccountLogsWithAccountNo(accountNo, AllLogs.current);
     navigate("/UserLocation", {
-      state: { AccountLogs: logs },
+      state: { AccountLogs: logs, AccountNo: accountNo },
     });
   };
 
@@ -382,7 +382,7 @@ function geoSummary() {
                 flaggedAccounts={accounts.flagged.length}
               />
             </div>
-            <div className="country-ban-btn">
+            <div className="country-ban">
               <Autocomplete
                 className="mt-4"
                 options={countries}

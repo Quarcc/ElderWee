@@ -8,11 +8,12 @@ import '../css/geolocation.css';
 
 function UserLocation(){
   const mapContainerStyle = {
-    width: "40vw",
-    height: "40vh",
+    width: "50vw",
+    height: "60vh",
   };
 
   const location = useLocation()
+  const { AccountLogs, AccountNo } = location.state || {};
 
   const [logs, setLogs] = useState(location.state.AccountLogs);
 
@@ -90,12 +91,13 @@ function UserLocation(){
         <AdminNavBar/>
       </div>
       <div className='location-bg'>
-        <div className='row mb-5 p-3'>
-            {/* Account Number */}
+        <div className='row mb-1 mt-5 p-3'>
+          	<h2 className='userlocation-accountNo-header'>Account Number: {AccountNo}</h2>
         </div>
         <div className='row mb-5 p-3 d-flex'>
-          <div className='col'>
-            <table></table>
+          <div></div>
+          <div className='col geo-flagacc-table'>
+            <AccountLogTable logs={logs}/>
           </div>
           <div className='col'>
             {center && (
@@ -114,9 +116,6 @@ function UserLocation(){
                 />
               <Marker position={center} title="Current Location" />
             </GoogleMap>)}
-          </div>
-          <div>
-            <AccountLogTable logs={logs}/>
           </div>
         </div>
       </div>

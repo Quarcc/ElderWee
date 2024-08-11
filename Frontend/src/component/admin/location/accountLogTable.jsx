@@ -1,29 +1,19 @@
-import React, { useState, useEffect, useMemo } from "react";
-import AdminNavBar from "../navbar/adminNavbar";
-import "../css/adminNavbar.css";
-import {
-  GoogleMap,
-  useLoadScript,
-  Circle,
-  Marker,
-} from "@react-google-maps/api";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+import TablePagination from "@mui/material/TablePagination";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import { visuallyHidden } from "@mui/utils";
 
-function AccountLogTable({logs}) {
+function AccountLogTable({ logs }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filter, setFilter] = useState("");
@@ -38,7 +28,6 @@ function AccountLogTable({logs}) {
           value.toString().toLowerCase().includes(filter.toLowerCase())
         )
       )
-      
     );
   }, [filter, logs]);
 
@@ -93,18 +82,68 @@ function AccountLogTable({logs}) {
   }, [filteredAccounts, order, orderBy, page, rowsPerPage]);
 
   return (
-    <div>
-      <div>Login Time</div>
-      <div>Last IP Login</div>
-    <div>
-      {logs.map((log,idx)=>{
-          return (<div key = {idx}>
-              <div>{log.LoginTime}</div>
-              <div>{log.LastIPLoginCountry}</div>
-          </div>)
-      })}
-    </div>
-    </div>
+    <Box>
+      <Toolbar>
+        <Typography variant="h6" component="div">
+          Account Logs
+        </Typography>
+        <TextField
+          label="Search"
+          variant="outlined"
+          size="small"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{ marginLeft: 'auto' }}
+        />
+      </Toolbar>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  sortDirection={orderBy === column.id ? order : false}
+                >
+                  <TableSortLabel
+                    active={orderBy === column.id}
+                    direction={orderBy === column.id ? order : "asc"}
+                    onClick={handleRequestSort(column.id)}
+                  >
+                    {column.label}
+                    {orderBy === column.id ? (
+                      <span>
+                        {order === "desc"}
+                      </span>
+                    ) : null}
+                  </TableSortLabel>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {visibleAccounts.map((row, index) => (
+              <TableRow key={index}>
+                {columns.map((column) => (
+                  <TableCell key={column.id}>
+                    {row[column.id]}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 50]}
+        component="div"
+        count={filteredAccounts.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </Box>
   );
 }
 

@@ -122,3 +122,12 @@
   border-radius: 10px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
+
+.country-ban .css-ka7ti6-MuiAutocomplete-root{
+  margin-top: 0 !important;
+}
+
+.userlocation-accountNo-header{
+  font-weight: 600;
+  text-align: center;
+}
