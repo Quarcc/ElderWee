@@ -1,16 +1,16 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import Validation from './SignUpValidation';
+import * as React from "react";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
+import Validation from "./SignUpValidation";
 
 const defaultTheme = createTheme();
 
@@ -25,10 +25,13 @@ export default function SignUp() {
 
   const checkEmailExists = async (email) => {
     try {
-      const response = await axios.post('http://localhost:8000/check-unique-email', { email });
+      const response = await axios.post(
+        "http://localhost:8000/check-unique-email",
+        { email }
+      );
       return response.data.exists; // assuming the server returns { exists: true/false }
     } catch (error) {
-      console.error('Error checking email:', error);
+      console.error("Error checking email:", error);
       return false;
     }
   };
@@ -37,13 +40,13 @@ export default function SignUp() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const userData = {
-      fullName: data.get('fullName'),
-      dob: data.get('dob'),
-      email: data.get('email'),
-      phoneNo: data.get('phoneNo'),
-      password: data.get('password'),
+      fullName: data.get("fullName"),
+      dob: data.get("dob"),
+      email: data.get("email"),
+      phoneNo: data.get("phoneNo"),
+      password: data.get("password"),
     };
-    const password2 = data.get('password2');
+    const password2 = data.get("password2");
 
     const validationErrors = Validation({ ...userData, password2 });
     if (Object.keys(validationErrors).length > 0) {
@@ -53,7 +56,10 @@ export default function SignUp() {
 
     const emailExists = await checkEmailExists(userData.email);
     if (emailExists) {
-      setErrors(prevErrors => ({ ...prevErrors, email: 'Email is already registered.' }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        email: "Email is already registered.",
+      }));
       return;
     }
 
@@ -74,15 +80,23 @@ export default function SignUp() {
         console.log(facialUploadRes);
       }
 
-      const response = await axios.post('http://localhost:8000/signup', userData);
-      console.log('User signed up successfully:', response.data);
-      navigate('/Login', { state: { message: 'Your account has been signed up, please log in with the credentials.' } });
+      const response = await axios.post(
+        "http://localhost:8000/signup",
+        userData
+      );
+      console.log("User signed up successfully:", response.data);
+      navigate("/Login", {
+        state: {
+          message:
+            "Your account has been signed up, please log in with the credentials.",
+        },
+      });
     } catch (error) {
-      console.error('There was an error signing up:', error);
+      console.error("There was an error signing up:", error);
     }
   };
 
-    const startVideo = async () => {
+  const startVideo = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -120,22 +134,27 @@ export default function SignUp() {
         <Box
           sx={{
             marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
           <RouterLink to="/home">
             <img
-              src='/elderwee-logo/svg/logo-no-background.svg'
+              src="/elderwee-logo/svg/logo-no-background.svg"
               alt="logo"
-              style={{ width: '80px', height: '40px' }}
+              style={{ width: "80px", height: "40px" }}
             />
           </RouterLink>
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit}
+            sx={{ mt: 3 }}
+          >
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -232,33 +251,87 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
-                <div className="hover:cursor-pointer">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            className="w-64 h-auto rounded-lg border-2 border-gray-300"
-          />
-          <button onClick={startVideo}>Start Camera</button>
-          {webcam && (
-            <button
-              className="text-center hover:pointer"
-              onClick={handleCapture}
-            >
-              Capture
-            </button>
-          )}
+        {/* FaceID Section */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mt: 4,
+            padding: 3,
+            borderRadius: 2,
+            backgroundColor: "background.paper",
+            boxShadow: 3,
+            width: "100%", // Ensure the box fits well within the container
+          }}
+        >
+          <Box
+            sx={{
+              position: "relative",
+              paddingBottom: "56.25%",
+              width: "100%",
+              marginBottom: "20px",
+            }}
+          >
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                borderRadius: "8px",
+                objectFit: "cover", // Maintain aspect ratio
+              }}
+              className="border-2 border-gray-300"
+            />
+          </Box>
 
+          <Button
+            onClick={startVideo}
+            variant="contained"
+            color="primary"
+            sx={{
+              mb: 2,
+              width: "100%",
+              backgroundColor: "#1976d2",
+              "&:hover": {
+                backgroundColor: "#1565c0",
+              },
+            }}
+          >
+            Add FaceID
+          </Button>
+          {webcam && (
+            <Button
+              onClick={handleCapture}
+              variant="contained"
+              color="secondary"
+              sx={{
+                width: "100%",
+                backgroundColor: "#00c853",
+                "&:hover": {
+                  backgroundColor: "#00b34a",
+                },
+              }}
+            >
+              Scan
+            </Button>
+          )}
           <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-        </div>
+        </Box>
+
         {capturedImage && (
-          <div className="mt-4">
+          <Box sx={{ mt: 4 }}>
             <img
               src={capturedImage}
               alt="Captured"
               className="w-64 h-auto rounded-lg border-2 border-gray-300"
             />
-          </div>
+          </Box>
         )}
       </Container>
     </ThemeProvider>
