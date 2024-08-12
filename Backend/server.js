@@ -2156,6 +2156,7 @@ app.post(
 server.listen(4000, () => {
     console.log(`Server running on http://localhost:4000`);
 });
+
 // Last line of code
 app.listen(port, async () => {
     console.log(`App running on http://localhost:${port}`);

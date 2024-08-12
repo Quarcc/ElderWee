@@ -41,7 +41,7 @@ export default function Home() {
                   <h4 className="card-text">Balance</h4>
                   <span className='span'>SGD</span>
                   <p className="balance">
-                    ${user.accounts && user.accounts.length > 0 ? user.accounts[0].Balance.toFixed(2) : 'N/A'}
+                    ${user.accounts && user.accounts.length > 0 ? user.accounts[0].BalanceDisplay.toFixed(2) : 'N/A'}
                   </p>
                   <div className="row">
                     <div className="col">
