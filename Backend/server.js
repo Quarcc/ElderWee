@@ -7,6 +7,7 @@ const cors = require('cors');
 const { Sequelize, DataTypes, where } = require('sequelize');
 const http = require('http');
 const { Server } = require('socket.io');
+const aws = require("aws-sdk");
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
@@ -22,7 +23,7 @@ const { Op } = require('sequelize');
 const User = require('./models/User');
 const Account = require('./models/Account');
 const Transaction = require('./models/Transaction');
-const BlockchainDB = require('./models/Blockchain')
+const BlockchainDB = require('./models/Blockchain');
 const Email = require('./models/Email');
 const Location = require('./models/Geolocation');
 const AccountLog = require('./models/AccountLogs');
@@ -47,6 +48,20 @@ const userCards = {}
 
 
 const app = express();
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+aws.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+const rekognition = new aws.Rekognition();
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -79,7 +94,7 @@ app.use(
     cors({
         origin: ["http://localhost:3000", "https://mail.google.com"],  //specify domains that can call your API
         methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        allowedHeaders: ["Content-Type", "Authorization, email, "],
         credentials: true
     })
 );
@@ -461,12 +476,94 @@ app.put('/api/transaction/rollback/id/:transactionID', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 
+    const receiver = await Account.findOne({ where: { UserID: receiverid } });
+    receiver.BalanceDisplay -= transactionAmt;
+
+    const sender = await Account.findOne({ where: { UserID: senderid } });
+    sender.BalanceDisplay += transactionAmt;
+
+    receiver.save();
+    sender.save();
+
+    const frozenDestroyer = await FrozenTransaction.findOne({
+        where: {
+            TransactionID: transactionID
+        }
+    })
+    frozenDestroyer.destroy();
+
     const newTransactionDB = await BlockchainDB.create({
         BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
         TransactionID: transactionID,
         TransactionDate: transactionDate,
         TransactionAmount: transactionAmt,
         TransactionStatus: 'Returned',
+        TransactionType: transactionType,
+        TransactionDesc: transactionDesc,
+        ReceiverID: receiverid,
+        ReceiverAccountNo: receiveraccountnum,
+        SenderID: senderid,
+        SenderAccountNo: senderaccountnum
+    });
+
+    if (newTransactionDB) {
+        initBc();
+    }
+})
+
+app.put('/api/transaction/release/id/:transactionID', async (req, res) => {
+    const { transactionID } = req.params;
+    let transactionDate;
+    let transactionAmt;
+    let transactionType;
+    let transactionDesc;
+    let receiverid;
+    let receiveraccountnum;
+    let senderid;
+    let senderaccountnum;
+    try {
+        const transaction = await Transaction.findOne({ where: { TransactionID: transactionID } });
+        if (transaction) {
+            transactionDate = transaction.TransactionDate;
+            transactionAmt = transaction.TransactionAmount;
+            transactionType = transaction.TransactionType;
+            transactionDesc = transaction.TransactionDesc;
+            receiverid = transaction.ReceiverID;
+            receiveraccountnum = transaction.ReceiverAccountNo;
+            senderid = transaction.SenderID;
+            senderaccountnum = transaction.SenderAccountNo;
+            transaction.TransactionStatus = 'Success';
+            await transaction.save();
+            res.status(200).json({ message: 'Transaction updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Transaction not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+
+    const receiver = await Account.findOne({ where: { UserID: receiverid } });
+    receiver.Balance += transactionAmt;
+
+    const sender = await Account.findOne({ where: { UserID: senderid } });
+    sender.Balance -= transactionAmt;
+
+    receiver.save();
+    sender.save();
+
+    const frozenDestroyer = await FrozenTransaction.findOne({
+        where: {
+            TransactionID: transactionID
+        }
+    })
+    frozenDestroyer.destroy();
+
+    const newTransactionDB = await BlockchainDB.create({
+        BlockNo: (Math.random() + ' ').substring(2, 10) + (Math.random() + ' ').substring(2, 10),
+        TransactionID: transactionID,
+        TransactionDate: transactionDate,
+        TransactionAmount: transactionAmt,
+        TransactionStatus: 'Success',
         TransactionType: transactionType,
         TransactionDesc: transactionDesc,
         ReceiverID: receiverid,
@@ -488,6 +585,28 @@ app.get('/api/FrozenFunds', async (req, res) => {
         res.status(500).json(err);
     }
 });
+
+app.get('/api/FrozenTransactions', async (req, res) => {
+    try {
+        const frozenFunds = await FrozenTransaction.findAll();
+        res.json(frozenFunds);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
+app.get('/api/FrozenTransactions/:id', async (req, res) => {
+    try {
+        const frozenFunds = await FrozenTransaction.findAll({
+            where: {
+                transactionID : req.params.id
+            }
+        });
+        res.json(frozenFunds);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 app.get('/api/FrozenFunds/Today', async (req, res) => {
     const { startOfToday, endOfToday } = getTodayDate();
@@ -1132,7 +1251,23 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.post('/authenticate-face-login',async(req,res)=>{
+    const {email} = req.body;
+    try{
+        const user = await User.findOne({where: {Email:email}});
+        
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
 
+        req.session.userId = user.UserID;
+        const { Password, ...userWithoutPassword } = user.toJSON();
+        res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
+    }catch(error){
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+})
 
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
@@ -1559,6 +1694,17 @@ app.post('/transfer', async (req, res) => {
         const bannedCountryNames = bannedCountry.map(country => country.CountryName);
 
         if (accountNo1.Scammer == true || accountNo2.Scammer == true) {
+            const DMZNewTransaction = {
+                id: transID,
+                amount: amount,
+                status: 'Checking...'
+            }
+    
+            // Emit to all connected sockets
+            for (let socket of connectedSockets) {
+                socket.emit('newTransaction', DMZNewTransaction);
+            }
+
             await FrozenTransaction.create({
                 TransactionID: transID,
                 SenderAccountNo: accountNo2.AccountNo,
@@ -1605,6 +1751,18 @@ app.post('/transfer', async (req, res) => {
             }
         }
         else if (bannedCountryNames.includes(loginCountry1.LastIPLoginCountry) || bannedCountryNames.includes(loginCountry2.LastIPLoginCountry)) {
+
+            const DMZNewTransaction = {
+                id: transID,
+                amount: amount,
+                status: 'Checking...'
+            }
+    
+            // Emit to all connected sockets
+            for (let socket of connectedSockets) {
+                socket.emit('newTransaction', DMZNewTransaction);
+            }
+
             await FrozenTransaction.create({
                 TransactionID: transID,
                 SenderAccountNo: accountNo2.AccountNo,
@@ -1651,6 +1809,18 @@ app.post('/transfer', async (req, res) => {
             }
         }
         else {
+
+            const DMZNewTransaction = {
+                id: transID,
+                amount: amount,
+                status: 'Checking...'
+            }
+    
+            // Emit to all connected sockets
+            for (let socket of connectedSockets) {
+                socket.emit('newTransaction', DMZNewTransaction);
+            }
+
             // Update balances
             senderAccount.BalanceDisplay -= amount;
             receiverAccount.BalanceDisplay += amount;
@@ -1842,6 +2012,146 @@ app.get('/transaction-summary', async (req, res) => {
     }
   });
 
+app.post("/user/upload-photo", async (req, res) => {
+  const email = req.headers["email"];
+  const contentType = req.headers["content-type"];
+
+  console.log(email, contentType);
+
+  let rawBody = Buffer.from([]);
+
+  req.on("data", (chunk) => {
+    rawBody = Buffer.concat([rawBody, chunk]);
+  });
+
+  if (!email) {
+    return res.status(400).json({ message: "Missing email" });
+  } else if (!contentType) {
+    return res.status(400).json({ message: "Missing content-type" });
+  }
+
+  req.on("end", async () => {
+    console.log("AWSSSSSSSSSSSSSSSSSSSSSSS",process.env.AWS_S3_BUCKET_NAME);
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: `${email}.jpeg`,
+      Body: rawBody, // Use the collected raw body data
+      ContentType: contentType,
+    };
+
+    try {
+      const data = await s3.upload(params).promise();
+      res.status(200).json({ message: "Image saved successfully" });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+});
+
+const listS3Objects = async (bucketName) => {
+  const params = {
+    Bucket: bucketName,
+  };
+  try {
+    const data = await s3.listObjectsV2(params).promise();
+    return data.Contents.map((item) => item.Key);
+  } catch (err) {
+    console.error("Error listing S3 objects:", err);
+    throw err;
+  }
+};
+
+const compareImageWithS3 = async (
+  sourceImageBucket,
+  sourceImageKey,
+  targetImageBucket,
+  targetImageKey
+) => {
+  console.log(
+    `COMPARING ${sourceImageKey} in ${sourceImageBucket} to ${targetImageKey} in ${targetImageBucket}`
+  );
+  const params = {
+    SourceImage: {
+      S3Object: {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Name: sourceImageKey,
+      },
+    },
+    TargetImage: {
+      S3Object: {
+        Bucket: process.env.AWS_S3_COMPARE_BUCKET_NAME,
+        Name: targetImageKey,
+      },
+    },
+    SimilarityThreshold: 90, // Adjust threshold as needed
+  };
+
+  try {
+    const data = await rekognition.compareFaces(params).promise();
+    return data.FaceMatches;
+  } catch (err) {
+    console.error("Error comparing images:", err);
+    return "No face detected";
+  }
+};
+
+
+app.post(
+  "/user/compare-faces",
+  async (req, res, next) => {
+    const contentType = req.headers["content-type"];
+
+    let rawBody = Buffer.from([]);
+    req.on("data", (chunk) => {
+      rawBody = Buffer.concat([rawBody, chunk]);
+    });
+
+    req.on("end", async () => {
+      let imageKey = await bcrypt.genSalt(10);
+      imageKey = imageKey.replace(/\//g, "@");
+      imageKey = imageKey.replace(".", "a");
+      req.imageKey = `${imageKey}.jpeg`;
+
+      const params = {
+        Bucket: process.env.AWS_S3_COMPARE_BUCKET_NAME,
+        Key: `${imageKey}.jpeg`,
+        Body: rawBody, // Use the collected raw body data
+        ContentType: contentType,
+      };
+
+      try {
+        const data = await s3.upload(params).promise();
+        next();
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
+    });
+  },
+  async (req, res) => {
+    console.log("NEXT");
+    let images = await listS3Objects(process.env.AWS_S3_BUCKET_NAME);
+    for (let i = 0; i < images.length; i++) {
+      let img = images[i];
+
+      let faceMatches = await compareImageWithS3(
+        process.env.AWS_S3_BUCKET_NAME,
+        img,
+        process.env.AWS_S3_COMPARE_BUCKET_NAME,
+        req.imageKey
+      );
+      if (faceMatches === "No face detected") {
+        return res.status(403).json({ message: faceMatches });
+      }
+      console.log(faceMatches);
+      if (faceMatches[0]?.Similarity >= 95) {
+        return res.status(200).json({ email: img });
+      }
+    }
+
+    return res.status(403).json({ message: "No matching faces." });
+  }
+);
+
 server.listen(4000, () => {
     console.log(`Server running on http://localhost:4000`);
 });
@@ -1849,10 +2159,10 @@ server.listen(4000, () => {
 app.listen(port, async () => {
     console.log(`App running on http://localhost:${port}`);
 
-    // ngrok.connect(port).then((ngrokUrl) => {
-    //     console.log(`NGROK URL: ${ngrokUrl}`);
-    //     ngrokopenurl = ngrokUrl
-    // }).catch(err => {
-    //     console.error('Error connecting to NGROK:', err);
-    // })
+    ngrok.connect(port).then((ngrokUrl) => {
+        console.log(`NGROK URL: ${ngrokUrl}`);
+        ngrokopenurl = ngrokUrl
+    }).catch(err => {
+        console.error('Error connecting to NGROK:', err);
+    })
 });

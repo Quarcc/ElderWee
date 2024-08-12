@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect,useRef } from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -27,6 +27,10 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const [webcam, setWebcam] = React.useState(false);
+  const [capturedImage, setCapturedImage] = React.useState(null);
+  const videoRef = useRef();
+  const canvasRef = useRef();
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -128,6 +132,100 @@ export default function Login() {
     }
   };
 
+  const startVideo = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      videoRef.current.srcObject = stream;
+      setWebcam(true);
+    } catch (err) {
+      console.error("Error accessing webcam: ", err);
+      alert("No webcam detected.");
+    }
+  };
+
+  const handleCapture = async () => {
+    console.log("CAPTURE");
+    const context = canvasRef.current.getContext("2d");
+    context.drawImage(
+      videoRef.current,
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+    let compareResult = null;
+    await canvasRef.current.toBlob(async (blob) => {
+      compareResult = await fetch(`http://localhost:8000/user/compare-faces`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "image/jpeg",
+        },
+        body: blob,
+      });
+
+      let message = await compareResult.json();
+      console.log(message);
+      if (compareResult.ok) {
+        let email = message.email.replace(".jpeg", "");
+        const authenticateFace = await axios.post(
+        "http://localhost:8000/authenticate-face-login",
+        {
+          email: email,
+        },
+        { withCredentials: true }
+      );
+        console.log(email);
+        try {
+            let accountData = await retrieveAccountDetailsWithEmail(
+              email
+            );
+            let LoginCoords = JSON.stringify(coordinates);
+            let currentDateTime = new Date();
+            const accountLogData = {
+              AccountNo: accountData.AccountNo,
+              LoginCoords: LoginCoords,
+              LastIPLoginCountry: "Singapore",
+              Flagged: accountData.Scammed ? true : false,
+              LoginTime: JSON.stringify(currentDateTime),
+            };
+
+          const addAccountLog = await fetch(
+            "http://localhost:8000/api/accounts/log",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(accountLogData),
+            }
+          );
+
+          let res = await addAccountLog.json();
+
+          console.log(res);
+
+          //to-do Replace conditional statement with (response.status === 200) when connected to DB
+          if (addAccountLog.status === 200) {
+            if (email === "DELETED@gmail.com") {
+              navigate("/adminDashboard");
+            } else {
+              navigate("/home"); // Replace with your desired route
+            }
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 401) {
+            setErrors({ general: "Email address and Password does not match" });
+          } else {
+            console.error("Login error:", error.message);
+            setErrors({ general: "An error occurred. Please try again." });
+          }
+        }
+      }
+    }, "image/jpeg");
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -222,6 +320,34 @@ export default function Login() {
             </Grid>
           </Box>
         </Box>
+                <div className="hover:cursor-pointer">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            className="w-64 h-auto rounded-lg border-2 border-gray-300"
+          />
+          <button onClick={startVideo}>Start Camera</button>
+          {webcam && (
+            <button
+              className="text-center hover:pointer"
+              onClick={handleCapture}
+            >
+              Capture
+            </button>
+          )}
+
+          <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+        </div>
+        {capturedImage && (
+          <div className="mt-4">
+            <img
+              src={capturedImage}
+              alt="Captured"
+              className="w-64 h-auto rounded-lg border-2 border-gray-300"
+            />
+          </div>
+        )}
       </Container>
     </ThemeProvider>
   );
