@@ -34,34 +34,24 @@ const TransactionHistory = () => {
       {transactions.length === 0 ? (
         <p className="no-transactions">No transactions found.</p>
       ) : (
-        <table className="transaction-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Sender</th>
-              <th>Receiver</th>
-              <th>Amount</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map(transaction => (
-              <tr key={transaction.TransactionID}>
-                <td>{new Date(transaction.TransactionDate).toLocaleDateString()}</td>
-                <td>{transaction.Sender ? transaction.Sender.FullName : '-'}</td>
-                <td>{transaction.Receiver ? transaction.Receiver.FullName : '-'}</td>
-                <td className={`amount ${transaction.TransactionType === 'Top Up' ? 'deposit' : 'withdrawal'}`}>
+        <div className="transaction-cards">
+          {transactions.map(transaction => (
+            <div key={transaction.TransactionID} className="transaction-card">
+              <h3 className="transaction-title">{transaction.TransactionType}</h3>
+              <p className="transaction-date">{new Date(transaction.TransactionDate).toLocaleDateString()}</p>
+              <p className="transaction-receiver"><strong>Receiver:</strong> {transaction.Receiver ? transaction.Receiver.FullName : '-'}</p>
+              <p className="transaction-amount">
+                <strong>Amount:</strong> 
+                <span className={transaction.TransactionType === 'Top Up' ? 'deposit' : 'withdrawal'}>
                   {transaction.TransactionType === 'Top Up' ? '+' : '-'}${transaction.TransactionAmount.toFixed(2)}
-                </td>
-                <td>{transaction.TransactionDesc || '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-          
-        <button className="back-button" onClick={handleBack}>← Back</button>
-        </table>
-        
+                </span>
+              </p>
+              <p className="transaction-description"><strong>Description:</strong> {transaction.TransactionDesc || '-'}</p>
+            </div>
+          ))}
+        </div>
       )}
+      <button className="back-button" onClick={handleBack}>← Back</button>
     </div>
   );
 };
