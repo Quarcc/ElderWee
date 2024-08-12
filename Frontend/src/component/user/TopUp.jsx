@@ -92,7 +92,7 @@ export default function TopUp() {
     }
   };
 
-  // Function to handle when a card is added
+  
   const handleCardAdded = () => {
     setShowCard(false); 
     window.location.reload();

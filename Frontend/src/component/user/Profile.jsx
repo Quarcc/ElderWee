@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {
   MDBCol,
@@ -45,6 +45,22 @@ export default function ProfilePage() {
 
     fetchUserProfile();
   }, []);
+
+  const profilePicStyle = {
+    width: '150px', /* Set the desired width */
+    height: '150px', /* Set the desired height */
+    borderRadius: '50%', /* Make the image a circle */
+    overflow: 'hidden', /* Hide parts of the image that overflow the container */
+    display: 'flex', /* Center the image */
+    justifyContent: 'center',
+    alignItems: 'center'
+  };
+  
+  const imageStyle = {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover' /* Ensure the image covers the container */
+  };
 
   const handleEditClick = () => {
     setEditMode(true);
@@ -129,7 +145,8 @@ export default function ProfilePage() {
 
     try {
       const response = await axios.post('http://localhost:8000/upload-profile-image', formData, { withCredentials: true });
-      setUser(prevUser => ({ ...prevUser, profilePic: response.data.profileImage }));
+      const imageUrl = `http://localhost:8000/uploads/${response.data.profilePic}`;
+      setUser(prevUser => ({ ...prevUser, profilePic: imageUrl }));
       setMessage('Profile image updated successfully.');
     } catch (err) {
       setError(err.message);
@@ -150,12 +167,14 @@ export default function ProfilePage() {
               <MDBCard className="mb-4">
                 <MDBCardBody className="text-center">
                   <MDBCardImage
-                    src={user.profilePic ? `http://localhost:8000/uploads/${user.profilePic}` : "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"}
+                    src={user.profilePic ? `${user.profilePic}?${new Date().getTime()}` : "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"}
                     alt="avatar"
                     className="rounded-circle"
-                    style={{ width: '150px' }}
+                    style={profilePicStyle}
+                    imgStyle={imageStyle}
                     fluid
                   />
+
                   <input
                     type="file"
                     onChange={handleProfileImageChange}
@@ -246,10 +265,6 @@ export default function ProfilePage() {
               <MDBRow>
                 <MDBCol>
                   <MDBCard className="mb-4 mb-md-0">
-                    <MDBCardBody>
-                      <MDBCardText className="mb-4">Queries</MDBCardText>
-                      {/* Add your queries and progress here */}
-                    </MDBCardBody>
                   </MDBCard>
                 </MDBCol>
               </MDBRow>

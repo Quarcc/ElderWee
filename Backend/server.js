@@ -1349,6 +1349,22 @@ app.post('/check-email', async (req, res) => {
     }
 });
 
+
+app.post('/check-unique-email', async (req, res) => {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ where: { email } });
+      if (user) {
+        return res.json({ exists: true });
+      }
+      res.json({ exists: false });
+    } catch (error) {
+      console.error('Error checking email:', error);
+      res.status(500).json({ exists: false });
+    }
+  });
+  
+
 app.post('/upload-profile-image', upload.single('profileImage'), async (req, res) => {
     const userId = req.session.userId;
     const profileImage = req.file.filename;
@@ -1417,7 +1433,7 @@ app.delete('/delete-card', (req, res) => {
 // Payment Endpoint
 app.post('/process-payment', async (req, res) => {
     const { cardNumber, amount } = req.body;
-    const userID = req.session.userId; // Get UserID from session
+    const userID = req.session.userId; 
 
     if (!cardNumber || !amount || !userID) {
         return res.status(400).json({ message: 'Card number, amount, and UserID are required' });
@@ -1427,9 +1443,7 @@ app.post('/process-payment', async (req, res) => {
         // Simulate a delay for payment processing
         await new Promise(resolve => setTimeout(resolve, 5000));
 
-        // Assuming you have logic to validate the card and process the payment here
-
-        // Update the user's account balance
+        
         const account = await Account.findOne({ where: { UserID: userID } });
 
         if (!account) {
@@ -1486,6 +1500,9 @@ app.post('/transfer', async (req, res) => {
 
         if (!receiverUser) {
             return res.status(404).json({ success: false, message: 'Receiver not found' });
+        }
+        if (receiverUser.UserID === senderUserId) {
+            return res.status(400).json({ success: false, message: 'You cannot send money to yourself. Please use the top-up function instead.' });
         }
 
         // Find sender's account
@@ -1799,9 +1816,9 @@ app.get('/transaction-history', async (req, res) => {
 
 app.get('/transaction-summary', async (req, res) => {
     try {
-      const { month } = req.query; // Expect month in format 'YYYY-MM'
+      const { month } = req.query; 
   
-      // Assuming you have a Sequelize model named `Transaction`
+      
       const transactions = await Transaction.findAll({
         where: {
           TransactionDate: {
@@ -1811,11 +1828,11 @@ app.get('/transaction-summary', async (req, res) => {
       });
   
       const moneyIn = transactions
-        .filter(tx => tx.TransactionType === 'Deposit')
+        .filter(tx => tx.TransactionType === 'Top Up')
         .reduce((acc, tx) => acc + parseFloat(tx.TransactionAmount), 0);
   
       const moneyOut = transactions
-        .filter(tx => tx.TransactionType === 'Withdrawal')
+        .filter(tx => tx.TransactionType === 'Transfer')
         .reduce((acc, tx) => acc + parseFloat(tx.TransactionAmount), 0);
   
       res.json({ moneyIn, moneyOut });

@@ -18,6 +18,16 @@ export default function SignUp() {
   const navigate = useNavigate();
   const [errors, setErrors] = React.useState({});
 
+  const checkEmailExists = async (email) => {
+    try {
+      const response = await axios.post('http://localhost:8000/check-unique-email', { email });
+      return response.data.exists; // assuming the server returns { exists: true/false }
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -33,6 +43,12 @@ export default function SignUp() {
     const validationErrors = Validation({ ...userData, password2 });
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      return;
+    }
+
+    const emailExists = await checkEmailExists(userData.email);
+    if (emailExists) {
+      setErrors(prevErrors => ({ ...prevErrors, email: 'Email is already registered.' }));
       return;
     }
 
