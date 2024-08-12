@@ -36,7 +36,6 @@ function App() {
     return (
         <>
             <Routes>
-                <Route path="/" element={<PlaceHolder />} />
                 <Route path="/adminNavbar" element={<AdminNavbar />} />
                 <Route path="/adminDashboard" element={<AdminDashboard />} />
                 <Route path="/adminAccount" element={<AdminAccount />} />
@@ -56,7 +55,7 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/contactus" element={<ContactUs />} />
                 <Route path='/transactionTest' element={<TransactionTest />} />
-                <Route path='/landing' element={<LandingPage />} />
+                <Route path='/' element={<LandingPage />} />
                 <Route path='/topup' element={<TopUp />} />
                 <Route path='/card' element={<Card />} />
                 <Route path='/transfer' element={<TransferFund />} />

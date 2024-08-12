@@ -1,38 +1,36 @@
 -- Users Table
 INSERT INTO elderwee.Users (UserID, FullName, DOB, Email, PhoneNo, Password, FaceID, resetToken, resetTokenExpiration)
 VALUES
-(32, 'test1', '2024-01-01 00:00:00', 'test1@gmail.com', '12345678', 'test1', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315', '2024-01-01 00:00:00'),
-(2, 'test2', '2024-01-02 00:00:00', 'test2@gmail.com', '12345679', 'test2', 1, 'a5ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315b', '2024-01-02 00:00:00'),
-(3, 'test3', '2024-01-03 00:00:00', 'test3@gmail.com', '12345677', 'test3', 1, 'b4ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315c', '2024-01-03 00:00:00'),
-(4, 'test4', '2024-01-04 00:00:00', 'test4@gmail.com', '12345666', 'test4', 1, 'c3ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315d', '2024-01-04 00:00:00'),
-(5, 'Michael Johnson', '1988-05-05 00:00:00', 'michael.johnson@example.com', '567-890-1234', 'password5', 1, 'd2ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315e', '2024-05-05 00:00:00'),
-(6, 'Jessica Lee', '1993-06-06 00:00:00', 'jessica.lee@example.com', '678-901-2345', 'password6', 1, 'e1ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315f', '2024-06-06 00:00:00'),
-(7, 'David Wilson', '1987-07-07 00:00:00', 'david.wilson@example.com', '789-012-3456', 'password7', 1, 'f0ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3150', '2024-07-07 00:00:00'),
-(8, 'Sarah Martinez', '1991-08-08 00:00:00', 'sarah.martinez@example.com', '890-123-4567', 'password8', 1, 'g9ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3151', '2024-08-08 00:00:00'),
-(9, 'James Anderson', '1990-09-09 00:00:00', 'james.anderson@example.com', '901-234-5678', 'password9', 1, 'h8ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3152', '2024-09-09 00:00:00'),
-(10, 'Laura Thomas', '1994-10-10 00:00:00', 'laura.thomas@example.com', '912-345-6789', 'password10', 1, 'i7ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3153', '2024-10-10 00:00:00'),
-(11, 'Daniel Moore', '1986-11-11 00:00:00', 'daniel.moore@example.com', '923-456-7890', 'password11', 1, 'j6ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3154', '2024-11-11 00:00:00'),
-(12, 'Karen Taylor', '1995-12-12 00:00:00', 'karen.taylor@example.com', '934-567-	8901', 'password12', 1, 'k5ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3155', '2024-12-12 00:00:00'),
-(13, 'Matthew Jackson', '1989-01-13 00:00:00', 'matthew.jackson@example.com', '945-678-9012', 'password13', 1, 'l4ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3156', '2024-01-13 00:00:00'),
-(14, 'Lisa White', '1993-02-14 00:00:00', 'lisa.white@example.com', '456-789-0193', 'password14', 1, 'm3ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3157', '2024-02-14 00:00:00'),
-(15, 'Anthony Harris', '1988-03-15 00:00:00', 'anthony.harris@example.com', '569-890-1234', 'password15', 1, 'n2ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3158', '2024-03-15 00:00:00'),
-(16, 'Patricia Martin', '1992-04-16 00:00:00', 'patricia.martin@example.com', '978-901-2345', 'password16', 1, 'o1ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3159', '2024-04-16 00:00:00'),
-(17, 'Thomas Thompson', '1990-05-17 00:00:00', 'thomas.thompson@example.com', '989-012-3456', 'password17', 1, 'p0ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3160', '2024-05-17 00:00:00'),
-(18, 'Elizabeth Garcia', '1991-06-18 00:00:00', 'elizabeth.garcia@example.com', '894-123-4567', 'password18', 1, 'q9ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3161', '2024-06-18 00:00:00'),
-(19, 'Joshua Martinez', '1994-07-19 00:00:00', 'joshua.martinez@example.com', '901-334-5678', 'password19', 1, 'r8ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3162', '2024-07-19 00:00:00'),
-(20, 'Barbara Robinson', '1987-08-20 00:00:00', 'barbara.robinson@example.com', '016-345-6789', 'password20', 1, 's7ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3163', '2024-08-20 00:00:00'),
-(21, 'John Doe', '1990-01-01 00:00:00', 'john.doe@example.com', '123-456-7890', 'password1', 1, 't6ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3164', '2024-01-01 00:00:00'),
-(22, 'Jane Smith', '1985-02-02 00:00:00', 'jane.smith@example.com', '234-567-8901', 'password2', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315', '2024-01-01 00:00:00'),
-(23, 'Robert Brown', '1992-03-03 00:00:00', 'robert.brown@example.com', '345-678-9012', 'password3', 1, 'e75ba7f432c3560ab83dbb7f75624888580633c93dc54592557372cab521e316', '2024-01-02 00:00:00'),
-(24, 'Emily Davis', '1995-04-04 00:00:00', 'emily.davis@example.com', '456-789-0123', 'password4', 1, 'f65ba8f433c3560ab83dbb7f75624888580633c93dc54592557372cab521e317', '2024-01-03 00:00:00'),
-(25, 'Test 25', '1988-05-06 00:00:00', 'mick.johnson@example.com', '511-890-1234', 'password5', 1, 'g55ba9f434c3560ab83dbb7f75624888580633c93dc54592557372cab521e318', '2024-01-04 00:00:00'),
-(26, 'Test 26', '1995-04-05 00:00:00', 'amy.davis@example.com', '456-112-0123', 'password4', 1, 'h45ba0f435c3560ab83dbb7f75624888580633c93dc54592557372cab521e319', '2024-01-05 00:00:00'),
-(27, 'Test 27', '1992-03-04 00:00:00', 'robet.brown@example.com', '345-174-9012', 'password3', 1, 'i35ba1f436c3560ab83dbb7f75624888580633c93dc54592557372cab521e320', '2024-01-06 00:00:00'),
-(28, 'Test 28', '1985-02-03 00:00:00', 'jan.smith@example.com', '234-567-5601', 'password2', 1, 'j25ba2f437c3560ab83dbb7f75624888580633c93dc54592557372cab521e321', '2024-01-07 00:00:00'),
-(29, 'Test 29', '1990-01-02 00:00:00', 'joh.doe@example.com', '123-456-7835', 'password1', 1, 'k15ba3f438c3560ab83dbb7f75624888580633c93dc54592557372cab521e322', '2024-01-08 00:00:00'),
-(1, 'DELETED', '2024-01-01 00:00:00', 'DELETED@gmail.com', '11111111', 'delete', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00'),
-(30, 'Brandon Wee', '2005-05-13 10:20:00', 'brandonweejc@gmail.com', '90743553', 'P@ssw0rd100', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00'),
-(31, 'Jeren Goh', '2005-05-13 10:20:00', 'jerengoh@gmail.com', '11223344', 'P@ssw0rd101', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00');
+(30, 'Emily Carter', '2024-01-01 00:00:00', 'emily.carter@example.com', '10000000', 'password30', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315', '2024-01-01 00:00:00'),
+(2, 'James Anderson', '2024-01-02 00:00:00', 'james.anderson@example.com', '20000000', 'password2', 1, 'a5ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315b', '2024-01-02 00:00:00'),
+(3, 'Sophia Martinez', '2024-01-03 00:00:00', 'sophia.martinez@example.com', '30000000', 'password3', 1, 'b4ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315c', '2024-01-03 00:00:00'),
+(4, 'Olivia Brown', '2024-01-04 00:00:00', 'olivia.brown@example.com', '40000000', 'password4', 1, 'c3ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315d', '2024-01-04 00:00:00'),
+(5, 'Michael Johnson', '1988-05-05 00:00:00', 'michael.johnson@example.com', '50000000', 'password5', 1, 'd2ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315e', '2024-05-05 00:00:00'),
+(6, 'Jessica Lee', '1993-06-06 00:00:00', 'jessica.lee@example.com', '60000000', 'password6', 1, 'e1ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e315f', '2024-06-06 00:00:00'),
+(7, 'David Wilson', '1987-07-07 00:00:00', 'david.wilson@example.com', '70000000', 'password7', 1, 'f0ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3150', '2024-07-07 00:00:00'),
+(8, 'Sarah Martinez', '1991-08-08 00:00:00', 'sarah.martinez@example.com', '80000000', 'password8', 1, 'g9ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3151', '2024-08-08 00:00:00'),
+(9, 'Ethan Clark', '1990-09-09 00:00:00', 'ethan.clark@example.com', '90000000', 'password9', 1, 'h8ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3152', '2024-09-09 00:00:00'),
+(10, 'Laura Thomas', '1994-10-10 00:00:00', 'laura.thomas@example.com', '01000001', 'password10', 1, 'i7ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3153', '2024-10-10 00:00:00'),
+(11, 'Daniel Moore', '1986-11-11 00:00:00', 'daniel.moore@example.com', '02000002', 'password11', 1, 'j6ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3154', '2024-11-11 00:00:00'),
+(12, 'Karen Taylor', '1995-12-12 00:00:00', 'karen.taylor@example.com', '03000003', 'password12', 1, 'k5ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3155', '2024-12-12 00:00:00'),
+(13, 'Matthew Jackson', '1989-01-13 00:00:00', 'matthew.jackson@example.com', '04000004', 'password13', 1, 'l4ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3156', '2024-01-13 00:00:00'),
+(14, 'Lisa White', '1993-02-14 00:00:00', 'lisa.white@example.com', '05000005', 'password14', 1, 'm3ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3157', '2024-02-14 00:00:00'),
+(15, 'Anthony Harris', '1988-03-15 00:00:00', 'anthony.harris@example.com', '06000006', 'password15', 1, 'n2ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3158', '2024-03-15 00:00:00'),
+(16, 'Patricia Martin', '1992-04-16 00:00:00', 'patricia.martin@example.com', '07000007', 'password16', 1, 'o1ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3159', '2024-04-16 00:00:00'),
+(17, 'Thomas Thompson', '1990-05-17 00:00:00', 'thomas.thompson@example.com', '08000008', 'password17', 1, 'p0ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3160', '2024-05-17 00:00:00'),
+(18, 'Elizabeth Garcia', '1991-06-18 00:00:00', 'elizabeth.garcia@example.com', '09000009', 'password18', 1, 'q9ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3161', '2024-06-18 00:00:00'),
+(19, 'Joshua Martinez', '1994-07-19 00:00:00', 'joshua.martinez@example.com', '10000010', 'password19', 1, 'r8ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3162', '2024-07-19 00:00:00'),
+(20, 'Barbara Robinson', '1987-08-20 00:00:00', 'barbara.robinson@example.com', '11000011', 'password20', 1, 's7ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3163', '2024-08-20 00:00:00'),
+(21, 'John Doe', '1990-01-01 00:00:00', 'john.doe@example.com', '12000012', 'password1', 1, 't6ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3164', '2024-01-01 00:00:00'),
+(22, 'Jane Smith', '1985-02-02 00:00:00', 'jane.smith@example.com', '13000013', 'password2', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3165', '2024-02-02 00:00:00'),
+(23, 'Michael Brown', '1992-03-03 00:00:00', 'michael.brown@example.com', '14000014', 'password3', 1, 'a5ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3166', '2024-03-03 00:00:00'),
+(24, 'Emily Davis', '1988-04-04 00:00:00', 'emily.davis@example.com', '15000015', 'password4', 1, 'b4ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3167', '2024-04-04 00:00:00'),
+(25, 'Sarah Wilson', '1995-05-05 00:00:00', 'sarah.wilson@example.com', '16000016', 'password5', 1, 'c3ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3168', '2024-05-05 00:00:00'),
+(26, 'Daniel Lee', '1990-06-06 00:00:00', 'daniel.lee@example.com', '17000017', 'password6', 1, 'd2ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3169', '2024-06-06 00:00:00'),
+(27, 'Olivia Miller', '1993-07-07 00:00:00', 'olivia.miller@example.com', '18000018', 'password7', 1, 'e1ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3170', '2024-07-07 00:00:00'),
+(28, 'Ethan Martinez', '1994-08-08 00:00:00', 'ethan.martinez@example.com', '19000019', 'password8', 1, 'f0ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3171', '2024-08-08 00:00:00'),
+(29, 'Laura Johnson', '1989-09-09 00:00:00', 'laura.johnson@example.com', '20000020', 'password9', 1, 'g9ba6f431c3560ab83dbb7f75624888580633c93dc54592557372cab521e3172', '2024-09-09 00:00:00'),
+(1, 'DELETED', '2024-01-01 00:00:00', 'DELETED@gmail.com', '11111111', 'delete', 1, 'd85ba6f431c3560ab83dbb7f75624888580633c93dc5459255a372cab521e315', '2024-01-01 00:00:00');
 
 -- Accounts Table
 INSERT INTO elderwee.accounts(AccountNo, Balance, BalanceDisplay, DateOpened, AccountStatus, Scammer, UserID)
@@ -66,8 +64,6 @@ VALUES
 ('899457210027', 8000, 8000, '2024-07-28 00:00:00', 0, 0, 28),
 ('931009810028', 4500, 5300, '2024-08-02 00:00:00', 0, 0, 8),
 ('972394680029', 4000, 3100, '2024-08-03 00:00:00', 0, 0, 29),
-('000000000000', '10000', '10000', '2024-08-03 00:00:00', 0, 0, 30),
-('111111111111', '10000', '10000', '2024-08-03 00:00:00', 0, 0, 31);
 
 -- Transactions Table
 INSERT INTO elderwee.Transactions (TransactionID, TransactionDate, TransactionAmount, TransactionStatus, TransactionType, TransactionDesc, ReceiverID, ReceiverAccountNo, SenderID, SenderAccountNo)
@@ -201,3 +197,16 @@ INSERT INTO elderwee.enquiries (EnquiryID, EnquiryDate, EnquiryType, EnquiryDeta
 (8, '2024-08-08 00:00:00', 'Sales', 'Will I get hacked?', 0, 8, '931009810028'),
 (9, '2024-08-09 00:00:00', 'Feedback', 'My Account Got Hacked.', 0, 9, '419193160013'),
 (10, '2024-08-10 00:00:00', 'Complaint', 'I was charged incorrectly on my last transaction.', 0, 10, '082324030004');
+
+-- Frozen Transactions
+INSERT INTO elderwee.frozentransactions (TransactionID, SenderAccountNo, ReceiverAccountNo, TransactionDate, TransactionAmount, Reason)
+VALUES
+('00000002', '082324030004', '075153210003', '2024-08-02 12:00:00', 200, 'Sanctioned Country'),
+('00000005', '271476730010', '260666700009', '2024-08-05 09:20:00', 750, 'Sanctioned Country'),
+('00000009', '644201070018', '541985570017', '2024-08-09 17:05:00', 1500, 'Sanctioned Country'),
+('00000013', '821826050026', '797170570025', '2024-08-12 14:25:00', 700, 'Sanctioned Country'),
+('00000017', '082324030004', '162499540005', '2024-08-12 13:00:00', 650, 'Sanctioned Country'),
+('00000021', '419193160013', '302127500012', '2024-08-09 10:05:00', 400, 'Sanctioned Country'),
+('00000025', '681559720020', '681765450021', '2024-07-30 09:10:00', 600, 'Sanctioned Country'),
+('00000029', '972394680029', '931009810028', '2024-07-29 17:30:00', 900, 'Sanctioned Country'),
+('00000031', '931009810028', '053999250001', '2024-07-31 08:45:00', 100, 'Sanctioned Country');

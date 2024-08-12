@@ -117,7 +117,7 @@ export default function TopUp() {
                     <div className="d-flex flex-column ms-4">
                       <span className="h4 mb-1">SGD</span>
                       <span className="small text-muted">
-                        Balance: ${user?.accounts && user.accounts.length > 0 ? user.accounts[0].Balance.toFixed(2) : 'N/A'}
+                        Balance: ${user?.accounts && user.accounts.length > 0 ? user.accounts[0].BalanceDisplay.toFixed(2) : 'N/A'}
                       </span>
                     </div>
                   </div>

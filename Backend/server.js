@@ -532,7 +532,7 @@ app.put('/api/transaction/release/id/:transactionID', async (req, res) => {
             receiveraccountnum = transaction.ReceiverAccountNo;
             senderid = transaction.SenderID;
             senderaccountnum = transaction.SenderAccountNo;
-            transaction.TransactionStatus = 'Success';
+            transaction.TransactionStatus = 'Completed';
             await transaction.save();
             res.status(200).json({ message: 'Transaction updated successfully' });
         } else {
@@ -563,7 +563,7 @@ app.put('/api/transaction/release/id/:transactionID', async (req, res) => {
         TransactionID: transactionID,
         TransactionDate: transactionDate,
         TransactionAmount: transactionAmt,
-        TransactionStatus: 'Success',
+        TransactionStatus: 'Completed',
         TransactionType: transactionType,
         TransactionDesc: transactionDesc,
         ReceiverID: receiverid,
@@ -1373,7 +1373,7 @@ app.get('/user-profile', async (req, res) => {
       const user = await User.findByPk(userId, {
         include: [{
           model: Account,
-          attributes: ['AccountNo', 'Balance']
+          attributes: ['AccountNo', 'BalanceDisplay']
         }]
       });
       
@@ -1590,7 +1590,7 @@ app.post('/process-payment', async (req, res) => {
             TransactionID: crypto.randomBytes(16).toString('hex'),
             TransactionDate: new Date(),
             TransactionAmount: parseFloat(amount),
-            TransactionStatus: 'Success',
+            TransactionStatus: 'Completed',
             TransactionType: 'Top Up', // You can use 'Top Up' or another type you prefer
             TransactionDesc: `Top-up from card ending in ${cardNumber.slice(-4)}`,
             ReceiverID: userID,
@@ -1836,7 +1836,7 @@ app.post('/transfer', async (req, res) => {
                 TransactionID: transID,
                 TransactionDate: new Date(),
                 TransactionAmount: amount,
-                TransactionStatus: 'Success',
+                TransactionStatus: 'Completed',
                 TransactionType: 'Transfer',
                 TransactionDesc: description || 'Fund Transfer',
                 ReceiverID: receiverUser.UserID,
@@ -1850,7 +1850,7 @@ app.post('/transfer', async (req, res) => {
                 TransactionID: transID,
                 TransactionDate: new Date(),
                 TransactionAmount: amount,
-                TransactionStatus: 'Success',
+                TransactionStatus: 'Completed',
                 TransactionType: 'Transfer',
                 TransactionDesc: description || 'Fund Transfer',
                 ReceiverID: receiverUser.UserID,
@@ -1891,7 +1891,7 @@ app.get('/user-balance', async (req, res) => {
 
         return res.json({
             accountNumber: account.AccountNo,
-            balance: account.Balance
+            balance: account.BalanceDisplay
         });
     } catch (error) {
         console.error('Error fetching user balance:', error);
