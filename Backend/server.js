@@ -1240,7 +1240,7 @@ app.post('/login', async (req, res) => {
 
         // Set the user ID in the session
         req.session.userId = user.UserID;
-
+        console.log("LOGIN SESSION:",req.session);
         // Respond with a success message and user data (excluding password)
         const { Password, ...userWithoutPassword } = user.toJSON();
         res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
@@ -1261,6 +1261,7 @@ app.post('/authenticate-face-login',async(req,res)=>{
         }
 
         req.session.userId = user.UserID;
+        console.log("FACELOGIN:",req.session);
         const { Password, ...userWithoutPassword } = user.toJSON();
         res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
     }catch(error){
