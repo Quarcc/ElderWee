@@ -236,6 +236,7 @@ export default function Login() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            gap: 2, // Added gap between elements for better spacing
           }}
         >
           <RouterLink to="/home">
@@ -259,7 +260,7 @@ export default function Login() {
             component="form"
             onSubmit={handleSubmit}
             noValidate
-            sx={{ mt: 1 }}
+            sx={{ mt: 1, width: "100%" }}
           >
             <TextField
               margin="normal"
@@ -319,36 +320,75 @@ export default function Login() {
               </Grid>
             </Grid>
           </Box>
-        </Box>
-                <div className="hover:cursor-pointer">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            className="w-64 h-auto rounded-lg border-2 border-gray-300"
-          />
-          <button onClick={startVideo}>Start Camera</button>
-          {webcam && (
-            <button
-              className="text-center hover:pointer"
-              onClick={handleCapture}
-            >
-              Capture
-            </button>
-          )}
 
-          <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-        </div>
-        {capturedImage && (
-          <div className="mt-4">
-            <img
-              src={capturedImage}
-              alt="Captured"
-              className="w-64 h-auto rounded-lg border-2 border-gray-300"
+          {/* OR Divider */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              width: "100%",
+              mt: 3,
+              mb: 3,
+            }}
+          >
+            <Box sx={{ flex: 1, height: "1px", backgroundColor: "gray" }} />
+            <Typography sx={{ mx: 2, color: "gray" }}>OR</Typography>
+            <Box sx={{ flex: 1, height: "1px", backgroundColor: "gray" }} />
+          </Box>
+
+          {/* FaceID Section */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mt: 2, // Margin top to separate from form
+              padding: 3,
+              borderRadius: 2,
+              backgroundColor: "background.paper",
+              boxShadow: 3,
+            }}
+          >
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              className="w-64 h-auto rounded-lg border-2 border-gray-300 mb-4"
             />
-          </div>
-        )}
+            <Button
+              onClick={startVideo}
+              fullWidth
+              variant="contained"
+              color="secondary"
+              sx={{ mb: 2 }}
+            >
+              Login with FaceID
+            </Button>
+            {webcam && (
+              <Button
+                onClick={handleCapture}
+                fullWidth
+                variant="contained"
+                color="primary"
+              >
+                Scan
+              </Button>
+            )}
+            <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+          </Box>
+
+          {capturedImage && (
+            <Box sx={{ mt: 4 }}>
+              <img
+                src={capturedImage}
+                alt="Captured"
+                className="w-64 h-auto rounded-lg border-2 border-gray-300"
+              />
+            </Box>
+          )}
+        </Box>
       </Container>
     </ThemeProvider>
   );
+
 }
