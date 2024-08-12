@@ -50,7 +50,7 @@ function AppAppBar() {
       await axios.post('http://localhost:8000/logout', {}, { withCredentials: true });
       setLoggedIn(false);
       setUser(null);
-      navigate('/landing');
+      navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
     }

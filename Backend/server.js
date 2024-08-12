@@ -1601,6 +1601,7 @@ app.post('/process-payment', async (req, res) => {
 
         // Update the account balance
         account.Balance += parseFloat(amount);
+        account.BalanceDisplay += parseFloat(amount);
         await account.save();
 
         res.status(200).json({ message: 'Payment processed successfully' });

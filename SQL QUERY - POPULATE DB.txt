@@ -63,7 +63,7 @@ VALUES
 ('821826050026', 7000, 6300, '2024-08-04 00:00:00', 0, 0, 23),
 ('899457210027', 8000, 8000, '2024-07-28 00:00:00', 0, 0, 28),
 ('931009810028', 4500, 5300, '2024-08-02 00:00:00', 0, 0, 8),
-('972394680029', 4000, 3100, '2024-08-03 00:00:00', 0, 0, 29),
+('972394680029', 4000, 3100, '2024-08-03 00:00:00', 0, 0, 29);
 
 -- Transactions Table
 INSERT INTO elderwee.Transactions (TransactionID, TransactionDate, TransactionAmount, TransactionStatus, TransactionType, TransactionDesc, ReceiverID, ReceiverAccountNo, SenderID, SenderAccountNo)
